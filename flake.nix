@@ -21,6 +21,13 @@
       url = "github:nix-community/nur";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # ASUS DialPad driver (touchpad-corner virtual dial). Not in nixpkgs; ships
+    # its own NixOS module + overlay.
+    asus-dialpad-driver = {
+      url = "github:asus-linux-drivers/asus-dialpad-driver";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

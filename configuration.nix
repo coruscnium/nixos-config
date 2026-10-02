@@ -10,6 +10,7 @@
     ./modules/hardware.nix
     ./modules/nvidia.nix
     ./modules/asus.nix
+    ./modules/asus-dialpad.nix
     ./modules/desktop.nix
     ./modules/networking.nix
     ./modules/power.nix
