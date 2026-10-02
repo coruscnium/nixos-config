@@ -2,16 +2,16 @@
   description = "NixOS on the ASUS ProArt PX13 (HN7306WU)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # CachyOS kernels are not in nixpkgs. `overlays.pinned` uses this flake's
     # own prebuilt package set, which is what its lantian/attic binary cache
     # covers — so we substitute kernels instead of compiling them.
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel";
 
-    # User-level packages & dotfiles. Pin to the release matching nixpkgs.
+    # User-level packages & dotfiles. `master` pairs with nixos-unstable.
     home-manager = {
-      url = "github:nix-community/home-manager/release-26.05";
+      url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
