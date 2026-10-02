@@ -1,14 +1,10 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
-  # Brave Origin has no nixpkgs package (Brave only publishes the stable Origin
-  # artifact for 1.97.53), so it is vendored in ../pkgs/brave-origin.nix and
-  # exposed to the whole pkgs set.
-  nixpkgs.overlays = [
-    (final: prev: {
-      braveOrigin = final.callPackage ../pkgs/brave-origin.nix { };
-    })
-  ];
+  # NUR (nix-community/user-repository) provides packages nixpkgs lacks —
+  # Brave Origin lives there. It's built/maintained by its own CI, so it moves
+  # with `nix flake update` alongside everything else.
+  nixpkgs.overlays = [ inputs.nur.overlays.default ];
 
   # System-wide only. User-facing applications live in home/coru.nix
   # (home-manager) — keep this list to what root or every user needs.

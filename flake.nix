@@ -14,6 +14,13 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # NUR supplies packages missing from nixpkgs (e.g. Brave Origin) and is
+    # CI-updated, so it tracks along with `nix flake update`.
+    nur = {
+      url = "github:nix-community/nur";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

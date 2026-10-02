@@ -11,10 +11,9 @@
   programs.floorp.enable = true;
   programs.firefox.enable = true;
 
-  # Brave Origin has no nixpkgs package (Brave only ships the stable Origin
-  # artifact for 1.97.53), so it is vendored in ../pkgs/brave-origin.nix.
+  # Brave Origin comes from NUR (no nixpkgs package); see modules/packages.nix.
   home.packages = [
-    pkgs.braveOrigin
+    pkgs.nur.repos.ymstnt."brave-origin"
   ]
   ++ (with pkgs; [
     kdePackages.kate
