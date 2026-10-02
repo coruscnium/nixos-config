@@ -15,6 +15,10 @@
     # HN7306WU uses the "proartp16" layout (see the driver's supported list).
     # sessionTypes defaults to ["wayland" "x11"]; daemon.enable defaults to true.
     layout = "proartp16";
+    # Start with the dialpad enabled (the driver otherwise writes enabled = 0).
+    defaultConfig = {
+      main.enabled = 1;
+    };
   };
 
   # The user-level daemon needs access to i2c, the raw input devices, and
