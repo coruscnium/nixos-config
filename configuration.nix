@@ -38,10 +38,8 @@
     isNormalUser = true;
     description = "Coru";
     extraGroups = [ "networkmanager" "wheel" "video" "audio" ];
-    packages = with pkgs; [ kdePackages.kate ];
   };
 
-  programs.firefox.enable = true;
   programs.appimage = {
     enable = true;
     binfmt = true;
