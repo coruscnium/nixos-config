@@ -2,7 +2,8 @@
 #
 # Howdy matches the face against an enrolled model. It can be spoofed with a
 # decent printed photo, so it is configured `sufficient` (face OR password,
-# never face alone) and is deliberately NOT wired into sudo/su/polkit.
+# never face alone). Wired into login, the lock screen, and (by request) the
+# polkit auth dialogs; deliberately NOT sudo/su, which stay password-only.
 { ... }:
 
 {
@@ -26,13 +27,16 @@
   };
 
   # Howdy enables itself in EVERY PAM service by default. Turn the global off
-  # and opt in only where it belongs, so privilege escalation stays
-  # password-only and a face misread can never lock you out.
+  # and opt in only where it belongs, so a face misread can never lock you out
+  # and `sudo`/`su` stay password-only.
   security.pam.howdy.enable = false;
   security.pam.services.login.howdy.enable = true;
   security.pam.services.sddm.howdy.enable = true;
   security.pam.services.sddm-greeter.howdy.enable = true;
   security.pam.services.kde.howdy.enable = true; # Plasma lock screen
+  # KDE "Authentication is required to ..." polkit dialogs. NOTE: this lets a
+  # face authorize root actions (howdy has no liveness), by explicit request.
+  security.pam.services.polkit-1.howdy.enable = true;
 
   # Where Howdy keeps enrolled face models. This directory must be traversable
   # by the *user*, not just root: kscreenlocker runs its PAM auth as uid 1000,
