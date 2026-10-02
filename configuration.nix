@@ -13,6 +13,7 @@
     ./modules/desktop.nix
     ./modules/networking.nix
     ./modules/power.nix
+    ./modules/face-unlock.nix
     ./modules/packages.nix
   ];
 
