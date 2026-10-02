@@ -1,0 +1,16 @@
+# Upstream sources that nixpkgs doesn't package (or doesn't package *currently*).
+#
+# `nvfetcher` resolves each `src.*` version and rewrites _sources/generated.nix
+# with the matching hash, so bumping is a command rather than hand-editing a
+# SHA. Run it, then rebuild:
+#
+#   nvfetcher && sudo nixos-rebuild switch --flake .#nixos
+#
+# Cherry Studio is stuck at 1.9.11 in nixpkgs (the 2.x bump is an open PR and
+# pins an insecure Electron), so we wrap upstream's AppImage instead.
+[cherry-studio]
+src.github = "CherryHQ/cherry-studio"
+# Upstream tags are "v2.1.4" but the release assets drop the "v".
+src.prefix = "v"
+fetch.url = "https://github.com/CherryHQ/cherry-studio/releases/download/v$ver/Cherry-Studio-$ver-linux-x64.AppImage"
+url.name = "Cherry-Studio-$ver-linux-x64.AppImage"

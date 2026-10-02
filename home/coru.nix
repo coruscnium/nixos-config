@@ -4,6 +4,7 @@
 
 {
   imports = [
+    ./packages/ai.nix
     ./packages/browsers.nix
     ./packages/development.nix
     ./packages/cli-tools.nix

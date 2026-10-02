@@ -7,5 +7,8 @@
     vim
     ripgrep
     fd
+
+    # Re-resolves the AppImage sources tracked in nvfetcher.toml.
+    nvfetcher
   ];
 }

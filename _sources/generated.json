@@ -1,0 +1,17 @@
+{
+    "cherry-studio": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "cherry-studio",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": "Cherry-Studio-2.1.4-linux-x64.AppImage",
+            "sha256": "sha256-A8fKKhg+ODiTMMvWHyJu1WhcJ0hR+VFFCGGbqWFzMbs=",
+            "type": "url",
+            "url": "https://github.com/CherryHQ/cherry-studio/releases/download/v2.1.4/Cherry-Studio-2.1.4-linux-x64.AppImage"
+        },
+        "version": "2.1.4"
+    }
+}
