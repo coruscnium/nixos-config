@@ -14,6 +14,7 @@
     ./modules/networking.nix
     ./modules/power.nix
     ./modules/face-unlock.nix
+    ./modules/app-platforms.nix
     ./modules/packages.nix
   ];
 
@@ -38,11 +39,6 @@
     isNormalUser = true;
     description = "Coru";
     extraGroups = [ "networkmanager" "wheel" "video" "audio" ];
-  };
-
-  programs.appimage = {
-    enable = true;
-    binfmt = true;
   };
 
   services.printing.enable = true;
