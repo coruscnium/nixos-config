@@ -1,8 +1,9 @@
-# Chat / calls.
+# Chat / calls / email.
 { pkgs, ... }:
 
 {
-  home.packages = with pkgs; [
+  home.packages = [
+    pkgs."tutanota-desktop" # Tuta Mail (encrypted email)
     # discord
     # signal-desktop
     # element-desktop

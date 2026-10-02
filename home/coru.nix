@@ -10,6 +10,7 @@
     ./packages/gaming.nix
     ./packages/media.nix
     ./packages/communication.nix
+    ./packages/security.nix
     ./packages/productivity.nix
   ];
 
