@@ -14,11 +14,12 @@
     enable = true;
     # HN7306WU uses the "proartp16" layout (see the driver's supported list).
     # sessionTypes defaults to ["wayland" "x11"]; daemon.enable defaults to true.
+    #
+    # Leave `enabled` at the driver default (0): the dial is summoned by
+    # press-and-hold, so its centre LED only lights while you're actually using
+    # it. (The LED can't be dimmed — ASUS's own software can't change it either,
+    # per upstream issue #8.)
     layout = "proartp16";
-    # Start with the dialpad enabled (the driver otherwise writes enabled = 0).
-    defaultConfig = {
-      main.enabled = 1;
-    };
   };
 
   # The user-level daemon needs access to i2c, the raw input devices, and
