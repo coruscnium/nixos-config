@@ -14,7 +14,8 @@
     ./modules/networking.nix
     ./modules/power.nix
     ./modules/face-unlock.nix
-    ./modules/app-platforms.nix
+    ./modules/apps/gaming.nix
+    ./modules/apps/platforms.nix
     ./modules/packages.nix
   ];
 

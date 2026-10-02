@@ -1,3 +1,4 @@
+# Alternative app-distribution platforms (system-level).
 { pkgs, ... }:
 
 {
@@ -9,7 +10,8 @@
 
   # Flatpak: escape hatch for GUI apps that aren't packaged in nixpkgs. This is
   # a system service plus the Flathub remote. Remove both options if you'd
-  # rather stay nix-only.
+  # rather stay nix-only. Flatpak apps are installed imperatively
+  # (`flatpak install …`), so they never appear in this config.
   services.flatpak.enable = true;
 
   systemd.services.flatpak-add-flathub = {

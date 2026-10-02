@@ -1,5 +1,6 @@
-# Gaming. Steam is *system*-level (programs.steam.enable lives in modules/),
-# so put standalone launchers/tools that are plain packages here.
+# Gaming — user-level packages.
+#
+# The system-side bits (Steam, udev rules) live in modules/apps/gaming.nix.
 { pkgs, ... }:
 
 {
