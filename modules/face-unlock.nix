@@ -34,9 +34,17 @@
   security.pam.services.sddm-greeter.howdy.enable = true;
   security.pam.services.kde.howdy.enable = true; # Plasma lock screen
 
-  # Where Howdy keeps enrolled face models.
+  # Where Howdy keeps enrolled face models. This directory must be traversable
+  # by the *user*, not just root: kscreenlocker runs its PAM auth as uid 1000,
+  # so a root-only models dir makes Howdy fail (EACCES) before it ever opens the
+  # camera. `d` only sets the mode when it creates the dir, so `z` is needed too
+  # to re-apply the mode on every activation. Howdy writes the model files
+  # themselves world-readable, so the directory mode is the only thing that
+  # blocks the lock screen.
   systemd.tmpfiles.rules = [
     "d /var/lib/howdy 0755 root root -"
-    "d /var/lib/howdy/models 0700 root root -"
+    "z /var/lib/howdy 0755 root root -"
+    "d /var/lib/howdy/models 0755 root root -"
+    "z /var/lib/howdy/models 0755 root root -"
   ];
 }
