@@ -1,0 +1,32 @@
+# quadcast2s - RGB lighting for the HyperX QuadCast 2 S
+# SPDX-License-Identifier: AGPL-3.0-only
+#
+# A user service, not a system one: the lighting belongs to whoever is logged
+# in, and it needs no privileges beyond the uaccess ACL the udev rule grants.
+#
+#   systemctl --user enable --now quadcast2s.service
+#
+# The arguments come from ~/.config/quadcast2s/service.env, which the GUI
+# writes. $QUADCAST2S_ARGS is deliberately unquoted so systemd splits it into
+# separate arguments.
+
+[Unit]
+Description=QuadCast 2 S RGB lighting
+Documentation=file:///usr/share/doc/quadcast2s/README.md
+After=graphical-session.target
+
+[Service]
+Type=simple
+Environment="QUADCAST2S_ARGS=solid ff0000"
+EnvironmentFile=-%h/.config/quadcast2s/service.env
+ExecStart=/usr/bin/quadcast2s --foreground --wait $QUADCAST2S_ARGS
+
+# The microphone never latches a frame, so the lighting lasts exactly as long
+# as this process. --wait means it also survives starting before the hardware
+# is ready, and the daemon reopens the device by itself after a suspend or an
+# unplug; Restart is the backstop for anything that kills the process outright.
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=QuadCast 2 S Lighting
+GenericName=RGB Lighting
+Comment=Control the RGB lighting on a HyperX QuadCast 2 S microphone
+Exec=quadcast2s-gui
+SingleMainWindow=true
+Icon=quadcast2s
+Terminal=false
+Categories=Settings;HardwareSettings;Qt;
+Keywords=RGB;LED;HyperX;QuadCast;microphone;lighting;
+StartupNotify=true

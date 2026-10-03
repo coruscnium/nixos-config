@@ -1,0 +1,14 @@
+#!/bin/bash
+SOCKET=/tmp/mpv-socket
+
+if [ -S "$SOCKET" ]; then
+    # Try to talk to it — if it fails, the socket is stale
+    if echo "print-console" | socat - "$SOCKET" 2>/dev/null; then
+        echo "loadfile \"$1\" append-play" | socat - "$SOCKET"
+    else
+        rm -f "$SOCKET"
+        mpv --input-ipc-server="$SOCKET" "$@"
+    fi
+else
+    mpv --input-ipc-server="$SOCKET" "$@"
+fi

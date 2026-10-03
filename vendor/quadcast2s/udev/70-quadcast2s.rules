@@ -1,0 +1,24 @@
+# HyperX QuadCast 2 S -- RGB lighting controller.
+#
+# Match the CONTROLLER, 03f0:02b5. The microphone also enumerates as an audio
+# device at 03f0:0d84, which has nothing to do with the lighting; matching that
+# one instead is a common mistake and silently achieves nothing.
+#
+# TAG+="uaccess" is what grants access on any systemd distribution: logind puts
+# an ACL on the device node for whoever is logged in at the seat. No group, no
+# relogin, no membership to get wrong.
+#
+# This rule used to say GROUP="plugdev", which is a Debian convention. On Arch
+# that group does not exist, so the rule quietly did nothing at all. MODE=0660
+# stays only as a fallback for systems without logind.
+#
+# Installed to /usr/lib/udev/rules.d by the package. To install by hand:
+#   sudo cp udev/70-quadcast2s.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+# then replug the microphone.
+
+# TAG+="systemd" makes a .device unit exist for this microphone, which is what
+# lets SYSTEMD_USER_WANTS start something when it is plugged in. The unit named
+# there is a no-op unless the user has opted in; see quadcast2s-hotplug.service.
+SUBSYSTEM=="usb", ATTR{idVendor}=="03f0", ATTR{idProduct}=="02b5", TAG+="uaccess", MODE="0660", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}+="quadcast2s-hotplug.service"
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="02b5", TAG+="uaccess", MODE="0660"

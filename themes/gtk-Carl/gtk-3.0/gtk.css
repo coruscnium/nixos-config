@@ -1,0 +1,9 @@
+/* Carl — GTK 3 theme entry point (gtk-theme-name=Carl).
+ *
+ * Adwaita-dark supplies structural completeness; carl.css does the restyling.
+ * Note that Adwaita's compiled stylesheet inlines ~780 literal colours against
+ * only 36 @define-color names, so carl.css overrides explicitly rather than
+ * relying on colour redefinition alone. */
+
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk-contained-dark.css");
+@import url("carl.css");

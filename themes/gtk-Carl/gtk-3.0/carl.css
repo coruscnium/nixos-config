@@ -1,0 +1,889 @@
+/* Carl — GTK 3 layer (no base import).
+ *
+ * Standalone so it can be loaded at USER priority from
+ * ~/.config/gtk-3.0/gtk.css, which is the only way to beat a user
+ * config that redefines @theme_selected_bg_color and friends.
+ * The theme-directory gtk.css imports Adwaita-dark and then this. */
+
+
+/* --- Carl palette, for apps that query the standard names ---------------- */
+@define-color theme_bg_color             #111216;
+@define-color theme_base_color           #111216;
+@define-color theme_fg_color             #cfd8dc;
+@define-color theme_text_color           #cfd8dc;
+@define-color theme_selected_bg_color    #3c78ff;
+@define-color theme_selected_fg_color    #ffffff;
+@define-color theme_unfocused_bg_color   #111216;
+@define-color theme_unfocused_base_color #111216;
+@define-color theme_unfocused_fg_color   #cfd8dc;
+@define-color theme_unfocused_text_color #cfd8dc;
+@define-color theme_unfocused_selected_bg_color #3c78ff;
+@define-color theme_unfocused_selected_fg_color #ffffff;
+@define-color insensitive_bg_color       #111216;
+@define-color insensitive_base_color     #111216;
+@define-color insensitive_fg_color       #556064;
+@define-color borders                    #29353b;
+@define-color unfocused_borders          #212c31;
+@define-color warning_color              #ffc107;
+@define-color error_color                #f04a50;
+@define-color success_color              #4db6ac;
+@define-color link_color                 #009dff;
+@define-color visited_link_color         #b172ff;
+@define-color content_view_bg            #111216;
+@define-color text_view_bg               #111216;
+@define-color wm_bg                      #111216;
+@define-color wm_title                   #cfd8dc;
+@define-color wm_unfocused_title         #787878;
+
+/* libadwaita-style names. GTK3 apps following adw-gtk3 conventions read these,
+ * and a user config that defines them — kde-gtk-config and the various
+ * Material-You generators both do — will otherwise leak its own accent in. */
+@define-color accent_color               #6d9aff;
+@define-color accent_bg_color            #3c78ff;
+@define-color accent_fg_color            #ffffff;
+@define-color window_bg_color            #111216;
+@define-color window_fg_color            #cfd8dc;
+@define-color view_bg_color              #111216;
+@define-color view_fg_color              #cfd8dc;
+@define-color headerbar_bg_color         #111216;
+@define-color headerbar_fg_color         #cfd8dc;
+@define-color headerbar_border_color     #cfd8dc;
+@define-color headerbar_backdrop_color   #111216;
+@define-color popover_bg_color           #111216;
+@define-color popover_fg_color           #cfd8dc;
+@define-color dialog_bg_color            #111216;
+@define-color dialog_fg_color            #cfd8dc;
+@define-color card_bg_color              #16181d;
+@define-color card_fg_color              #cfd8dc;
+@define-color sidebar_bg_color           #111216;
+@define-color sidebar_fg_color           #cfd8dc;
+@define-color sidebar_border_color       #212c31;
+@define-color sidebar_backdrop_color     #111216;
+@define-color destructive_bg_color       #f04a50;
+@define-color destructive_fg_color       #ffffff;
+@define-color destructive_color          #ff7a7e;
+@define-color success_bg_color           #4db6ac;
+@define-color success_fg_color           #06120f;
+@define-color warning_bg_color           #ffc107;
+@define-color warning_fg_color           #1a1400;
+@define-color warning_color              #ffc107;
+@define-color error_bg_color             #f04a50;
+@define-color error_fg_color             #ffffff;
+
+/* Carl's own names, for readability below */
+@define-color carl_bg          #111216;
+@define-color carl_raised      #16181d;
+@define-color carl_fg          #cfd8dc;
+@define-color carl_fg_dim      #556064;
+@define-color carl_border      #29353b;
+@define-color carl_border_soft #212c31;
+@define-color carl_line        #47535a;
+@define-color carl_accent      #3c78ff;
+@define-color carl_accent_lt   #6d9aff;
+@define-color carl_check       #717b81;
+@define-color carl_check_hi    #7f898f;
+@define-color carl_scroll      #556165;
+@define-color carl_scroll_hi   #6c787d;
+
+/* ===========================================================================
+ * Base surfaces
+ * ========================================================================= */
+
+/* Only real surfaces get an opaque fill. Generic containers must NOT: a box or
+ * grid sitting inside a selected row would otherwise punch a dark rectangle
+ * straight through the row's highlight, around the label. Likewise `.view` is
+ * excluded — GTK3 puts that class on sidebar rows, not just on the view. */
+window, .background,
+dialog, messagedialog, assistant {
+  background-color: @carl_bg;
+  color: @carl_fg;
+}
+
+treeview.view, textview, textview text,
+iconview, flowbox, scrolledwindow {
+  background-color: @carl_bg;
+  color: @carl_fg;
+}
+
+/* Defensive: keep layout containers transparent so they inherit whatever is
+ * behind them (window, selected row, popover ...). */
+box, grid, stack, overlay, viewport, paned, revealer {
+  background-color: transparent;
+}
+
+window:backdrop, .background:backdrop {
+  background-color: @carl_bg;
+  color: @carl_fg;
+}
+
+textview text, .view, iconview, flowbox {
+  background-color: @carl_bg;
+  color: @carl_fg;
+}
+
+/* Carl doesn't dim on backdrop the way Adwaita does. */
+*:backdrop {
+  text-shadow: none;
+  -gtk-icon-shadow: none;
+}
+
+decoration {
+  border-radius: 2px 2px 0 0;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.55);
+}
+
+decoration:backdrop { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); }
+
+/* ===========================================================================
+ * Header bars / title bars / toolbars
+ * ========================================================================= */
+
+headerbar, .titlebar,
+toolbar, .toolbar,
+searchbar > revealer > box,
+actionbar > revealer > box {
+  background-color: @carl_bg;
+  background-image: none;
+  border-color: @carl_border_soft;
+  box-shadow: none;
+  text-shadow: none;
+  color: @carl_fg;
+}
+
+headerbar, .titlebar {
+  border-bottom: 1px solid @carl_border_soft;
+  min-height: 42px;
+}
+
+headerbar:backdrop, .titlebar:backdrop {
+  background-color: @carl_bg;
+  background-image: none;
+  color: alpha(@carl_fg, 0.55);
+}
+
+headerbar .title { font-weight: bold; color: @carl_fg; }
+headerbar .subtitle { color: alpha(@carl_fg, 0.55); font-size: smaller; }
+headerbar:backdrop .title { color: #787878; font-style: italic; }
+
+menubar, .menubar {
+  background-color: @carl_bg;
+  background-image: none;
+  box-shadow: none;
+  border-bottom: 1px solid @carl_border_soft;
+  color: @carl_fg;
+}
+
+menubar > menuitem {
+  color: @carl_fg;
+  padding: 4px 8px;
+}
+
+/* menubaritem-focused is #cfd8dc @ 10% */
+menubar > menuitem:hover {
+  background-color: rgba(207, 216, 220, 0.1);
+  background-image: none;
+  box-shadow: none;
+  color: @carl_fg;
+}
+
+statusbar {
+  background-color: @carl_bg;
+  color: alpha(@carl_fg, 0.7);
+  border-top: 1px solid @carl_border_soft;
+}
+
+/* ===========================================================================
+ * Buttons
+ * ========================================================================= */
+
+button,
+button.toggle,
+spinbutton button,
+headerbar button,
+toolbar button {
+  background-image: none;
+  background-color: @carl_raised;
+  border: 1px solid @carl_border_soft;
+  border-radius: 2px;
+  color: @carl_fg;
+  box-shadow: none;
+  text-shadow: none;
+  -gtk-icon-shadow: none;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out;
+}
+
+button:hover {
+  background-image: none;
+  background-color: shade(@carl_raised, 1.35);
+  border-color: @carl_border;
+  color: @carl_fg;
+}
+
+/* button-pressed in the SVG is flat #111216 — pressing a button does NOT turn
+ * it accent-coloured. Only button-toggled (i.e. :checked) is #3c78ff. */
+button:active {
+  background-image: none;
+  background-color: @carl_bg;
+  border-color: @carl_border;
+  color: @carl_fg;
+}
+
+button:checked,
+button:checked:active,
+button:checked:hover {
+  background-image: none;
+  background-color: @carl_accent;
+  border-color: @carl_accent;
+  color: #ffffff;
+}
+
+button:disabled,
+button:disabled:backdrop {
+  background-image: none;
+  background-color: @carl_bg;
+  border-color: @carl_border_soft;
+  color: @carl_fg_dim;
+}
+
+button:backdrop {
+  background-image: none;
+  background-color: @carl_raised;
+  border-color: @carl_border_soft;
+  color: alpha(@carl_fg, 0.7);
+}
+
+/* The `.toggle` variants are spelled out deliberately. `button.toggle` in the
+ * base rule above scores (0,1,1), which outranks a bare `headerbar button` at
+ * (0,0,2) — a class beats two element names — so without these, every toggle
+ * button in a header bar or toolbar (search toggles, menu buttons) keeps the
+ * raised fill and renders as a visible box instead of a flat icon. */
+button.flat,
+button.flat.toggle,
+headerbar button,
+headerbar button.toggle,
+headerbar button.image-button,
+toolbar button,
+toolbar button.toggle,
+button.titlebutton {
+  background-image: none;
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+button.flat:hover,
+headerbar button:hover,
+toolbar button:hover,
+button.titlebutton:hover {
+  background-color: rgba(255, 255, 255, 0.05);   /* itemview-focused */
+  border-color: transparent;
+}
+
+button.flat:active,
+button.flat:checked,
+headerbar button:active,
+headerbar button:checked,
+toolbar button:active,
+toolbar button:checked {
+  background-color: rgba(207, 216, 220, 0.1);
+  border-color: transparent;
+  color: @carl_fg;
+}
+
+/* mdi-close-focused is #f04a50 */
+button.titlebutton.close:hover {
+  background-color: #f04a50;
+  color: #ffffff;
+}
+
+button.suggested-action {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  border-color: transparent;
+  color: #ffffff;
+}
+
+button.suggested-action:hover {
+  background-image: linear-gradient(to right, #8355ff, #2ac2ff);
+}
+
+button.suggested-action:active {
+  background-image: linear-gradient(to right, #5f33e0, #049ce0);
+}
+
+button.destructive-action {
+  background-image: none;
+  background-color: #f04a50;
+  border-color: transparent;
+  color: #ffffff;
+}
+
+button.destructive-action:hover  { background-color: #f4676c; }
+button.destructive-action:active { background-color: #d33f45; }
+
+button.circular { border-radius: 9999px; }
+
+/* .linked groups keep square inner edges */
+.linked > button:not(:first-child) { border-left-width: 0; }
+
+/* ===========================================================================
+ * Entries — underline only, gradient on focus
+ * ========================================================================= */
+
+entry,
+spinbutton:not(.vertical),
+.entry {
+  background-image: none;
+  background-color: @carl_bg;
+  border: none;
+  border-bottom: 1px solid @carl_line;
+  border-radius: 2px 2px 0 0;
+  box-shadow: none;
+  color: @carl_fg;
+  caret-color: @carl_fg;
+  padding: 6px 8px;
+  transition: border-color 120ms ease-out;
+}
+
+entry:hover,
+spinbutton:not(.vertical):hover {
+  border-bottom-color: @carl_check_hi;
+}
+
+entry:focus,
+spinbutton:not(.vertical):focus {
+  border-bottom-color: transparent;
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-size: 100% 2px;
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  box-shadow: none;
+  outline: none;
+}
+
+entry:disabled,
+entry:disabled:backdrop,
+spinbutton:not(.vertical):disabled {
+  background-image: none;
+  background-color: @carl_bg;
+  border-bottom-color: @carl_border_soft;
+  color: @carl_fg_dim;
+}
+
+entry:backdrop {
+  background-image: none;
+  background-color: @carl_bg;
+  border-bottom-color: @carl_border_soft;
+  color: alpha(@carl_fg, 0.7);
+}
+
+entry.error   { border-bottom-color: #f04a50; }
+entry.warning { border-bottom-color: #ffc107; }
+entry image   { color: alpha(@carl_fg, 0.7); }
+entry selection { background-color: @carl_accent; color: #ffffff; }
+
+/* ===========================================================================
+ * Check boxes and radios
+ * ========================================================================= */
+
+check, radio,
+checkbutton check,
+radiobutton radio {
+  background-image: none;
+  background-color: transparent;
+  border: 2px solid @carl_check;
+  box-shadow: none;
+  color: #fbfbfc;
+  min-width: 16px;
+  min-height: 16px;
+  padding: 0;
+  transition: border-color 120ms ease-out, background-color 120ms ease-out;
+}
+
+check  { border-radius: 2px; }
+radio  { border-radius: 9999px; }
+
+check:hover, radio:hover { border-color: @carl_check_hi; }
+
+check:checked,
+check:indeterminate,
+radio:checked,
+radio:indeterminate {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  border-color: transparent;
+  color: #fbfbfc;
+}
+
+check:disabled, radio:disabled {
+  background-image: none;
+  border-color: @carl_fg_dim;
+  color: @carl_fg_dim;
+}
+
+/* Adwaita ships pixmap assets for these; make sure they don't come back. */
+check, radio,
+check:checked, radio:checked,
+check:indeterminate, radio:indeterminate {
+  -gtk-icon-source: none;
+}
+
+check:checked      { -gtk-icon-source: -gtk-icontheme("object-select-symbolic"); }
+check:indeterminate{ -gtk-icon-source: -gtk-icontheme("list-remove-symbolic"); }
+radio:checked      { -gtk-icon-source: -gtk-icontheme("radio-checked-symbolic"); }
+
+/* ===========================================================================
+ * Switches
+ * ========================================================================= */
+
+switch {
+  background-image: none;
+  background-color: rgba(77, 182, 172, 0.2);   /* #4db6ac @ 20% */
+  border: 1px solid @carl_border;
+  border-radius: 9999px;
+  box-shadow: none;
+  color: transparent;
+  min-width: 44px;
+  min-height: 22px;
+  -gtk-icon-source: none;
+}
+
+switch:checked {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  border-color: transparent;
+}
+
+switch slider {
+  background-image: none;
+  background-color: @carl_fg;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  min-width: 18px;
+  min-height: 18px;
+  margin: 1px;
+}
+
+switch:checked slider { background-color: #ffffff; }
+switch:disabled { background-color: rgba(77, 182, 172, 0.1); }
+switch:disabled slider { background-color: @carl_fg_dim; }
+
+/* ===========================================================================
+ * Progress, level, scale
+ * ========================================================================= */
+
+progressbar trough,
+levelbar trough {
+  background-image: none;
+  background-color: rgba(77, 182, 172, 0.2);
+  border: none;
+  border-radius: 9999px;
+  box-shadow: none;
+  min-height: 3px;
+}
+
+progressbar progress {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: none;
+  min-height: 3px;
+}
+
+progressbar.vertical progress {
+  background-image: linear-gradient(to bottom, #7040ff, #05b5ff);
+  min-width: 3px;
+}
+
+progressbar text { color: alpha(@carl_fg, 0.7); font-size: smaller; }
+
+levelbar block.filled {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  border: none;
+  border-radius: 9999px;
+}
+
+levelbar block.high  { background-image: none; background-color: #4db6ac; }
+levelbar block.low   { background-image: none; background-color: #ffc107; }
+levelbar block.full  { background-image: none; background-color: #4db6ac; }
+levelbar block.empty { background-image: none; background-color: transparent; }
+
+scale trough {
+  background-image: none;
+  background-color: rgba(77, 182, 172, 0.2);
+  border: none;
+  border-radius: 9999px;
+  box-shadow: none;
+  min-height: 2px;
+  min-width: 2px;
+}
+
+scale highlight {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  border: none;
+  border-radius: 9999px;
+}
+
+scale.vertical highlight {
+  background-image: linear-gradient(to bottom, #7040ff, #05b5ff);
+}
+
+scale slider {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  min-width: 18px;
+  min-height: 18px;
+  margin: -9px;
+}
+
+scale slider:hover  { background-image: linear-gradient(to right, #8355ff, #2ac2ff); }
+scale slider:active { background-image: linear-gradient(to right, #5f33e0, #049ce0); }
+
+/* slidercursor-disabled is #364249 */
+scale slider:disabled {
+  background-image: none;
+  background-color: #364249;
+}
+
+scale value { color: alpha(@carl_fg, 0.7); }
+scale marks { color: alpha(@carl_fg, 0.4); }
+
+/* ===========================================================================
+ * Scrollbars — scroll_width=9, no steppers
+ * ========================================================================= */
+
+scrollbar,
+scrollbar trough {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+}
+
+scrollbar slider {
+  background-color: @carl_scroll;
+  background-image: none;
+  border: none;
+  border-radius: 9999px;
+  min-width: 9px;
+  min-height: 9px;
+  margin: 2px;
+  transition: background-color 120ms ease-out;
+}
+
+scrollbar slider:hover    { background-color: @carl_scroll_hi; }
+scrollbar slider:active   { background-color: @carl_fg; }
+scrollbar slider:disabled { background-color: transparent; }
+scrollbar slider:backdrop { background-color: alpha(@carl_scroll, 0.6); }
+
+scrollbar button {
+  min-width: 0;
+  min-height: 0;
+  opacity: 0;
+  -gtk-icon-source: none;
+}
+
+/* ===========================================================================
+ * Lists, tree views, icon views
+ * ========================================================================= */
+
+treeview.view,
+list, list row,
+.list, .list-row {
+  background-color: @carl_bg;
+  background-image: none;
+  border-color: @carl_border_soft;
+  color: @carl_fg;
+}
+
+treeview.view:hover,
+list row:hover,
+.list-row:hover,
+row:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  background-image: none;
+}
+
+treeview.view:selected,
+treeview.view:selected:focus,
+list row:selected,
+.list-row:selected,
+row:selected,
+iconview:selected,
+flowboxchild:selected,
+gridview child:selected {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  color: #ffffff;
+}
+
+/* alt.base.color == base.color: Carl has no row striping */
+treeview.view:nth-child(even),
+treeview.view:nth-child(odd) {
+  background-color: transparent;
+}
+
+/* HeaderSection */
+treeview.view header button,
+treeview header button,
+columnview header button {
+  background-image: none;
+  background-color: @carl_bg;
+  border: none;
+  border-right: 1px solid @carl_border_soft;
+  border-bottom: 1px solid @carl_border_soft;
+  border-radius: 0;
+  color: @carl_fg;
+  font-weight: normal;
+  box-shadow: none;
+}
+
+/* header-focused is white @ 3.9% */
+treeview.view header button:hover,
+treeview header button:hover {
+  background-color: rgba(255, 255, 255, 0.039);
+}
+
+treeview.view expander { color: alpha(@carl_fg, 0.7); }
+treeview.view:selected expander { color: #ffffff; }
+
+/* ===========================================================================
+ * Menus and popovers — menu_shadow_depth=5
+ * ========================================================================= */
+
+menu, .menu,
+popover, popover.background,
+.context-menu {
+  background-color: @carl_bg;
+  background-image: none;
+  border: 1px solid @carl_border;
+  border-radius: 2px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.5);
+  color: @carl_fg;
+  padding: 4px;
+}
+
+menu menuitem,
+.menu menuitem,
+popover modelbutton,
+popover button.model {
+  background-color: transparent;
+  background-image: none;
+  border-radius: 2px;
+  color: @carl_fg;
+  min-height: 24px;
+  padding: 3px 8px;
+  transition: background-color 120ms ease-out;
+}
+
+menu menuitem:hover,
+.menu menuitem:hover,
+popover modelbutton:hover,
+popover button.model:hover {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  color: #ffffff;
+}
+
+menu menuitem:disabled,
+popover modelbutton:disabled { color: @carl_fg_dim; }
+
+menu separator,
+popover separator,
+.menu separator {
+  background-color: @carl_border_soft;
+  min-height: 1px;
+  margin: 3px 0;
+  padding: 0;
+}
+
+menu arrow { color: @carl_fg; }
+
+/* ===========================================================================
+ * Notebook tabs
+ * ========================================================================= */
+
+notebook > header {
+  background-color: @carl_bg;
+  background-image: none;
+  border-color: @carl_border_soft;
+  box-shadow: none;
+}
+
+notebook > header > tabs > tab {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  color: alpha(@carl_fg, 0.6);
+  min-height: 30px;
+  padding: 4px 12px;
+  transition: color 120ms ease-out, background-color 120ms ease-out;
+}
+
+notebook > header > tabs > tab:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: @carl_fg;
+  box-shadow: none;
+}
+
+notebook > header > tabs > tab:checked {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-size: 100% 2px;
+  background-repeat: no-repeat;
+  color: @carl_fg;
+  box-shadow: none;
+}
+
+notebook > header.top > tabs > tab:checked    { background-position: left bottom; }
+notebook > header.bottom > tabs > tab:checked { background-position: left top; }
+
+notebook > header.left > tabs > tab:checked,
+notebook > header.right > tabs > tab:checked {
+  background-image: linear-gradient(to bottom, #7040ff, #05b5ff);
+  background-size: 2px 100%;
+}
+
+notebook > header.left > tabs > tab:checked  { background-position: right top; }
+notebook > header.right > tabs > tab:checked { background-position: left top; }
+
+notebook > stack { background-color: @carl_bg; }
+
+/* ===========================================================================
+ * Sidebars and places
+ * ========================================================================= */
+
+placessidebar, .sidebar,
+stacksidebar, stacksidebar list {
+  background-color: @carl_bg;
+  border-color: @carl_border_soft;
+  color: @carl_fg;
+}
+
+placessidebar row:hover, .sidebar row:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+placessidebar row:selected,
+.sidebar row:selected,
+stacksidebar list row:selected {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  color: #ffffff;
+}
+
+/* ===========================================================================
+ * Tooltips, selection, separators, focus
+ * ========================================================================= */
+
+tooltip, tooltip.background {
+  background-color: @carl_bg;
+  background-image: none;
+  border: 1px solid @carl_border;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  color: #eefcff;                    /* tooltip.text.color */
+  text-shadow: none;
+}
+
+tooltip label, tooltip decoration { color: #eefcff; background-color: transparent; }
+
+selection {
+  background-color: @carl_accent;
+  color: #ffffff;
+}
+
+separator {
+  background-color: @carl_border_soft;
+  background-image: none;
+  border: none;
+  min-width: 1px;
+  min-height: 1px;
+}
+
+/* splitter_width=4 */
+paned > separator {
+  background-color: @carl_border_soft;
+  background-image: none;
+  min-width: 4px;
+  min-height: 4px;
+}
+
+paned > separator:hover { background-color: @carl_accent; }
+
+/* Focus rings are deliberately NOT overridden — a bare `*:focus` matches every
+ * container in the focus chain, not just the focused control, so keyboard use
+ * lights the whole window up with nested outlines. Adwaita's own GTK3 focus
+ * ring is already a 1px dashed pattern, which is what Carl wants anyway.
+ * To recolour it, scope to real controls:
+ *
+ *   button:focus, entry:focus, check:focus, radio:focus {
+ *     outline-color: @carl_accent_lt;
+ *   }
+ */
+
+/* ===========================================================================
+ * Info bars, OSD, misc
+ * ========================================================================= */
+
+infobar, infobar.info {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  color: #ffffff;
+  border: none;
+}
+
+infobar.warning { background-image: none; background-color: #ffc107; color: #1a1400; }
+infobar.error   { background-image: none; background-color: #f04a50; color: #ffffff; }
+infobar.question{ background-image: none; background-color: @carl_raised; color: @carl_fg; }
+
+.osd, .osd .background {
+  background-color: alpha(@carl_bg, 0.9);
+  border: 1px solid @carl_border;
+  color: @carl_fg;
+}
+
+calendar {
+  background-color: @carl_bg;
+  border: 1px solid @carl_border_soft;
+  border-radius: 2px;
+  color: @carl_fg;
+}
+
+calendar:selected {
+  background-image: linear-gradient(to right, #7040ff, #05b5ff);
+  background-color: @carl_accent;
+  color: #ffffff;
+}
+
+calendar.header { background-color: @carl_bg; border-bottom: 1px solid @carl_border_soft; }
+calendar.button { color: @carl_fg; }
+calendar:indeterminate { color: @carl_fg_dim; }
+
+spinner { color: @carl_accent_lt; }
+
+*:link, button.link  { color: #009dff; }
+*:visited            { color: #b172ff; }
+
+.dim-label { opacity: 0.55; }
+
+/* Frames — GenericFrame "common" uses #29353b over #212c31 */
+frame > border,
+.frame {
+  border: 1px solid @carl_border_soft;
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+expander title > arrow { color: alpha(@carl_fg, 0.7); }
+
+/* Sizing hints carried over from the kvconfig */
+menu menuitem, popover modelbutton { min-height: 24px; }

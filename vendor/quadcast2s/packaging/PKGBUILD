@@ -1,0 +1,87 @@
+# Maintainer: Coruscnium <coru-personal+github@coruscnium.xyz>
+#
+# Builds the checkout this file sits under. Run it from here:
+#
+#   cd packaging && makepkg -si
+#
+# This file deliberately lives in a subdirectory. makepkg sets
+# $srcdir="$startdir/src" and wipes it on --clean, and the project's own source
+# tree is called src/ -- with the PKGBUILD at the repository root those are the
+# same directory, and one `makepkg -C` would delete the whole project.
+#
+# When the project has a public git remote, replace the _project use below with
+# a normal source=() line:
+#
+#   source=("$pkgname-$pkgver.tar.gz::<url>/archive/v$pkgver.tar.gz")
+#
+# and cd "$srcdir/$pkgname-$pkgver" in build() and package() instead.
+
+pkgname=quadcast2s
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="RGB lighting control for the HyperX QuadCast 2 S microphone"
+arch=('any')
+license=('AGPL-3.0-only')
+depends=('python' 'python-pyusb' 'hicolor-icon-theme')
+optdepends=('pyside6: graphical front end (quadcast2s-gui)')
+makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
+_project="$startdir/.."
+_appid=xyz.coruscnium.quadcast2s
+source=()
+sha256sums=()
+
+# Always the system interpreter, never whatever `python` happens to be. With a
+# virtualenv active in the calling shell, `python` is that virtualenv and
+# `installer` takes its install scheme from it -- the package then quietly
+# contains .../<project>/.venv/lib/... instead of /usr/lib/..., and installs
+# a working-looking package that puts nothing where it belongs.
+_python=/usr/bin/python
+
+build() {
+    cd "$_project"
+    "$_python" -m build --wheel --no-isolation
+}
+
+check() {
+    cd "$_project"
+    PYTHONPATH=src "$_python" -m unittest discover -s tests -q
+}
+
+package() {
+    cd "$_project"
+    "$_python" -m installer --destdir="$pkgdir" dist/quadcast2s-$pkgver-*.whl
+
+    # Insurance against the above ever regressing: the payload must be in the
+    # system site-packages, not in somebody's virtualenv.
+    if [ ! -d "$pkgdir/usr/lib/python"*"/site-packages/$pkgname" ]; then
+        echo "the wheel did not land in /usr/lib -- wrong interpreter?" >&2
+        return 1
+    fi
+
+    # device access; see the comments in the rule itself
+    install -Dm644 udev/70-quadcast2s.rules \
+        "$pkgdir/usr/lib/udev/rules.d/70-quadcast2s.rules"
+
+    # desktop integration. No install scriptlet: udevd picks up rule changes
+    # by itself, and 36 of the 43 packages on a typical system that ship udev
+    # rules have none either.
+    install -Dm644 desktop/$_appid.desktop \
+        "$pkgdir/usr/share/applications/$_appid.desktop"
+    install -Dm644 desktop/$_appid.metainfo.xml \
+        "$pkgdir/usr/share/metainfo/$_appid.metainfo.xml"
+    install -Dm644 desktop/quadcast2s.svg \
+        "$pkgdir/usr/share/icons/hicolor/scalable/apps/quadcast2s.svg"
+
+    # systemd user units: the lighting belongs to the logged-in user and needs
+    # no privileges, so these are user units rather than system ones.
+    install -Dm644 systemd/quadcast2s.service \
+        "$pkgdir/usr/lib/systemd/user/quadcast2s.service"
+    install -Dm644 systemd/quadcast2s-hotplug.service \
+        "$pkgdir/usr/lib/systemd/user/quadcast2s-hotplug.service"
+
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+    for doc in docs/*.md; do
+        install -Dm644 "$doc" "$pkgdir/usr/share/doc/$pkgname/$(basename "$doc")"
+    done
+}

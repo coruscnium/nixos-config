@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Carl
+Comment=Flat near-black theme with a violet-to-cyan accent gradient. Ported from the Kvantum theme Carl by jomada, based on KvAdaptaDark by Tsu Jan.
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Carl
+MetacityTheme=Carl
+IconTheme=hicolor
+CursorTheme=Bibata-Modern-Classic
+ButtonLayout=icon:minimize,maximize,close

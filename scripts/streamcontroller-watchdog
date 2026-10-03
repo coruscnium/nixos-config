@@ -1,0 +1,141 @@
+#!/bin/bash
+set -uo pipefail
+
+APP_BIN="/usr/bin/streamcontroller"
+VENDOR_ID="0fd9"
+INTERVAL=1200          # seconds between cycles (20 min)
+RECONNECT_TIMEOUT=8    # max seconds to wait for the Stream Deck to re-enumerate
+RECONNECT_GRACE=1      # seconds to keep muting after it returns (covers the connect event)
+MAX_HOLD=30            # safety cap: inhibitor self-releases after this no matter what
+
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
+
+usage() {
+    cat >&2 <<EOF
+Usage: ${0##*/} [-r] [-h]
+  -r   run one cycle now and exit (no loop) -- same effect as a restart
+  -h   show this help
+With no options, runs continuously, cycling every ${INTERVAL}s.
+EOF
+}
+
+run_cycle() {
+    local devpath="" devdir="" product="" ready="" inhibit_pid=""
+
+    # ── Kill ───────────────────────────────────────────────
+    log "Killing all streamcontroller processes..."
+    pkill -9 -f "StreamController" 2>/dev/null && sleep 2 || true
+    log "  done"
+
+    # ── USB power-cycle ────────────────────────────────────
+    log "Power-cycling Stream Deck USB port..."
+    devpath=$(grep -l "^$VENDOR_ID$" /sys/bus/usb/devices/*/idVendor 2>/dev/null | head -1)
+    if [ -n "$devpath" ]; then
+        devdir=$(dirname "$devpath")
+        product=$(cat "$devdir/product" 2>/dev/null || echo "unknown")
+        log "  Found: $product ($(basename "$devdir"))"
+
+        # Start the notification inhibitor. It checks the bus-wide "Inhibited"
+        # state first: if Do Not Disturb is already active (set by the user or
+        # another app) it leaves it alone; otherwise it raises an inhibit and
+        # holds it on a live connection until we signal release (SIGTERM).
+        # Either way it only ever touches its OWN cookie, so it can't clobber a
+        # pre-existing DND. It signals via $ready once the inhibit is live.
+        ready=$(mktemp -u --suffix=.scwd-ready)
+        MAX_HOLD="$MAX_HOLD" python3 - "$ready" <<'PY' &
+import dbus, os, sys, signal, time
+ready = sys.argv[1]
+cookie = None
+def touch():
+    try: open(ready, 'w').close()
+    except Exception: pass
+try:
+    obj = dbus.SessionBus().get_object('org.freedesktop.Notifications',
+                                       '/org/freedesktop/Notifications')
+    notif = dbus.Interface(obj, 'org.freedesktop.Notifications')
+    props = dbus.Interface(obj, 'org.freedesktop.DBus.Properties')
+
+    already = False
+    try:
+        already = bool(props.Get('org.freedesktop.Notifications', 'Inhibited'))
+    except Exception:
+        already = False   # property unsupported -> treat as not inhibited
+
+    if not already:
+        cookie = notif.Inhibit('streamcontroller-watchdog',
+                               'Stream Deck USB power-cycle', {})
+    touch()  # inhibit is now live (or DND was already on); bash may cut power
+
+    def release(*_):
+        try:
+            if cookie is not None:
+                notif.UnInhibit(cookie)
+        finally:
+            os._exit(0)
+    signal.signal(signal.SIGTERM, release)
+    signal.signal(signal.SIGINT, release)
+
+    time.sleep(float(os.environ.get('MAX_HOLD', '30')))  # safety cap
+    release()
+except Exception:
+    touch()   # never hang the watchdog if D-Bus/dbus-python is unavailable
+PY
+        inhibit_pid=$!
+
+        # Wait until the inhibit is live before cutting power, so the
+        # DISCONNECT sound is covered too (cap at 3s, then proceed regardless).
+        for _ in $(seq 1 30); do [ -e "$ready" ] && break; sleep 0.1; done
+        rm -f "$ready"
+
+        sudo /usr/local/bin/usb-port-power-cycle "$devdir"
+        sleep 1
+        log "  Power-cycle complete"
+
+        # Hold the mute until the device re-enumerates (covers the CONNECT
+        # sound), then a short grace, then drop our inhibit.
+        for _ in $(seq 1 $((RECONNECT_TIMEOUT * 10))); do
+            grep -qx "$VENDOR_ID" /sys/bus/usb/devices/*/idVendor 2>/dev/null && break
+            sleep 0.1
+        done
+        sleep "$RECONNECT_GRACE"
+    else
+        log "WARNING: No Elgato Stream Deck found on USB bus"
+    fi
+
+    # ── Relaunch minimized ─────────────────────────────────
+    log "Starting streamcontroller..."
+    "$APP_BIN" -b &
+
+    # ── Disable the inhibitor now that the restart is done ─
+    # Only releases the inhibit WE raised; if DND was already active the helper
+    # never touched it, so it stays on. SIGTERM triggers a clean UnInhibit.
+    if [ -n "$inhibit_pid" ]; then
+        kill "$inhibit_pid" 2>/dev/null || true
+        wait "$inhibit_pid" 2>/dev/null || true
+    fi
+
+    log "Watchdog cycle complete"
+}
+
+# ── Parse args ─────────────────────────────────────────────
+once=0
+while getopts ":rh" opt; do
+    case "$opt" in
+        r) once=1 ;;
+        h) usage; exit 0 ;;
+        *) usage; exit 2 ;;
+    esac
+done
+
+# ── Run ────────────────────────────────────────────────────
+if [ "$once" -eq 1 ]; then
+    run_cycle
+    log "Single cycle complete (-r); exiting"
+    exit 0
+fi
+
+while true; do
+    run_cycle
+    log "Sleeping ${INTERVAL}s"
+    sleep "$INTERVAL"
+done

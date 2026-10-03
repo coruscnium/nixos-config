@@ -1,0 +1,10 @@
+/* Carl — GTK 4 theme entry point.
+ *
+ * This file is what GTK loads when gtk-theme-name=Carl. It only matters for
+ * plain GTK4 apps: libadwaita apps ignore gtk-theme-name entirely, and reach
+ * Carl through ~/.config/gtk-4.0/gtk.css instead (see README.md).
+ *
+ * Default-dark gives us the structural base; carl.css does the restyling. */
+
+@import url("resource:///org/gtk/libgtk/theme/Default/Default-dark.css");
+@import url("carl.css");
