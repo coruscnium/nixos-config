@@ -7,12 +7,14 @@ file is that nothing gets forgotten and nothing gets installed twice.
 
 | Thing | Update mechanism |
 |---|---|
-| nixpkgs, home-manager, chaotic-nyx, NUR, quadcast2sSrc | `nix flake update` (bumps flake.lock) |
+| nixpkgs, home-manager, chaotic-nyx, NUR | `nix flake update` (bumps flake.lock) |
+| Cherry Studio | `nix run nixpkgs#nvfetcher` — re-resolves `_sources/generated.nix` |
 | NUR packages (e.g. `forkprince.nuvio`) | ride the NUR input, so `nix flake update` |
 | OctoEverywhere container image | `./nixos/update-octoeverywhere.sh --rebuild` |
 | `reigntweak` | bump `url` + `hash` in `pkgs/default.nix` (upstream has no releases API) |
 | `cheatengine` .exe | re-vendor the binary into `pkgs/` |
-| `quadcast2s` | `nix flake lock --update-input quadcast2sSrc` after editing the project |
+| `quadcast2s` | re-copy the project over `vendor/quadcast2s` (exclude `.git`, `.venv`, `dist`, `build`, `*.egg-info`) |
+| `themes/` (Carl) | manual — pling.com serves a bot challenge, so there is no fetchable URL |
 | Flatpaks | `flatpak update` |
 | AppImages | manual (that is the cost of being an AppImage) |
 
@@ -86,6 +88,22 @@ anvil-organizer.
                     wrapper that replaces cehelper.sh and the Proton.SH script.
     octoeverywhere -> nixos/octoeverywhere.nix. Official container image, pinned
                     by digest via dockerTools.pullImage.
+    cherry-studio -> pkgs/cherry-studio.nix. nixpkgs has it, but at 1.9.11
+                    against our 2.1.4, and the 2.x bump there pins an insecure
+                    Electron. We wrap upstream's AppImage with the version and
+                    hash resolved by nvfetcher (nvfetcher.toml -> _sources/).
+                    This is also the harness this config is developed in.
+
+                    nvfetcher CANNOT replace the rest of the vendoring:
+                      themes/             pling.com serves a bot challenge.
+                      pkgs/cheatengine-*  Cheat Engine's GitHub releases carry
+                                          no binary assets; cheatengine.org
+                                          direct links are fragile.
+                      scripts/            our own code.
+                      vendor/quadcast2s   our own project, no remote yet. Once
+                                          it has one, add a [quadcast2s] src.git
+                                          entry and drop the vendored copy.
+
     windscribe   -> NOT PACKAGED, deferred. It is not "just an unpacked .deb":
                     Windscribe publishes its own Arch package, and the payload is
                     a root helper daemon + four more daemons + a systemd system

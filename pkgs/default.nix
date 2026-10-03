@@ -18,6 +18,9 @@ in
 (import ./scripts.nix final prev)
 // (import ./wallpaper-engine.nix final prev)
 // {
+  # Cherry Studio, pinned from upstream's AppImage by nvfetcher.
+  cherry-studio = prev.callPackage ./cherry-studio.nix { };
+
   # ---------------------------------------------------------------------------
   # quadcast2s — RGB lighting for the HyperX QuadCast 2 S
   #
