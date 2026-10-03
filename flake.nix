@@ -159,11 +159,6 @@
           # The real machine.
           coru = mkNixos [ ];
 
-          # The same system, configured to live entirely on a removable device
-          # (see nixos/usb.nix). Build with nixos-generators, or install it with
-          # `nixos-install --root /mnt/usb --flake ...#coru-usb`.
-          coru-usb = mkNixos [ ./nixos/usb.nix ];
-
           # The full system as a live squashfs image, for a stick too small for
           # a real install (see nixos/iso.nix).
           coru-iso = mkNixos [ ./nixos/iso.nix ];

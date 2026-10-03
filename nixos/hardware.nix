@@ -1,85 +1,70 @@
 { config, lib, pkgs, ... }:
 
-let
-  # ===========================================================================
-  # WHICH SUBVOLUME NIXOS TAKES OVER -- READ THIS BEFORE INSTALLING.
-  #
-  #   "@nixos"  a NEW subvolume, side by side with CachyOS. CachyOS is left
-  #             completely untouched and you keep booting it. THIS IS THE
-  #             CURRENT VALUE -- it is what you install into.
-  #
-  #   "@"       the CachyOS root itself. Installing here REPLACES its /etc and
-  #             takes over the system -- CachyOS stops booting. This is the
-  #             END state, after you are satisfied.
-  #
-  # Create the new subvolume with:
-  #   sudo mkdir -p /mnt/btrfs
-  #   sudo mount -o subvolid=5 /dev/nvme2n1p2 /mnt/btrfs
-  #   sudo btrfs subvolume create /mnt/btrfs/@nixos
-  #
-  # boot.nix derives rootflags= from this same value automatically, so the
-  # config and the kernel command line cannot disagree.
-  # ===========================================================================
-  rootSubvol = "@nixos";
-in
-
-# Filesystems, CPU/GPU and firmware. Every UUID and option here is copied from
-# /etc/fstab on the CachyOS install, so this describes the SAME disk layout --
-# which is what makes installing NixOS into a new subvolume possible without
-# touching /home.
+# Filesystems, CPU/GPU and firmware.
+#
+# Every UUID below was read off THIS machine -- /dev/disk/by-uuid, plus the
+# running system's generated /etc/fstab. The old CachyOS values are gone: root
+# and the ESP were recreated when NixOS was installed, and a new filesystem
+# means a new UUID. The two data disks kept theirs, so they still match the
+# paths the Steam libraries expect.
+#
+#   root    ed9b8b18-9f45-4f00-9082-7b6b85835011   nvme2n1p2  1G ESP on p1
+#   ESP     3FAA-B683                               nvme2n1p1
+#   swap    88505ea1-9c9c-4667-94d5-8bbce6247446   nvme2n1p3
+#   SSD2    0c5412da-2b1f-4f1b-a3db-13a2ce9bdea1   nvme0n1p1  btrfs, label SSD2
+#   SSD3    fb803c53-b07d-48a2-a7cb-fedbe9a5b7d4   nvme1n1p1  btrfs, label SSD3
+#
+# The subvolume set also changed. CachyOS used @nixos/@home/@root/@srv/@cache/
+# @log/@tmp; this install has only `home` and `nix`, with root on the DEFAULT
+# subvolume. There is deliberately no /root, /srv, /var/cache, /var/log or
+# /var/tmp entry -- those subvolumes do not exist here, and declaring them
+# would fail to mount at boot.
 {
   fileSystems = {
+    # NOTE: NO subvol= option here, and that is load-bearing. This install's
+    # root is the btrfs DEFAULT subvolume. boot.nix only emits rootflags= when
+    # it finds a subvol= option on this entry, so leaving it bare is what keeps
+    # the kernel command line correct. Adding subvol=@ here would make the
+    # initrd look for a subvolume that does not exist.
+    # NOTE: no `x-initrd.mount` here either -- NixOS adds it to / and /nix on
+    # its own (verified: the installer's generated config listed no options for
+    # /, yet its fstab still carried x-initrd.mount). Specifying it by hand just
+    # duplicates the flag.
     "/" = {
-      device = "/dev/disk/by-uuid/08a86259-d4d2-4bc9-b8c6-24da18aa2adb";
+      device = "/dev/disk/by-uuid/ed9b8b18-9f45-4f00-9082-7b6b85835011";
       fsType = "btrfs";
-      options = [ "subvol=${rootSubvol}" "noatime" "compress=zstd" "commit=120" ];
     };
+
     "/home" = {
-      device = "/dev/disk/by-uuid/08a86259-d4d2-4bc9-b8c6-24da18aa2adb";
+      device = "/dev/disk/by-uuid/ed9b8b18-9f45-4f00-9082-7b6b85835011";
       fsType = "btrfs";
-      options = [ "subvol=@home" "noatime" "compress=zstd" "commit=120" ];
-    };
-    "/root" = {
-      device = "/dev/disk/by-uuid/08a86259-d4d2-4bc9-b8c6-24da18aa2adb";
-      fsType = "btrfs";
-      options = [ "subvol=@root" "noatime" "compress=zstd" "commit=120" ];
-    };
-    "/srv" = {
-      device = "/dev/disk/by-uuid/08a86259-d4d2-4bc9-b8c6-24da18aa2adb";
-      fsType = "btrfs";
-      options = [ "subvol=@srv" "noatime" "compress=zstd" "commit=120" ];
-    };
-    "/var/cache" = {
-      device = "/dev/disk/by-uuid/08a86259-d4d2-4bc9-b8c6-24da18aa2adb";
-      fsType = "btrfs";
-      options = [ "subvol=@cache" "noatime" "compress=zstd" "commit=120" ];
-    };
-    "/var/log" = {
-      device = "/dev/disk/by-uuid/08a86259-d4d2-4bc9-b8c6-24da18aa2adb";
-      fsType = "btrfs";
-      options = [ "subvol=@log" "noatime" "compress=zstd" "commit=120" ];
-    };
-    "/var/tmp" = {
-      device = "/dev/disk/by-uuid/08a86259-d4d2-4bc9-b8c6-24da18aa2adb";
-      fsType = "btrfs";
-      options = [ "subvol=@tmp" "noatime" "compress=zstd" "commit=120" ];
+      options = [ "subvol=home" ];
     };
 
-    # The SHARED ESP. umask=0077 mirrors the CachyOS fstab.
+    "/nix" = {
+      device = "/dev/disk/by-uuid/ed9b8b18-9f45-4f00-9082-7b6b85835011";
+      fsType = "btrfs";
+      options = [ "subvol=nix" ];
+    };
+
+    # 1 GiB, and NOT shared with a second OS any more -- so the bootloader can
+    # use it freely. umask=0077 mirrors what the installer generated.
     "/boot" = {
-      device = "/dev/disk/by-uuid/BC66-E13C";
+      device = "/dev/disk/by-uuid/3FAA-B683";
       fsType = "vfat";
-      options = [ "umask=0077" ];
+      options = [ "fmask=0077" "dmask=0077" ];
     };
 
-    # Two other NVMe drives. KEEP THESE PATHS: the Steam libraries are
-    # /mnt/ssd2/Games/Steam (1.7T) and /mnt/ssd3/Games/Steam (341G).
-    # nofail so an unplugged disk cannot block boot.
+    # ---- The two 1.8T data disks ------------------------------------------
+    # Mounted at the same paths the old config used, so the Steam libraries at
+    # /mnt/ssd2/Games/Steam and /mnt/ssd3/Games/Steam keep resolving.
+    # nofail: an unplugged disk must not block boot.
     "/mnt/ssd2" = {
       device = "/dev/disk/by-uuid/0c5412da-2b1f-4f1b-a3db-13a2ce9bdea1";
       fsType = "btrfs";
       options = [ "noatime" "nodatacow" "nofail" ];
     };
+
     "/mnt/ssd3" = {
       device = "/dev/disk/by-uuid/fb803c53-b07d-48a2-a7cb-fedbe9a5b7d4";
       fsType = "btrfs";
@@ -87,13 +72,34 @@ in
     };
   };
 
-  swapDevices = [ ];
-  zramSwap.enable = true;                       # CachyOS had 30.9G of zram
+  # A real 34G swap partition exists on this machine, so use it. (The old
+  # config had swapDevices = [] because CachyOS was zram-only.) zram still runs
+  # and takes priority, so this is spillover rather than the primary swap.
+  swapDevices = [
+    { device = "/dev/disk/by-uuid/88505ea1-9c9c-4667-94d5-8bbce6247446"; }
+  ];
+  zramSwap.enable = true;
+
+  # ---- initrd / kernel modules, taken from the generated config ------------
+  boot.initrd.availableKernelModules = [
+    "nvme"
+    "ahci"
+    "xhci_pci"
+    "usbhid"
+    "uas"
+    "usb_storage"
+    "sd_mod"
+  ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ "kvm-amd" ];
+  boot.extraModulePackages = [ ];
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   hardware.cpu.amd.updateMicrocode = true;
   hardware.enableRedistributableFirmware = true;
 
-  # ---- GPU: Radeon RX 9070 XT (Navi 48 / RDNA4) -----------------------------
+  # ---- GPU: Radeon RX 9070 XT (Navi 48 / RDNA4) ----------------------------
   # mesa + vulkan + radeonsi come from hardware.graphics.enable.
   hardware.graphics = {
     enable = true;
@@ -106,10 +112,4 @@ in
       rocmPackages.rocminfo
     ];
   };
-
-  # v4l2loopback was only for phonecam, which is dropped -- and a kernel-module
-  # package has to match the cachyos kernel set exactly. Uncomment if you want
-  # your phone as a webcam again:
-  #   boot.kernelModules = [ "v4l2loopback" ];
-  #   boot.extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
 }
