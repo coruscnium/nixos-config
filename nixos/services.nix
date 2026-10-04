@@ -37,26 +37,37 @@
   services.psd.enable = true;             # profile-sync-daemon (browser profiles)
 
   # ---- Flatpak --------------------------------------------------------------
-  # The NixOS flatpak module has NO declarative app list (its options are just
-  # enable / package / extraPortals), so the apps cannot be declared here. This
-  # enables the plumbing; install the apps once after first boot with the
-  # command below.
+  # nixpkgs' flatpak module has no app list, so nix-flatpak (imported in
+  # flake.nix) adds services.flatpak.packages/remotes and installs/removes them
+  # on activation. The flathub remote is added by default.
+  #
+  # Only the apps listed here are managed; flatpaks installed by hand are left
+  # alone (uninstallUnmanaged is off). To make it prune them too, set
+  # services.flatpak.uninstallUnmanaged = true.
   #
   # Two of your CachyOS flatpaks are EXCLUDED on purpose: com.hypixel.HytaleLauncher
   # and wtf.aubree.MacOBlox came from custom remotes (hytalelauncher-origin,
   # macoblox-origin) that do not exist here.
   #
-  #   flatpak install -y flathub \
-  #     com.cherry_ai.CherryStudio org.vinegarhq.Sober app.fluxer.Fluxer \
-  #     com.stremio.Stremio com.unity.UnityHub com.usebottles.bottles \
-  #     io.github.loot.loot io.github.mhogomchungu.sirikali \
-  #     io.gitlab.adhami3310.Footage net.blockbench.Blockbench \
-  #     org.nickvision.tubeconverter org.onlyoffice.desktopeditors \
-  #     org.upscayl.Upscayl page.codeberg.libre_menu_editor.LibreMenuEditor
-  #
-  # CherryStudio is the one that matters: nixpkgs is a full major version behind
-  # (1.9.11 vs your 2.1.4). Sober is Flatpak-only (Roblox).
-  services.flatpak.enable = true;
+  # Cherry Studio is NOT here -- it is packaged in-repo (pkgs/cherry-studio.nix,
+  # built from the upstream AppImage). Sober is Flatpak-only (Roblox).
+  services.flatpak = {
+    enable = true;
+    packages = [
+      "org.vinegarhq.Sober"
+      "app.fluxer.Fluxer"
+      "com.stremio.Stremio"
+      "com.unity.UnityHub"
+      "com.usebottles.bottles"
+      "io.github.loot.loot"
+      "io.github.mhogomchungu.sirikali"
+      "io.gitlab.adhami3310.Footage"
+      "org.nickvision.tubeconverter"
+      "org.onlyoffice.desktopeditors"
+      "org.upscayl.Upscayl"
+      "page.codeberg.libre_menu_editor.LibreMenuEditor"
+    ];
+  };
 
   # ---- Hardware hooks -------------------------------------------------------
   # Installs the udev rule shipped by the quadcast2s derivation, including its

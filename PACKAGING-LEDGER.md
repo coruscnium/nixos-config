@@ -15,7 +15,7 @@ file is that nothing gets forgotten and nothing gets installed twice.
 | `cheatengine` .exe | re-vendor the binary into `pkgs/` |
 | `quadcast2s` | re-copy the project over `vendor/quadcast2s` (exclude `.git`, `.venv`, `dist`, `build`, `*.egg-info`) |
 | `themes/` (Carl) | manual — pling.com serves a bot challenge, so there is no fetchable URL |
-| Flatpaks | `flatpak update` |
+| Flatpaks | declarative — `services.flatpak.packages` via nix-flatpak; set `services.flatpak.update.onActivation = true` to update on rebuild |
 | AppImages | manual (that is the cost of being an AppImage) |
 
 ## A. Becomes a NixOS system module (not a home package)
@@ -124,13 +124,19 @@ AmethystModManager, WeekBox, HD2Arsenal (your mod managers), bluestar,
 elegooslicer, orcaslicer, F-Chat.Horizon, Cordial, Root, Mocktail.
 Nuvio is no longer here — it comes from NUR now.
 
-## E. Keep as Flatpak
+## E. Flatpak (declarative)
 
-    cherry-studio -> com.cherry_ai.CherryStudio  (nixpkgs is on 1.9.11, you run
-                     2.1.4 — a full major version behind)
+Managed with **nix-flatpak** (flake input) — declare apps in
+`nixos/services.nix` under `services.flatpak.packages`. The module adds the
+flathub remote and installs/removes on activation. `uninstallUnmanaged` stays
+off, so flatpaks installed by hand are left alone.
+
     Sober         -> org.vinegarhq.Sober  (Roblox; Flatpak-only)
     shelly        -> Flatpak-only, and you note it is ALPM/Arch-only
-    plus your other 12 existing Flatpaks
+    ...the other twelve in nixos/services.nix
+
+cherry-studio is NOT a flatpak here — it is packaged in-repo
+(pkgs/cherry-studio.nix, built from the upstream AppImage).
 
 ## F. Deliberate opt-ins
 

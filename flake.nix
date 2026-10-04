@@ -44,10 +44,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    # Declarative flatpak installs. nixpkgs' own flatpak module only has
+    # enable/package/extraPortals -- no app list -- so the apps are declared
+    # through this module, which installs/removes them on activation.
+    nix-flatpak.url = "github:gmodena/nix-flatpak";
   };
 
   outputs =
-    { nixpkgs, home-manager, chaotic, nur, plasma-manager, ... }:
+    { nixpkgs, home-manager, chaotic, nur, plasma-manager, nix-flatpak, ... }:
     let
       system = "x86_64-linux";
 
@@ -107,6 +112,10 @@
           # never drift apart.
           common = [
             home-manager.nixosModules.home-manager
+
+            # Adds services.flatpak.packages/remotes and applies them on
+            # activation. See the flatpak block in nixos/services.nix.
+            nix-flatpak.nixosModules.nix-flatpak
 
             # Enables https://nyx-cache.chaotic.cx. WITHOUT THIS, every nyx
             # package -- including the CachyOS KERNEL and proton-cachyos -- is
