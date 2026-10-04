@@ -40,6 +40,46 @@
   boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
   boot.loader.timeout = 5;
 
+  # Boot menu wallpaper + a theme sampled from it. Limine only reads files from
+  # the ESP, so NixOS copies this store path across and writes the entries into
+  # limine.conf -- no additionalFiles needed.
+  #
+  # The image is pre-cropped to the ultrawide's 2.39:1 and re-encoded to JPEG at
+  # exactly the interface mode, so Limine does a 1:1 blit and the loader stage
+  # reads ~680 KiB instead of the original 11 MiB PNG. "stretched" fills the
+  # screen with no distortion only if the interface matches that shape, hence
+  # pinning interface.resolution to the panel's mode (Limine falls back to
+  # another GOP mode if the firmware does not offer it).
+  #
+  # One display only: UEFI GOP is a single framebuffer, so Limine cannot crop
+  # per-monitor. If the menu appears on a different screen, re-crop for that one.
+  #
+  # Colours come from the art -- a deep violet void (#110226) with a #693698
+  # accent. Its text region sits at luma 9-21 (near black), so light text reads
+  # cleanly with no solid panel behind it. Branding and help colours are certain;
+  # the entry list is drawn through Limine's terminal palette, so foreground and
+  # background theme it. The background keeps the wallpaper visible (the doc's
+  # own 50%-transparent default) tinted toward the theme.
+  boot.loader.limine.style = {
+    wallpapers = [ ../boot/limine-wallpaper.jpg ];
+    wallpaperStyle = "stretched";
+    interface = {
+      resolution = "3440x1440";
+      branding = "CoruscOS";        # the OS name, provisional
+      brandingColor = "B79BF0";     # title (Limine default is cyan #00AAAA)
+      helpColor = "8E7BB8";         # keybind help (default green #00AA00)
+      helpColorBright = "C9A9F5";   # boot-countdown digit
+    };
+    graphicalTerminal = {
+      foreground = "D8CBEF";
+      brightForeground = "EDE4FF";
+      background = "800F0325";      # 50% transparent deep violet panel
+      brightBackground = "532678";  # selected-entry bar, the image's accent
+      palette = "0F0325;C05A7A;7FB58A;B08A5A;7A6FD0;B06FD0;6FB5C0;8E7BB8";
+      brightPalette = "4A3A6B;E5809D;A6D4AE;E0C98A;9E93F0;D2A0F5;9AD4DE;EDE4FF";
+    };
+  };
+
   # RDNA4 (RX 9070 XT) needs a recent kernel and mesa. chaotic-nyx's CachyOS
   # kernel provides exactly what you run today.
   #
@@ -59,6 +99,16 @@
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
 
   boot.plymouth.enable = true;
+
+  # Boot splash logo. The default bgrt theme runs the two-step plugin, which
+  # draws the logo as a native-pixel watermark at bottom centre -- no scaling --
+  # so the file must be pre-sized to what should appear on screen. NixOS ships
+  # only a 48px default, which is near-invisible on a 3440px display. This is
+  # Coru's art, downscaled from 1204px to 160px. Change 160 to resize it.
+  #
+  # (Aside: the same plugin draws the spinner at its native 32px, which is why
+  # the splash reads as a blank grey screen -- there is nothing broken.)
+  boot.plymouth.logo = ../boot/plymouth-logo.png;
 
   # rootflags MUST be on the kernel command line for a btrfs SUBVOLUME root:
   # the initrd has to find the subvolume before systemd remounts anything.

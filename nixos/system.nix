@@ -5,6 +5,13 @@
   # Pick whatever you like -- CachyOS called itself "CachyOS".
   networking.hostName = "coru";
 
+  # What the OS calls itself. Feeds NAME and PRETTY_NAME in /etc/os-release, so
+  # fastfetch reports "CoruscOS 26.11 (Zokor)" instead of "NixOS 26.11 (Zokor)".
+  # Version, codename and ID are untouched -- ID stays "nixos", which is what
+  # fastfetch keys its ASCII logo off, so the snowflake remains. It also renames
+  # the Limine entry group ("CoruscOS default profile"). Drop the line for stock.
+  system.nixos.distroName = "CoruscOS";
+
   time.timeZone = "America/Chicago";       # verified against the running system
   i18n.defaultLocale = "en_US.UTF-8";
   console.keyMap = "us";
