@@ -15,6 +15,7 @@
     ./files.nix
     ./shell.nix
     ./shortcuts.nix
+    ./session.nix
     ./security.nix
     ./hardware.nix
     ./ai.nix

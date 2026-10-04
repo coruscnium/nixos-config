@@ -37,6 +37,12 @@
   # preset is seeded by modules/hardware.nix.
   services.input-remapper.enable = true;
 
+  # The G502 X LIGHTSPEED is a USB wakeup source, so any movement wakes suspend or
+  # hibernate. Disable it on the device node (its parent hubs are already off).
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c098", ATTR{power/wakeup}="disabled"
+  '';
+
   # Bluetooth stack only (bluez); Plasma's applet is the manager.
   hardware.bluetooth = {
     enable = true;
@@ -121,6 +127,23 @@
           install -m 0644 -o plasmalogin -g plasmalogin \
             "$src/fontconfig/fonts.conf" "$dst/.config/fontconfig/fonts.conf"
         fi
+
+        # The greeter's XDG_DATA_DIRS is only the session desktops dir, NOT
+        # /run/current-system/sw/share, so the Carl suite linked there is
+        # invisible to it and it renders missing-SVG garbage. $HOME/.local/share
+        # is always on Qt's search path, so link the theme/icon/cursor trees that
+        # the synced kdeglobals + plasmarc name into there.
+        sw=/run/current-system/sw/share
+        for d in plasma/desktoptheme plasma/look-and-feel color-schemes aurorae/themes icons; do
+          install -d -m 0755 -o plasmalogin -g plasmalogin "$dst/.local/share/$d"
+        done
+        ln -sfn "$sw/plasma/desktoptheme/Carl"    "$dst/.local/share/plasma/desktoptheme/Carl"
+        ln -sfn "$sw/plasma/look-and-feel/Carl"   "$dst/.local/share/plasma/look-and-feel/Carl"
+        ln -sfn "$sw/color-schemes/Carl.colors"   "$dst/.local/share/color-schemes/Carl.colors"
+        ln -sfn "$sw/aurorae/themes/Carl"         "$dst/.local/share/aurorae/themes/Carl"
+        ln -sfn "$sw/icons/BeautySolar"           "$dst/.local/share/icons/BeautySolar"
+        ln -sfn "$sw/icons/Bibata-Modern-Classic" "$dst/.local/share/icons/Bibata-Modern-Classic"
+
         rm -rf "$dst/.cache"
       '';
     };
