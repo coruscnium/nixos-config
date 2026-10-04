@@ -28,12 +28,55 @@
 #
 # The version and hash come from nvfetcher:
 #   nix run nixpkgs#nvfetcher && nixos-rebuild switch --flake .#coru
+#
+# ---------------------------------------------------------------------------
+# Wayland patch: the Quick Assistant global shortcut
+#
+# 2.1.4's main process does try to enable Chromium's Wayland global-shortcut
+# portal, then clobbers its own flag. In out/main/main.js:
+#
+#   if (isLinux && XDG_SESSION_TYPE === "wayland")
+#     appendSwitch("enable-features", "GlobalShortcutsPortal");
+#   ...
+#   appendSwitch("enable-features", "DocumentPolicy...,EarlyEstablishGpuChannel,...");
+#
+# Electron keeps one value per switch name, so the second call overwrites the
+# first and "GlobalShortcutsPortal" never reaches Chromium. Under Wayland that
+# makes Electron's globalShortcut.register() a silent no-op: the Quick Assistant
+# hotkey never binds, and nothing shows up in KDE's shortcut settings.
+#
+# The install phase rewrites two strings in resources/app.asar IN PLACE. Both
+# edits are byte-length-preserving, so the archive's per-file offsets and sizes
+# stay valid and the 791 native modules under app.asar.unpacked are untouched --
+# a full asar repack could not guarantee that. Each anchor is asserted to occur
+# exactly once, so a Cherry bump that moves this code fails the build loudly
+# instead of silently shipping an unpatched app.
+#
+# That flag is necessary but, on xdg-desktop-portal >= 1.21, not sufficient.
+# The portal now hard-rejects a GlobalShortcuts CreateSession whose caller has
+# no app id (src/global-shortcuts.c: NOT_ALLOWED "An app id is required"), so
+# Chromium must first identify itself via
+# org.freedesktop.host.portal.Registry.Register. Electron 44 / Chromium 152
+# does make that call, but with the app id "CherryStudio" (the app's own name),
+# and the portal refuses it:
+#
+#   Could not register app ID: App info not found for 'CherryStudio'
+#
+# The id has to be backed by an installed .desktop file. Upstream's AppImage
+# ships CherryStudio.desktop -- but this wrapper used to install it *renamed*
+# to cherry-studio.desktop, so the lookup could never match and the whole
+# portal path died there. Installing it under its own name is the fix.
+#
+# (A CHROME_DESKTOP env var was tried first and did nothing: Electron derives
+# that itself from the app name, so overriding it was moot.)
+# ---------------------------------------------------------------------------
 { lib
 , stdenv
 , appimageTools
 , makeWrapper
 , callPackage
 , util-linux
+, python3
 , pkgs
 }:
 
@@ -49,13 +92,46 @@ let
   fhsArgs = appimageTools.defaultFhsEnvArgs;
   runtimeLibs = lib.makeLibraryPath (fhsArgs.multiPkgs pkgs ++ fhsArgs.targetPkgs pkgs);
   runtimeBin = lib.makeBinPath (fhsArgs.targetPkgs pkgs);
+
+  # Length-preserving byte edits to resources/app.asar -- see the header note.
+  # Invoked as: python3 <this> <path-to-app.asar>
+  asarPatch = pkgs.writeText "cherry-studio-wayland-shortcut.py" ''
+    import sys
+
+    path = sys.argv[1]
+    data = open(path, "rb").read()
+
+    # (old, new) pairs, each the same byte length. The first call is dead code
+    # -- its value is always overwritten -- so it is emptied to free the bytes
+    # the second call needs in order to carry the portal flag.
+    edits = [
+        (
+            b'appendSwitch("enable-features", "GlobalShortcutsPortal")',
+            b'appendSwitch("enable-features","")',
+        ),
+        (
+            b'appendSwitch("enable-features", "DocumentPolicyIncludeJSCallStacksInCrashReports,',
+            b'appendSwitch("enable-features", "GlobalShortcutsPortal,DocumentPolicyIncludeJSCallStacksInCrashReports,',
+        ),
+    ]
+
+    # The file size must not change, or the archive's stored offsets break.
+    # Only the sum of the edits has to net to zero, not each edit on its own.
+    assert sum(len(new) - len(old) for old, new in edits) == 0, "edits are not length-preserving overall"
+
+    for old, new in edits:
+        assert data.count(old) == 1, ("anchor not unique", old.decode(), data.count(old))
+        data = data.replace(old, new)
+
+    open(path, "wb").write(data)
+  '';
 in
 stdenv.mkDerivation {
   pname = "cherry-studio";
   inherit version;
   src = contents;
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [ makeWrapper python3 ];
 
   dontConfigure = true;
   dontBuild = true;
@@ -70,6 +146,12 @@ stdenv.mkDerivation {
     mkdir -p $out/opt/cherry-studio
     cp -a . $out/opt/cherry-studio
     chmod +x $out/opt/cherry-studio/CherryStudio
+
+    # Wayland Quick Assistant hotkey fix -- see the header note. cp -a keeps
+    # upstream's read-only file mode, so make the archive writable first.
+    asar=$out/opt/cherry-studio/resources/app.asar
+    chmod u+w "$asar"
+    python3 ${asarPatch} "$asar"
 
     # Mirrors AppRun's exports, minus the sandbox:
     #   PATH             -> the AppDir itself
@@ -87,8 +169,12 @@ stdenv.mkDerivation {
       --run 'if ! ${util-linux}/bin/unshare -Ur true 2>/dev/null; then set -- --no-sandbox "$@"; fi'
 
     # Menu entry and icon, straight from the AppImage's own metadata.
-    install -Dm644 CherryStudio.desktop $out/share/applications/cherry-studio.desktop
-    substituteInPlace $out/share/applications/cherry-studio.desktop \
+    # Keep the AppImage's own file name: Chromium registers the portal app id
+    # as "CherryStudio", and the portal resolves it by looking up exactly
+    # CherryStudio.desktop. Renaming the file to cherry-studio.desktop broke
+    # that lookup and with it every portal feature for the app.
+    install -Dm644 CherryStudio.desktop $out/share/applications/CherryStudio.desktop
+    substituteInPlace $out/share/applications/CherryStudio.desktop \
       --replace-fail 'Exec=AppRun %U' 'Exec=cherry-studio %U'
     install -Dm644 usr/share/icons/hicolor/1024x1024/apps/CherryStudio.png \
       $out/share/icons/hicolor/1024x1024/apps/CherryStudio.png

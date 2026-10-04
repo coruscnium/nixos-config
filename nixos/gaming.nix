@@ -15,6 +15,16 @@
     # proton-cachyos-native.
     extraCompatPackages = [ pkgs.proton-cachyos ];
 
+    # MangoHud has to live *inside* Steam's FHS environment: the client and the
+    # games it launches run in a sandbox that cannot see the host profile (the
+    # same reason the cursor theme needed its own symlink -- see
+    # modules/theming.nix). extraPackages seeds it into that environment's /usr,
+    # so `mangohud %command%` and MANGOHUD=1 resolve for the games. The
+    # user-facing `mangohud` command for lutris / heroic / a terminal comes from
+    # programs.mangohud in modules/gaming.nix -- two consumers, not a duplicate.
+    # pkgs.mangohud already bundles the 32-bit build, so one package covers both.
+    extraPackages = [ pkgs.mangohud ];
+
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = false;
   };

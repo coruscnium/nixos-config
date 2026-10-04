@@ -68,13 +68,35 @@ in
     ".local/share/themes/Carl".source = "${themes}/gtk-Carl";
 
     # GTK reads these; nothing writes them, so read-only symlinks are correct.
+    #
+    # gtk-3.0/gtk.css imports carl.css, colors.css and thunar.css by relative
+    # name, so the installed dir needs all three *beside* it. The gtk-4.0 block
+    # below always had them; the gtk-3.0 tree was missing them, so every GTK3
+    # app logged "Theme parsing error ... Failed to import". The three files are
+    # byte-identical to the gtk-4.0 copies (gtk-3.0/gtk.css is itself identical
+    # to gtk-4.0/gtk.css) -- each tree keeps its own copy because the relative
+    # import resolves against the importing file's own directory.
     ".config/gtk-3.0/settings.ini".source = "${themes}/gtk-3.0/settings.ini";
     ".config/gtk-3.0/gtk.css".source = "${themes}/gtk-3.0/gtk.css";
+    ".config/gtk-3.0/carl.css".source = "${themes}/gtk-3.0/carl.css";
+    ".config/gtk-3.0/colors.css".source = "${themes}/gtk-3.0/colors.css";
+    ".config/gtk-3.0/thunar.css".source = "${themes}/gtk-3.0/thunar.css";
     ".config/gtk-4.0/settings.ini".source = "${themes}/gtk-4.0/settings.ini";
     ".config/gtk-4.0/gtk.css".source = "${themes}/gtk-4.0/gtk.css";
     ".config/gtk-4.0/carl.css".source = "${themes}/gtk-4.0/carl.css";
     ".config/gtk-4.0/colors.css".source = "${themes}/gtk-4.0/colors.css";
     ".config/gtk-4.0/thunar.css".source = "${themes}/gtk-4.0/thunar.css";
+
+    # Chromium/CEF apps -- Steam's client UI -- run inside Steam's
+    # pressure-vessel sandbox, which bind-mounts THIS directory but not
+    # /run/current-system or /etc/profiles. Chromium finds the cursor theme NAME
+    # (from GTK / Xcursor.theme) but reads the cursor FILES from the XCURSOR_PATH
+    # dirs; with Bibata only visible in the store profile it finds no files,
+    # falls back to the "default" theme and then to the 16px core X cursor.
+    # A symlink here is visible in the sandbox because /nix/store is. Relying on
+    # XCURSOR_THEME does NOT work -- Chromium never reads that variable.
+    ".local/share/icons/Bibata-Modern-Classic".source =
+      "${pkgs.bibata-cursors}/share/icons/Bibata-Modern-Classic";
 
     # Mirrors the GTK settings for non-GTK toolkits.
     #

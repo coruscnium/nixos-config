@@ -11,6 +11,20 @@
 final: prev:
 let
   lib = prev.lib;
+
+  # See the `mangohud` override below. nixpkgs' glfw is 3.4; this pins 3.3.10.
+  glfw33 = prev.glfw.overrideAttrs (o: {
+    version = "3.3.10";
+    src = prev.fetchFromGitHub {
+      owner = "glfw";
+      repo = "GLFW";
+      rev = "3.3.10";
+      hash = "sha256-kTRXsfQ+9PFurG3ffz0lwnITAYAXtNl3h/3O6FSny5o=";
+    };
+    # nixpkgs' postPatch rewrites Wayland dlopen paths in src/wl_init.c, a file
+    # the 3.3.x tree does not have. 3.3.x builds X11-only anyway.
+    postPatch = "";
+  });
 in
 # Scripts are defined in ./scripts.nix. They live in the overlay so that
 # modules/services.nix can reference the same store paths.
@@ -155,5 +169,22 @@ in
       platforms = [ "x86_64-linux" ];
     };
   };
+
+  # ---------------------------------------------------------------------------
+  # mangohud — pinned to glfw 3.3.10 because mangoapp segfaults on glfw 3.4.
+  #
+  # gamescope's `--mangoapp` spawns the separate `mangoapp` binary. Against
+  # nixpkgs' glfw 3.4 (built with both the Wayland and X11 backends) mangoapp's
+  # X11 init fails -- "Glfw Error 65550: X11: Platform not initialized" -- and it
+  # then calls XInternAtom on the null display and dumps core (SIGSEGV), so the
+  # HUD never shows, inside gamescope or out. Upstream flightlessmango/MangoHud
+  # #1261 names glfw 3.3.10 (X11-only) as the fix. Verified here: the 3.3.10
+  # build runs instead of crashing.
+  #
+  # Overriding mangohud (not glfw globally) keeps every other glfw consumer on
+  # 3.4. Both consumers of mangohud pick this up: home-manager's
+  # programs.mangohud and programs.steam.extraPackages.
+  # ---------------------------------------------------------------------------
+  mangohud = prev.mangohud.override { glfw = glfw33; };
 
 }

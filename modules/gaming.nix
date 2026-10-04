@@ -38,4 +38,10 @@
 
     pince                         # primary game-memory tool
   ];
+
+  # The user-facing `mangohud` command plus its config file. Steam needs its own
+  # copy inside the sandbox (programs.steam.extraPackages, nixos/gaming.nix);
+  # this one covers lutris, heroic and a plain terminal, and lets mangojuice's
+  # output land where MangoHud reads it. pkgs.mangohud bundles the 32-bit build.
+  programs.mangohud.enable = true;
 }

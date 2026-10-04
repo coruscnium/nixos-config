@@ -35,7 +35,10 @@ file is that nothing gets forgotten and nothing gets installed twice.
     v4l2loopback       -> boot.kernelModules=["v4l2loopback"] +
                           boot.extraModulePackages=[...v4l2loopback]
     kdePackages.kscreen-> supplies kscreen-doctor
-    steam/mangohud/gamemode -> programs.steam / programs.mangohud / programs.gamemode
+    steam/gamemode     -> programs.steam / programs.gamemode
+    mangohud           -> programs.mangohud (home-manager -- there is NO NixOS
+                          module for it) + pkgs.mangohud seeded into the Steam
+                          FHS via programs.steam.extraPackages
     ollama             -> services.ollama.enable
     syncthing          -> services.syncthing.enable
     ydotool            -> programs.ydotool.enable
@@ -93,6 +96,9 @@ anvil-organizer.
                     Electron. We wrap upstream's AppImage with the version and
                     hash resolved by nvfetcher (nvfetcher.toml -> _sources/).
                     This is also the harness this config is developed in.
+                    Its install phase byte-patches app.asar to fix Cherry's own
+                    clobbered Wayland global-shortcut flag (see the header note
+                    in pkgs/cherry-studio.nix).
 
                     nvfetcher CANNOT replace the rest of the vendoring:
                       themes/             pling.com serves a bot challenge.
