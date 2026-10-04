@@ -3,9 +3,9 @@
 # System-level gaming glue ONLY.
 #
 # The apps themselves (lutris, heroic, prismlauncher, r2modman, winboat,
-# protonup-qt, protonplus, protontricks, reigntweak, cheatengine-launcher,
-# pince, mangohud, goverlay, vkbasalt, wine, vinegar) live in the USER config
-# at modules/gaming.nix. Duplicating them here would install everything twice.
+# protonup-qt, protonplus, protontricks, reigntweak, pince, mangohud, goverlay,
+# vkbasalt, wine, vinegar) live in the USER config at modules/gaming.nix.
+# Duplicating them here would install everything twice.
 {
   programs.steam = {
     enable = true;

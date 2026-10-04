@@ -9,8 +9,6 @@
 # NOTE ON WHAT THIS DOES *NOT* COVER (deliberate):
 #   themes/            pling.com serves a bot challenge; there is no stable
 #                      fetchable URL, so the Carl suite stays vendored.
-#   pkgs/cheatengine-* Cheat Engine's GitHub releases carry no binary assets
-#                      (7.5, 7.4, ... are asset-less), so it stays vendored.
 #   scripts/           our own code.
 #   vendor/quadcast2s  our own project, which has no remote yet. Once it does,
 #                      add a [quadcast2s] src.git entry (plus

@@ -6,10 +6,6 @@
 # the equivalent of your proton-cachyos-native. On the NixOS side, register it
 # with programs.steam.extraCompatPackages rather than installing it here alone.
 #
-# cheatengine-launcher (pkgs/default.nix) replaces cehelper.sh and the
-# third-party Proton.SH script: protontricks-launch already resolves the right
-# prefix from a Steam appid.
-#
 # mangohud / gamemode / steam themselves are NixOS modules (programs.*), not
 # home packages.
 {
@@ -25,7 +21,6 @@
     protonplus
     proton-cachyos
     protontricks
-    cheatengine-launcher
     reigntweak                    # Elden Ring: Nightreign ultrawide / 60fps
 
     # goverlay is DROPPED, not omitted by accident: it is a Lazarus/Free Pascal

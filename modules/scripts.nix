@@ -9,7 +9,7 @@
 #
 # NOT ported: phonecam, fleasion-launch, heroic-performance-off.sh, hyprpush.sh,
 # gemini-mcp-wrapper.sh, obsidian-mcp*, paste-into-game.sh, lock-displays.sh
-# (excluded), cheatengine + cehelper.sh (replaced by pkgs/default.nix).
+# (excluded).
 {
   home.packages = with pkgs; [
     script-cover-extract

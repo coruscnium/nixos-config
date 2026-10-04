@@ -3,10 +3,9 @@
 # Imported as an overlay in flake.nix:
 #   pkgs = import nixpkgs { overlays = [ (import ./pkgs) ]; ... };
 #
-# Three things live here:
+# Two things live here:
 #   quadcast2s   - your own project, built from the checkout on disk
-#   reigntweak   - prebuilt binary from the upstream GitHub release
-#   cheatengine  - Windows CE binary + a protontricks launcher
+#   reigntweak   - Elden Ring: Nightreign patcher, built from source
 #
 { quadcast2sSrc }:
 final: prev:
@@ -120,26 +119,32 @@ in
   # ---------------------------------------------------------------------------
   # reigntweak — Elden Ring: Nightreign ultrawide / 60 FPS patcher
   #
-  # Upstream ships a bare x86_64 binary and no source. The hash below is the
-  # one GitHub reports for the Release1.2 asset, and it matches the copy that
-  # was already sitting in ~/.local/bin, so this is the same build.
+  # Built from source: plain C++17 against the standard library plus pthread, no
+  # external deps. Upstream also ships a prebuilt binary, but building it here
+  # means the compiler and the resulting binary are ours, not a downloaded blob.
+  # The build command mirrors build.sh in the repo.
   # ---------------------------------------------------------------------------
-  reigntweak = prev.stdenvNoCC.mkDerivation rec {
+  reigntweak = prev.stdenv.mkDerivation {
     pname = "reigntweak";
-    version = "1.2";
+    version = "unstable-2026-04-18";
 
-    src = prev.fetchurl {
-      url = "https://github.com/Minksh/ReignTweak/releases/download/Release1.2/reigntweak";
-      hash = "sha256-WOQMLqi+TCE7kECA2UbzcFv6KcqOByzTkJJwRiMIm+s=";
+    src = prev.fetchFromGitHub {
+      owner = "Minksh";
+      repo = "ReignTweak";
+      rev = "6f999c4f5c2483bed73c2cce715ebeee4a721d8a";
+      hash = "sha256-Lt8++TRIFnsG6h5PDNwBqTIPAePaYV2mTCSukdjZcjY=";
     };
 
-    dontUnpack = true;
-    nativeBuildInputs = [ prev.autoPatchelfHook ];
-    buildInputs = [ prev.stdenv.cc.cc.lib ];
+    buildPhase = ''
+      runHook preBuild
+      $CXX -std=c++17 reigntweak.cpp fps_patch.cpp ultrawide_patch.cpp \
+        depth_buffer_patch.cpp -o reigntweak -lpthread
+      runHook postBuild
+    '';
 
     installPhase = ''
       runHook preInstall
-      install -Dm755 $src $out/bin/reigntweak
+      install -Dm755 reigntweak $out/bin/reigntweak
       runHook postInstall
     '';
 
@@ -149,59 +154,6 @@ in
       license = lib.licenses.unfree; # no license declared upstream
       platforms = [ "x86_64-linux" ];
     };
-  };
-
-  # ---------------------------------------------------------------------------
-  # Cheat Engine — Windows build, run inside a game's Proton prefix.
-  #
-  # There is no cheat-engine package in nixpkgs, and the upstream GitHub
-  # releases carry no assets (the installer only lives on cheatengine.org), so
-  # the binary is vendored from the existing local copy.
-  #
-  # This replaces BOTH cehelper.sh and the third-party "Proton.SH by NuLLxD"
-  # script: protontricks-launch already finds the right prefix for an appid.
-  # ---------------------------------------------------------------------------
-  cheatengine = prev.stdenvNoCC.mkDerivation rec {
-    pname = "cheatengine";
-    version = "7.5"; # TODO confirm against the vendored binary
-
-    # Vendored into this flake directory: upstream GitHub releases carry no
-    # assets and cheatengine.org has no stable URL, so there is nothing to
-    # fetch. Pure eval forbids reading it from ~/.local/bin.
-    src = ./cheatengine-x86_64.exe;
-
-    dontUnpack = true;
-    dontPatchELF = true;
-
-    installPhase = ''
-      runHook preInstall
-      install -Dm644 $src $out/share/cheatengine/cheatengine-x86_64.exe
-      runHook postInstall
-    '';
-
-    meta = {
-      description = "Cheat Engine (Windows build) for use under Proton";
-      homepage = "https://cheatengine.org";
-      license = lib.licenses.gpl2Plus;
-      platforms = [ "x86_64-linux" ];
-    };
-  };
-
-  # Thin launcher: cheatengine <steam-appid> [args...]
-  cheatengine-launcher = prev.writeShellApplication {
-    name = "cheatengine";
-    runtimeInputs = [ prev.protontricks ];
-    text = ''
-      if [ "$#" -lt 1 ]; then
-        echo "usage: cheatengine <steam-appid> [CE args...]" >&2
-        echo "  e.g. cheatengine 1245620   # ELDEN RING" >&2
-        exit 2
-      fi
-      appid="$1"
-      shift
-      exec protontricks-launch --appid "$appid" \
-        ${final.cheatengine}/share/cheatengine/cheatengine-x86_64.exe "$@"
-    '';
   };
 
 }

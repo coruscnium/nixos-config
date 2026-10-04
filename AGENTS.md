@@ -50,7 +50,7 @@ and a broken boot.
 ## Hard rules — do not break these
 
 1. **Only git-tracked files reach the store.** The flake copies tracked files into `/nix/store`, so
-   `themes/`, `vendor/quadcast2s/`, and `pkgs/cheatengine-x86_64.exe` must stay tracked. `.gitignore`
+   `themes/` and `vendor/quadcast2s/` must stay tracked. `.gitignore`
    ignores only `result*` and editor cruft — keep it that way.
 2. **`pkgs.usb-port-power-cycle` is identity-critical.** A sudoers rule (`nixos/users.nix`) and a
    watchdog wrapper both pin its store path. Do not redefine it elsewhere.

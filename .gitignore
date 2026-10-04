@@ -3,7 +3,6 @@ result
 result-*
 
 # NOTE: everything else here is intentionally tracked, including:
-#   pkgs/cheatengine-x86_64.exe   6.9 MB vendored Windows binary (not fetchable)
 #   themes/                        3.3 MB vendored Carl suite (pling is unautomatable)
 #   vendor/quadcast2s/             376 KB vendored project source
 # The flake copies only files TRACKED BY GIT into the store, so anything you

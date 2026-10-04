@@ -11,8 +11,7 @@ file is that nothing gets forgotten and nothing gets installed twice.
 | Cherry Studio | `nix run nixpkgs#nvfetcher` — re-resolves `_sources/generated.nix` |
 | NUR packages (e.g. `forkprince.nuvio`) | ride the NUR input, so `nix flake update` |
 | OctoEverywhere container image | `./nixos/update-octoeverywhere.sh --rebuild` |
-| `reigntweak` | bump `url` + `hash` in `pkgs/default.nix` (upstream has no releases API) |
-| `cheatengine` .exe | re-vendor the binary into `pkgs/` |
+| `reigntweak` | bump `rev` + `hash` in `pkgs/default.nix` — `nix-prefetch-github Minksh ReignTweak --rev <sha>` |
 | `quadcast2s` | re-copy the project over `vendor/quadcast2s` (exclude `.git`, `.venv`, `dist`, `build`, `*.egg-info`) |
 | `themes/` (Carl) | manual — pling.com serves a bot challenge, so there is no fetchable URL |
 | Flatpaks | declarative — `services.flatpak.packages` via nix-flatpak; set `services.flatpak.update.onActivation = true` to update on rebuild |
@@ -84,10 +83,9 @@ anvil-organizer.
                     `quadcast2sSrc` flake input (`flake = false` path input, so
                     pure eval works and the space in the path is percent-encoded).
                     Ships the wheel, udev rule, desktop entry, icon and docs.
-    reigntweak   -> pkgs/default.nix. Fetched from the upstream GitHub release;
-                    the hash matches the binary in ~/.local/bin byte for byte.
-    cheatengine  -> pkgs/default.nix. Vendored .exe plus a protontricks-launch
-                    wrapper that replaces cehelper.sh and the Proton.SH script.
+    reigntweak   -> pkgs/default.nix. Built from source — github:Minksh/ReignTweak
+                    pinned by rev. Plain C++17 against the standard library plus
+                    pthread, no external deps.
     octoeverywhere -> nixos/octoeverywhere.nix. Official container image, pinned
                     by digest via dockerTools.pullImage.
     cherry-studio -> pkgs/cherry-studio.nix. nixpkgs has it, but at 1.9.11
@@ -98,9 +96,6 @@ anvil-organizer.
 
                     nvfetcher CANNOT replace the rest of the vendoring:
                       themes/             pling.com serves a bot challenge.
-                      pkgs/cheatengine-*  Cheat Engine's GitHub releases carry
-                                          no binary assets; cheatengine.org
-                                          direct links are fragile.
                       scripts/            our own code.
                       vendor/quadcast2s   our own project, no remote yet. Once
                                           it has one, add a [quadcast2s] src.git
