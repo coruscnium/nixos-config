@@ -176,7 +176,6 @@ in
         desktopchangeosdEnabled = true;
         karouselEnabled = false;
         translucencyEnabled = true;
-        "window-to-desktop-followEnabled" = true;
       };
 
       # Exact font values from kdeglobals [General]. The encoded form is

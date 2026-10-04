@@ -1,8 +1,7 @@
 {
-  description = "Home Manager configuration of coru";
+  description = "coru's NixOS + Home Manager flake";
 
   inputs = {
-    # Specify the source of Home Manager and Nixpkgs.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -81,8 +80,6 @@
       homeConfigurations."coru" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
-        # Specify your home configuration modules here, for example,
-        # the path to your home.nix.
         modules = [
           ./home.nix
           ./modules
@@ -90,21 +87,16 @@
           # kdeglobals/kwinrc/plasmarc stay writable.
           plasma-manager.homeModules.plasma-manager
         ];
-
-        # Optionally use extraSpecialArgs
-        # to pass through arguments to home.nix
       };
 
       # =======================================================================
       # NixOS SYSTEM
       #
-      # The target of the migration. Build/eval with:
+      # Build/eval with:
       #   nixos-rebuild build --flake .#coru
       #
-      # This does NOT affect the CachyOS install until you boot it. The
-      # standalone homeConfigurations."coru" above keeps working on CachyOS, and
-      # both targets import the SAME ./home.nix + ./modules, so the two stay in
-      # sync while you migrate.
+      # homeConfigurations."coru" above and this system both import the SAME
+      # ./home.nix + ./modules, so they cannot drift apart.
       # =======================================================================
       nixosConfigurations =
         let

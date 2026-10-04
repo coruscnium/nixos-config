@@ -62,9 +62,9 @@ in
     version = "0.2.0";
     pyproject = true;
 
-    # Supplied as a `flake = false` path input from flake.nix, so the source is
-    # copied into the store at lock time. Refresh after editing the project:
-    #   nix flake lock --update-input quadcast2sSrc
+    # Supplied as a path argument from flake.nix (./vendor/quadcast2s), so the
+    # source is copied into the store at build time. Editing the vendored tree is
+    # picked up on the next build -- no lock update needed.
     src = quadcast2sSrc;
 
     build-system = [ prev.python3Packages.setuptools ];

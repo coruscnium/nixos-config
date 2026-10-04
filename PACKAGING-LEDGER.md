@@ -24,7 +24,7 @@ file is that nothing gets forgotten and nothing gets installed twice.
     power-profiles     -> services.power-profiles-daemon.enable
     zram               -> zramSwap.enable
     limine             -> boot.loader.limine.enable      (maxGenerations matters:
-                          the 2G ESP has ~482M free)
+                          the 1 GiB ESP holds ~3 generations comfortably)
     pipewire           -> services.pipewire.enable
     networkmanager     -> networking.networkmanager.enable
     bluetooth          -> hardware.bluetooth.enable   (bluez only). blueman is
@@ -133,8 +133,7 @@ flathub remote and installs/removes on activation. `uninstallUnmanaged` stays
 off, so flatpaks installed by hand are left alone.
 
     Sober         -> org.vinegarhq.Sober  (Roblox; Flatpak-only)
-    shelly        -> Flatpak-only, and you note it is ALPM/Arch-only
-    ...the other twelve in nixos/services.nix
+    ...the other eleven in nixos/services.nix (shelly is NOT here -- see §G)
 
 cherry-studio is NOT a flatpak here — it is packaged in-repo
 (pkgs/cherry-studio.nix, built from the upstream AppImage).

@@ -1,8 +1,7 @@
 # =============================================================================
 # OctoEverywhere Companion — Elegoo Centauri Carbon 2
 #
-# NixOS SYSTEM MODULE, not a home-manager module. Not imported by the flake yet.
-# When the NixOS config exists:   imports = [ ./octoeverywhere.nix ];
+# NixOS SYSTEM MODULE, not a home-manager module. Imported by nixos/default.nix.
 #
 # WHY THE CONTAINER: the old user unit ran a venv built by virtualenv against
 # /usr/bin/python3.14, which cannot work on NixOS. Packaging natively would also
@@ -31,8 +30,8 @@ let
 in
 {
   virtualisation = {
-    docker.enable = true;
-
+    # docker.enable is set in nixos/services.nix, not here, so it survives
+    # dropping this module. Not repeated.
     oci-containers = {
       backend = "docker";
       containers.octoeverywhere = {
