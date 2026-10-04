@@ -28,6 +28,23 @@
   services.libinput.enable = true;
   services.udisks2.enable = true;
 
+  # ---- Logitech peripherals -------------------------------------------------
+  # Solaar could not see the G502 X because nothing installed its udev rules:
+  # without them the hidraw node is root-only. programs.solaar supplies the
+  # package and the rules (it enables hardware.logitech.wireless); userService
+  # starts it tray-only on login. On-board profiles get switched off in Solaar so
+  # the buttons can be remapped instead of replaying what is stored on the mouse.
+  programs.solaar = {
+    enable = true;
+    userService.enable = true;
+    userService.window = "hide";
+  };
+
+  # Button remapping. enableUdevRules stays at its default (off) -- upstream
+  # disables it over input-remapper#140, and the system service handles presets
+  # without it. The preset file is seeded by modules/hardware.nix.
+  services.input-remapper.enable = true;
+
   # ---- Bluetooth ------------------------------------------------------------
   # Stack only (bluez). Bluetooth is managed with Plasma's own applet, so the
   # GTK blueman manager is deliberately not enabled.
@@ -104,4 +121,47 @@
     noto-fonts-color-emoji
     nerd-fonts.jetbrains-mono
   ];
+
+  # ---- Make the greeter match the desktop -----------------------------------
+  # The greeter runs as its own user (plasmalogin, home /var/lib/plasmalogin),
+  # so it cannot read coru's ~/.config -- which is why "Apply Plasma Settings"
+  # in the Login Screen KCM copies files across at runtime. Do the same at boot
+  # so the look survives a wipe or rebuild with no manual step.
+  #
+  # The file list mirrors PlasmaLoginAuthHelper::sync():
+  #   plasma-login-manager/src/frontend/kcm/auth/plasmaloginauthhelper.cpp
+  # It writes kxkbrc, kdeglobals, plasmarc, plasma-localerc, kcminputrc,
+  # kwinoutputconfig.json and fontconfig/fonts.conf into the greeter's
+  # ~/.config, then clears its ~/.cache so the new colours are picked up.
+  #
+  # Only runs when coru actually has a config, never fails the boot, and copies
+  # whatever the last home-manager activation wrote -- so a theme change shows
+  # up on the greeter from the next boot after a switch.
+  systemd.services.plasmalogin-sync-settings = {
+    description = "Copy coru's Plasma settings into the plasmalogin greeter home";
+    before = [ "plasmalogin.service" ];
+    wantedBy = [ "multi-user.target" ];
+    unitConfig.ConditionPathExists = "/home/coru/.config/kdeglobals";
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeShellScript "plasmalogin-sync-settings" ''
+        set -eu
+        src=/home/coru/.config
+        dst=/var/lib/plasmalogin
+        install -d -m 0750 -o plasmalogin -g plasmalogin "$dst/.config"
+        for f in kxkbrc kdeglobals plasmarc plasma-localerc kcminputrc kwinoutputconfig.json; do
+          if [ -f "$src/$f" ]; then
+            install -m 0644 -o plasmalogin -g plasmalogin "$src/$f" "$dst/.config/$f"
+          fi
+        done
+        if [ -f "$src/fontconfig/fonts.conf" ]; then
+          install -d -m 0750 -o plasmalogin -g plasmalogin "$dst/.config/fontconfig"
+          install -m 0644 -o plasmalogin -g plasmalogin \
+            "$src/fontconfig/fonts.conf" "$dst/.config/fontconfig/fonts.conf"
+        fi
+        rm -rf "$dst/.cache"
+      '';
+    };
+  };
 }

@@ -1,0 +1,119 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 281,
+                "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KP_Up",
+        "name": "DPI up (G8)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 282,
+                "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KP_Down",
+        "name": "DPI down (G7)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 276,
+                "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "Shift_L",
+        "name": "DPI shift (G6)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 274,
+                "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_symbol": "BTN_MIDDLE",
+        "name": "Middle click (G3)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 275,
+                "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_symbol": "BTN_SIDE",
+        "name": "Back (G4)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 277,
+                "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_symbol": "BTN_EXTRA",
+        "name": "Forward (G5)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 280,
+                "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
+            }
+        ],
+        "target_uinput": "keyboard + mouse",
+        "output_symbol": "XF86Calculator",
+        "name": "Profile cycling (G9)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 278,
+                "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "Left",
+        "name": "Scroll left (Wheel tilt left)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 279,
+                "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "Right",
+        "name": "Scroll right (Wheel tilt right)",
+        "mapping_type": "key_macro"
+    }
+]
