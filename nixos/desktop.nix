@@ -29,11 +29,12 @@
   services.udisks2.enable = true;
 
   # ---- Bluetooth ------------------------------------------------------------
+  # Stack only (bluez). Bluetooth is managed with Plasma's own applet, so the
+  # GTK blueman manager is deliberately not enabled.
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = false;
   };
-  services.blueman.enable = true;
 
   # ---- Printing and scanning ------------------------------------------------
   services.printing.enable = true;

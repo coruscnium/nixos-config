@@ -24,6 +24,22 @@
       "Switch to Desktop 4" = "Meta+4";
       "Switch to Desktop 5" = "Meta+5";
       "Window Fullscreen" = "Meta+F";
+
+      # Move the focused window to desktop N and follow it there. KWin ships
+      # native "Window to Desktop N" actions but they move the window without
+      # following it, so this uses our own script (kwin-scripts/move-window-to-desktop),
+      # which moves the window and activates it -- and KWin follows the active
+      # window to its new desktop.
+      #
+      # Written in shifted-symbol form (Meta+!, Meta+@, ...). That is the same
+      # physical keystroke as Meta+Shift+1..5, but KGlobalAccel canonicalises
+      # Shift+<digit> to the symbol -- a literal "Meta+Shift+1" is stored yet
+      # never matches the key event, so the shortcut silently does nothing.
+      "MoveWindowToDesktop1" = "Meta+!";
+      "MoveWindowToDesktop2" = "Meta+@";
+      "MoveWindowToDesktop3" = "Meta+#";
+      "MoveWindowToDesktop4" = "Meta+$";
+      "MoveWindowToDesktop5" = "Meta+%";
     };
   };
 }

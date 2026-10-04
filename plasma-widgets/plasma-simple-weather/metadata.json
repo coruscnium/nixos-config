@@ -1,0 +1,25 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Coru"
+            }
+        ],
+        "Category": "Environment & Weather",
+        "Description": "A weather widget with hourly and 10-day forecast, no location shown in panel",
+        "EnabledByDefault": true,
+        "FormFactors": [
+            "desktop",
+            "tablet",
+            "handset"
+        ],
+        "Icon": "weather-clear",
+        "Id": "com.owljet.simpleweather",
+        "License": "GPL-3.0+",
+        "Name": "Simple Weather",
+        "Version": "1.0.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml"
+}

@@ -1,0 +1,14 @@
+{
+    "KPackageStructure": "KWin/Script",
+    "KPlugin": {
+        "Id": "movewindowtodesktop",
+        "Name": "Move Window to Desktop",
+        "Description": "Moves the focused window to a virtual desktop and follows it there.",
+        "Icon": "preferences-system-windows",
+        "License": "MIT",
+        "Version": "1.0.0",
+        "EnabledByDefault": false
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

@@ -28,7 +28,9 @@ file is that nothing gets forgotten and nothing gets installed twice.
                           the 2G ESP has ~482M free)
     pipewire           -> services.pipewire.enable
     networkmanager     -> networking.networkmanager.enable
-    bluetooth/blueman  -> hardware.bluetooth.enable + programs.blueman
+    bluetooth          -> hardware.bluetooth.enable   (bluez only). blueman is
+                          NOT enabled -- Bluetooth is managed with Plasma's own
+                          applet
     printing           -> services.printing.enable
     brscan5            -> Brother scanner driver/udev (unfree .deb repack)
     v4l2loopback       -> boot.kernelModules=["v4l2loopback"] +

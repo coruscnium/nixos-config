@@ -59,6 +59,10 @@
     };
   };
 
+  # System-information fetch for the terminal. home-manager writes its default
+  # config; there is no custom one yet.
+  programs.fastfetch.enable = true;
+
   # The wizard-generated p10k prompt, vendored so the shell is fully declarative.
   home.file.".p10k.zsh".source = ../zsh/p10k.zsh;
 }

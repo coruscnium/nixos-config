@@ -24,4 +24,21 @@
     # Plasma finds plugins through XDG_DATA_DIRS, so a user-profile install works.
     wallpaper-engine-kde-plugin
   ];
+
+  # Vendored Plasma additions, referenced from the repo so they are reproducible
+  # instead of hand-installed into ~/.local/share.
+  home.file = {
+    # Simple Weather plasmoid (com.owljet.simpleweather). Plasma loads applets
+    # from ~/.local/share/plasma/plasmoids/<id>.
+    ".local/share/plasma/plasmoids/com.owljet.simpleweather".source =
+      ../plasma-widgets/plasma-simple-weather;
+
+    # Move the focused window to desktop N and follow it. KWin scans
+    # kwin/scripts/<plugin-id>; the dir name matches the metadata Id.
+    ".local/share/kwin/scripts/movewindowtodesktop".source =
+      ../kwin-scripts/move-window-to-desktop;
+  };
+
+  # The script ships EnabledByDefault=false, so KWin has to be told to load it.
+  programs.plasma.configFile."kwinrc"."Plugins".movewindowtodesktopEnabled = true;
 }
