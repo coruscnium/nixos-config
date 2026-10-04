@@ -4,47 +4,44 @@
 #
 # The login shell itself is set elsewhere -- nixos/users.nix picks pkgs.zsh and
 # turns on programs.zsh system-wide. This module owns the *user* side: prompt,
-# autosuggestions, completion and the nix aliases. ~/.zshrc is generated from
-# here, so the hand-written one is replaced; home-manager backs it up to
-# ~/.zshrc.hm-backup rather than clobbering it (backupFileExtension is set in
-# flake.nix).
+# completion and the nix aliases. ~/.zshrc is generated from here, so the
+# hand-written one is replaced; home-manager backs it up to ~/.zshrc.hm-backup
+# rather than clobbering it (backupFileExtension is set in flake.nix).
 {
   programs.zsh = {
     enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;          # fish-style inline suggestions
-    syntaxHighlighting.enable = true;      # command validity as you type
-    historySubstringSearch.enable = true;  # up/down through matching history
+
+    # zsh-autocomplete runs compinit itself and owns the completion system, so
+    # home-manager's own completion init has to be off (its docs require this on
+    # Nix). It also owns Tab and the history keys, so zsh-autosuggestions,
+    # zsh-history-substring-search and fzf-tab are deliberately absent -- each of
+    # them fights it for the same bindings (see zsh-autocomplete issues #211,
+    # #501). syntax-highlighting is fine: it only needs to load last.
+    enableCompletion = false;
+    syntaxHighlighting.enable = true;
 
     history = {
       size = 10000;
       save = 10000;
       ignoreDups = true;
-      ignoreSpace = true;                  # a leading space keeps a command out
-      share = true;                        # history shared across sessions
+      ignoreSpace = true;
+      share = true;
     };
 
-    # fzf-tab replaces zsh's completion menu with an fzf picker. It must load
-    # AFTER compinit -- home-manager runs compinit at order 570 but sources
-    # plugins at 900, which is why this works without manual ordering.
-    plugins = [
-      {
-        name = "fzf-tab";
-        src = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
-      }
-    ];
-
-    # p10k is sourced last (order 1300, after syntax-highlighting at 1200), as
-    # upstream expects. BOTH lines are required: the theme only *defines* the
-    # prompt, and it refuses to trust a config it did not see sourced -- if no
-    # POWERLEVEL9K_* variable is set, p10k assumes it is unconfigured and launches
-    # its wizard on the first prompt. Sourcing ~/.p10k.zsh is what stops that.
-    #
-    # The prompt config is vendored at zsh/p10k.zsh and placed as ~/.p10k.zsh
-    # below, so it is reproducible instead of a loose file in $HOME. To change it:
-    # run `p10k configure`, copy the result back over zsh/p10k.zsh, rebuild (the
-    # managed ~/.p10k.zsh is a read-only store symlink).
     initContent = lib.mkMerge [
+      # zsh-autocomplete must be sourced near the top, before anything calls
+      # compdef -- it installs its own completion widgets and does its own
+      # compinit, which is why enableCompletion is false above.
+      (lib.mkOrder 500 ''
+        source ${pkgs.zsh-autocomplete}/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+      '')
+
+      # p10k is sourced last, as upstream expects. BOTH lines are required: the
+      # theme only *defines* the prompt, and it runs its wizard unless a
+      # POWERLEVEL9K_* variable is already set, so ~/.p10k.zsh must be sourced
+      # too. The config is vendored at zsh/p10k.zsh and placed as ~/.p10k.zsh
+      # below -- to change it, run `p10k configure`, copy the result back over
+      # zsh/p10k.zsh, rebuild (the managed ~/.p10k.zsh is a read-only symlink).
       (lib.mkOrder 1300 ''
         source ${pkgs.zsh-powerlevel10k}/share/zsh/themes/powerlevel10k/powerlevel10k.zsh-theme
         [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -52,8 +49,7 @@
     ];
 
     shellAliases = {
-      # nixup is the one that matters: rebuild and switch this host from the
-      # flake. The rest are the same operation at other points in the loop.
+      # nixup is the everyday one: rebuild and switch this host from the flake.
       nixup = "sudo nixos-rebuild switch --flake ~/Projects/NixClone/nixos-config#coru";
       nixbuild = "sudo nixos-rebuild build --flake ~/Projects/NixClone/nixos-config#coru";
       nixboot = "sudo nixos-rebuild boot --flake ~/Projects/NixClone/nixos-config#coru";
