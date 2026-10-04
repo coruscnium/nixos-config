@@ -29,6 +29,17 @@
     };
 
     initContent = lib.mkMerge [
+      # p10k's instant prompt. It reprints the prompt from a dump p10k caches in
+      # ~/.cache before the rest of this file runs, so the terminal looks ready
+      # immediately instead of after p10k + compinit finish. It MUST come first;
+      # the guard skips it until the dump exists (the first shell writes it), so
+      # sourcing unconditionally is safe.
+      (lib.mkOrder 100 ''
+        if [[ -r ''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-$USER.zsh ]]; then
+          source ''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-$USER.zsh
+        fi
+      '')
+
       # zsh-autocomplete must be sourced near the top, before anything calls
       # compdef -- it installs its own completion widgets and does its own
       # compinit, which is why enableCompletion is false above.

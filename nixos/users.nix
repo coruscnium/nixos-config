@@ -34,6 +34,13 @@
 
   programs.zsh.enable = true;
 
+  # /etc/zshrc would otherwise run compinit AND set up the default `prompt suse`
+  # prompt. Both are wasted work here: zsh-autocomplete runs its own compinit
+  # (see modules/shell.nix) and p10k owns the prompt. Dropping them is roughly a
+  # third of interactive shell startup.
+  programs.zsh.enableGlobalCompInit = false;
+  programs.zsh.promptInit = "";
+
   security.sudo = {
     enable = true;
     # Only this one helper may run passwordless: streamcontroller-watchdog calls
