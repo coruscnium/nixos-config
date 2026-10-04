@@ -14,6 +14,7 @@
     ./net.nix            # torrents, downloads, cloud/sync
     ./files.nix          # file management, encryption, disks
     ./shell.nix          # zsh: prompt, completion, nix aliases
+    ./shortcuts.nix      # global keyboard shortcuts (kglobalshortcutsrc)
     ./security.nix       # vaults, auth, privacy
     ./hardware.nix       # peripherals, monitoring, Wayland input
     ./ai.nix
