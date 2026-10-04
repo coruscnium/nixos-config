@@ -22,26 +22,19 @@ in
 {
   systemd.user.services = {
     # ------------------------------------------------------------------ Stream Deck
-    # Your own unit. The upstream package's unit is NOT used: this pair exists
-    # because of the enumeration bug the watchdog works around.
-    streamcontroller = {
-      Unit = {
-        Description = "StreamController";
-        After = [ "graphical-session.target" ];
-        PartOf = [ "graphical-session.target" ];
-        StartLimitIntervalSec = 60;
-        StartLimitBurst = 5;
-      };
-      Service = {
-        Type = "simple";
-        ExecStart = "${lib.getExe pkgs.streamcontroller} -b";
-        Restart = "on-failure";
-        RestartSec = 5;
-        ExecStopPost = "-${pkgs.procps}/bin/pkill -f streamcontroller";
-      };
-      Install.WantedBy = [ "graphical-session.target" ];
-    };
-
+    # NOTE: there is deliberately NO streamcontroller.service here.
+    #
+    # StreamController autostarts ITSELF. With its `system.autostart` setting on
+    # (the default) it writes ~/.config/autostart/StreamController.desktop with
+    # `Exec=streamcontroller -b` on every launch. A second, systemd-side launcher
+    # only races it -- and whichever starts second is worse than redundant: the
+    # app's quit_running() finds the instance already up and fires a DBus
+    # `reopen` at it, which PRESENTS the window. That is precisely the "opens as
+    # a full window on every login / nixup" bug. So: one launcher only, the
+    # app's own (it passes -b, which hides the window).
+    #
+    # The watchdog below is what keeps the deck honest (USB power-cycle +
+    # relaunch); it pkills before it relaunches, so it never triggers a reopen.
     streamcontroller-watchdog = {
       Unit = {
         Description = "StreamController Watchdog";
