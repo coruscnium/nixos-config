@@ -39,7 +39,10 @@ in
     bibata-cursors                 # provides Bibata-Modern-Classic
                                    # (nixpkgs name is bibata-cursors, NOT
                                    # bibata-cursor-theme — that is the Arch name)
-    beautyline-icons               # chaotic-nyx: supplies BeautySolar/BeautyLine
+    beautyline-icons               # BeautyLine (chaotic-nyx)
+    beautysolar                    # BeautySolar -- our package; nixpkgs carries
+                                   # BeautyLine but not this sibling, which is
+                                   # why the old iconTheme name silently failed
     kdePackages.qtstyleplugin-kvantum
   ];
 
@@ -81,9 +84,28 @@ in
 
     workspace = {
       colorScheme = "Carl";
-      lookAndFeel = "Carl";
+      # lookAndFeel is deliberately NOT set. plasma-manager treats it as
+      # mutually exclusive with the individual theme options below: with it set,
+      # it stops writing colorScheme/iconTheme/cursor/plasmarc and instead runs
+      # `plasma-apply-lookandfeel -a Carl` at login. That applies the vendored
+      # LNF's contents/defaults, which still names themes that are NOT installed
+      # here (WhiteSur-cursors, kora) and a decoration library that disagrees
+      # with the kwinrc block further down -- so the explicit settings below get
+      # discarded and the desktop comes up half-themed.
+      #
+      # plasma-manager's own warning (modules/workspace.nix:411) says the same:
+      # "Setting lookAndFeel together with ... windowDecorations ... is not
+      # recommended since lookAndFeel themes often override these settings."
+      #
+      # If you ever want the LNF back, fix themes/look-and-feel-Carl/contents/
+      # defaults FIRST so it names Bibata/BeautyLine and org.kde.kwin.aurorae.v2.
       theme = "Carl";                  # Plasma desktop theme (plasmarc)
-      iconTheme = "BeautySolar";
+      iconTheme = "BeautySolar";       # provided by pkgs/beautysolar.nix.
+                                       # nixpkgs' beautyline-icons supplies only
+                                       # BeautyLine, so asking for BeautySolar
+                                       # used to fail silently AND leave
+                                       # plasma-manager's login script unable to
+                                       # stamp itself complete.
       # kdeglobals says kvantum-dark, not "kvantum"
       widgetStyle = "kvantum-dark";
       soundTheme = "ocean";
@@ -106,7 +128,10 @@ in
     configFile = {
       "kwinrc"."org.kde.kdecoration2" = {
         library = "org.kde.kwin.aurorae.v2";
-        theme = "Carl";                # the Aurorae decoration in themes/
+        # NOT plain "Carl". Aurorae SVG themes are addressed with this prefix;
+        # with "Carl" the decoration fails to load and windows come up with no
+        # titlebar at all. This is the pair the running (working) session uses.
+        theme = "__aurorae__svg__Carl";
         AlwaysShowExcludeFromCapture = true;
       };
 

@@ -57,7 +57,43 @@
     extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ];
   };
   environment.sessionVariables.NIXOS_OZONE_WL = "1";   # Wayland for Electron
-  environment.sessionVariables.QT_QPA_PLATFORMTHEME = "qt6ct";
+
+  # MUST be "kde" on a Plasma desktop. This was set to "qt6ct", which makes
+  # every Qt application read its palette, fonts and widget style from qt6ct's
+  # own config instead of the Plasma colour scheme. Plasma's chrome (panels,
+  # titlebars) is drawn by Plasma and stays dark while app widgets render
+  # light -- the "half light, half dark" breakage.
+  #
+  # qt6ct stays installed (modules/desktop.nix) so it is available as a style
+  # chooser, but it must not be the platform theme under KDE.
+  environment.sessionVariables.QT_QPA_PLATFORMTHEME = "kde";
+
+  # ---- Login screen theming ------------------------------------------------
+  # The Plasma Login Manager greeter runs as its own user (`plasmalogin`, home
+  # /var/lib/plasmalogin), so it cannot read anything in coru's home --
+  # ~/.local/share/plasma/..., ~/.local/share/color-schemes/... and
+  # /etc/profiles/per-user/coru are all invisible to it. Whatever the login
+  # screen should show has to be in /run/current-system/sw instead.
+  #
+  # PLM has no colour-scheme or theme option of its own: its System Settings
+  # module exposes only PreselectedSession and WallpaperPluginId. It draws the
+  # greeter with Plasma, so it picks these up as ordinary system-wide assets.
+  environment.systemPackages = with pkgs; [
+    carl-theme     # colour scheme + Look-and-Feel + desktop theme + Aurorae
+    beautysolar    # icon theme (see pkgs/beautysolar.nix)
+    bibata-cursors # cursor theme
+  ];
+
+  # environment.systemPackages only links the share/ subdirectories named here,
+  # and the defaults do NOT include any of these four -- which is why the icon
+  # theme previously existed only in coru's per-user profile.
+  environment.pathsToLink = [
+    "/share/color-schemes"
+    "/share/plasma"
+    "/share/aurorae"
+    # NOTE: /share/icons is deliberately absent -- another module already adds
+    # it, and listing it twice puts a duplicate in the merged list.
+  ];
 
   # System-wide fonts, so the login screen and anything outside the session
   # still renders. The user-level set came from the [fonts] package line.

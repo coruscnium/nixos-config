@@ -21,6 +21,16 @@ in
   # Cherry Studio, pinned from upstream's AppImage by nvfetcher.
   cherry-studio = prev.callPackage ./cherry-studio.nix { pkgs = prev; };
 
+  # BeautySolar icons. nixpkgs has BeautyLine (beauty-line-icon-theme) but not
+  # this sibling, and theming.nix asks for it by name.
+  beautysolar = prev.callPackage ./beautysolar.nix { };
+
+  # The Carl suite as a system-wide package. Needed because the Plasma Login
+  # Manager greeter runs as its own user and cannot see coru's home, where
+  # modules/theming.nix otherwise installs these. themesDir is the vendored
+  # tree, so the greeter and the session share one source of truth.
+  carl-theme = prev.callPackage ./carl-theme.nix { themesDir = ../themes; };
+
   # ---------------------------------------------------------------------------
   # quadcast2s — RGB lighting for the HyperX QuadCast 2 S
   #
