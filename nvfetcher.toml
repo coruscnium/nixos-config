@@ -1,30 +1,18 @@
-# Upstream sources that nixpkgs doesn't package, or packages too old.
+# Upstream sources nixpkgs doesn't package, or packages too old.
 #
-# `nvfetcher` resolves each src.* version and rewrites _sources/generated.nix
-# with the matching hash, so bumping is a command rather than hand-editing a
-# SHA. Run it, then rebuild:
-#
+# nvfetcher resolves each src.* version and rewrites _sources/generated.nix, so
+# bumping is a command:
 #   nix run nixpkgs#nvfetcher && nixos-rebuild switch --flake .#coru
 #
-# NOTE ON WHAT THIS DOES *NOT* COVER (deliberate):
-#   themes/            pling.com serves a bot challenge; there is no stable
-#                      fetchable URL, so the Carl suite stays vendored.
-#   scripts/           our own code.
-#   vendor/quadcast2s  our own project, which has no remote yet. Once it does,
-#                      add a [quadcast2s] src.git entry (plus
-#                      git.fetchSubmodules if needed) and drop the vendored copy.
+# NOT covered (deliberate): themes/ (pling serves a bot challenge), scripts/ (our
+# code), vendor/quadcast2s (no remote yet).
 #
-# Table names go at the ROOT ("[cherry-studio]"), not under a [sources.*]
-# wrapper -- nvfetcher 0.8 rejects the latter with
-#   "Decode error at '.src': Field does not exist"
+# Table names go at the ROOT -- nvfetcher 0.8 rejects a [sources.*] wrapper.
 
 [cherry-studio]
-# Cherry Studio is stuck at 1.9.11 in nixpkgs (the 2.x bump is an open PR and
-# pins an insecure Electron), so we wrap upstream's AppImage instead. This is
-# the harness this whole config is developed in, which is why pinning it beats
-# installing it by hand.
+# nixpkgs is stuck at 1.9.11, so wrap upstream's AppImage instead.
 src.github = "CherryHQ/cherry-studio"
-# Upstream tags are "v2.1.4" but the release assets drop the "v".
+# tags are "v2.1.4" but the release assets drop the "v"
 src.prefix = "v"
 fetch.url = "https://github.com/CherryHQ/cherry-studio/releases/download/v$ver/Cherry-Studio-$ver-linux-x64.AppImage"
 url.name = "Cherry-Studio-$ver-linux-x64.AppImage"

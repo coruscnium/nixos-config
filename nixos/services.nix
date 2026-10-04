@@ -1,56 +1,29 @@
 { config, lib, pkgs, ... }:
 
-# System services. These are the things that CANNOT live in home-manager
-# because they need root, a system daemon, or global state.
+# System services that need root / a system daemon / global state.
 {
   networking.networkmanager.enable = true;
+  networking.firewall.allowedTCPPorts = [ 1883 ];   # OctoEverywhere MQTT relay
 
-  # 1883 is the OctoEverywhere MQTT relay (nixos/octoeverywhere.nix publishes it
-  # from the container). Docker writes its own iptables rules, so this entry is
-  # belt-and-braces for LAN clients rather than strictly required.
-  networking.firewall.allowedTCPPorts = [ 1883 ];
-
-  # ---- Containers -----------------------------------------------------------
-  # Docker is here rather than in octoeverywhere.nix so it exists even if you
-  # drop that module. The oci-containers backend there depends on it.
   virtualisation.docker.enable = true;
 
-  # ---- Storage --------------------------------------------------------------
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
   };
-  services.fstrim.enable = true;          # discard=async is in fstab; this is belt-and-braces
+  services.fstrim.enable = true;
 
-  # ---- Sync / cloud ---------------------------------------------------------
   services.syncthing.enable = true;
   services.tailscale.enable = true;
 
-  # ---- AI -------------------------------------------------------------------
-  # Matches your local ollama. Models live under /var/lib/ollama, which is NOT
-  # your CachyOS ~/.ollama -- re-pull them, or point OLLAMA_MODELS at the old
-  # directory on /mnt/ssd2.
+  # Models live under /var/lib/ollama (not the old ~/.ollama).
   services.ollama.enable = true;
 
-  # ---- Performance ----------------------------------------------------------
-  services.scx.enable = true;             # sched-ext; you had scx installed
-  services.psd.enable = true;             # profile-sync-daemon (browser profiles)
+  services.scx.enable = true;
+  services.psd.enable = true;
 
-  # ---- Flatpak --------------------------------------------------------------
-  # nixpkgs' flatpak module has no app list, so nix-flatpak (imported in
-  # flake.nix) adds services.flatpak.packages/remotes and installs/removes them
-  # on activation. The flathub remote is added by default.
-  #
-  # Only the apps listed here are managed; flatpaks installed by hand are left
-  # alone (uninstallUnmanaged is off). To make it prune them too, set
-  # services.flatpak.uninstallUnmanaged = true.
-  #
-  # Two of your CachyOS flatpaks are EXCLUDED on purpose: com.hypixel.HytaleLauncher
-  # and wtf.aubree.MacOBlox came from custom remotes (hytalelauncher-origin,
-  # macoblox-origin) that do not exist here.
-  #
-  # Cherry Studio is NOT here -- it is packaged in-repo (pkgs/cherry-studio.nix,
-  # built from the upstream AppImage). Sober is Flatpak-only (Roblox).
+  # Apps are declared here; nix-flatpak installs/removes them on activation.
+  # Hand-installed flatpaks are left alone (uninstallUnmanaged off).
   services.flatpak = {
     enable = true;
     packages = [
@@ -68,13 +41,8 @@
       "page.codeberg.libre_menu_editor.LibreMenuEditor"
     ];
 
-    # Sober (Roblox) needs the Discord IPC socket and an input device, or it
-    # comes up a black window with no controller. Declarative form of:
-    #   flatpak override --user \
-    #     --filesystem=xdg-run/app/com.discordapp.Discord:create \
-    #     --filesystem=xdg-run/discord-ipc-0 \
-    #     --device=input org.vinegarhq.Sober
-    # writeMode defaults to "merge", so any hand-made override keys survive.
+    # Sober (Roblox) needs the Discord IPC socket + an input device or it comes up
+    # a black window. writeMode defaults to "merge".
     overrides.settings."org.vinegarhq.Sober".Context = {
       filesystems = [
         "xdg-run/app/com.discordapp.Discord:create"
@@ -84,15 +52,9 @@
     };
   };
 
-  # ---- Hardware hooks -------------------------------------------------------
-  # Installs the udev rule shipped by the quadcast2s derivation, including its
-  # SYSTEMD_USER_WANTS tag, which is what starts quadcast2s-hotplug. Without
-  # this line the rule never reaches /etc/udev/rules.d.
+  # Installs the quadcast2s udev rule (incl. its SYSTEMD_USER_WANTS tag).
   services.udev.packages = [ pkgs.quadcast2s ];
 
-  # Secrets / keyring, as on CachyOS.
   services.gnome.gnome-keyring.enable = true;
-
-  # Firmware updates.
   services.fwupd.enable = true;
 }

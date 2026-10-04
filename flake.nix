@@ -8,45 +8,29 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # quadcast2s is VENDORED at ./vendor/quadcast2s rather than being a
-    # `path:` flake input. The old input pointed at an absolute path containing
-    # a space ("AI Folder"), which meant the flake could only ever evaluate on
-    # this machine -- fatal after a wipe. Vendoring makes the repo self-contained.
-    #
-    # To update it, re-copy the project over vendor/quadcast2s, EXCLUDING
-    # .git, .venv, dist, build and *.egg-info. Those artifacts are what made the
-    # build fail the first time (two wheels declaring the same console script).
-
-    # Chaotic-Nyx — the CachyOS-on-NixOS bridge. Provides linux-cachyos
-    # (incl. the znver4 config that matches this machine), nvidia-cachyos,
-    # proton-bin with the CachyOS manifests, ananicy-cpp-rules, bpftools-full,
-    # and the *-git package variants.
-    # Use the nyxpkgs-* branches: they are the ones meant to follow nixpkgs.
+    # quadcast2s is vendored at ./vendor/quadcast2s, not a flake input -- the old
+    # path input contained a space and pinned the flake to this machine.
     chaotic = {
+      # CachyOS-on-NixOS bridge: linux-cachyos (incl. znver4), proton-cachyos.
       url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Nix User Repository. User-contributed and unvetted — pin it, and prefer a
-    # dedicated flake where one exists. Consumed as pkgs.nur.repos.<user>.<pkg>.
     nur = {
+      # Unvetted; used only as pkgs.nur.repos.<user>.<pkg>.
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Declarative KDE/Plasma settings. It applies values with kwriteconfig at
-    # activation, which is exactly why it is needed: kdeglobals / kwinrc /
-    # plasmarc are rewritten by KDE whenever a setting changes, so they cannot
-    # be home.file symlinks into the read-only store.
     plasma-manager = {
+      # Applies KDE settings with kwriteconfig at activation -- kdeglobals/kwinrc/
+      # plasmarc get rewritten by KDE, so they cannot be store symlinks.
       url = "github:nix-community/plasma-manager";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
 
-    # Declarative flatpak installs. nixpkgs' own flatpak module only has
-    # enable/package/extraPortals -- no app list -- so the apps are declared
-    # through this module, which installs/removes them on activation.
+    # Declarative flatpak app list -- nixpkgs' flatpak module has no app option.
     nix-flatpak.url = "github:gmodena/nix-flatpak";
   };
 
@@ -55,20 +39,14 @@
     let
       system = "x86_64-linux";
 
-      # NOTE: because we pass `pkgs` explicitly to homeManagerConfiguration,
-      # home-manager IGNORES its own `nixpkgs.config` option. Any package
-      # config (unfree, codecs, overlays) has to live HERE.
-      # This is also why ~/.config/nixpkgs/config.nix is not enough on its own:
-      # we fold it in here so it works with flakes.
+      # `pkgs` is passed explicitly to homeManagerConfiguration, so home-manager
+      # ignores its own nixpkgs.config -- package config (unfree, overlays) MUST
+      # live here.
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
           (import ./pkgs { quadcast2sSrc = ./vendor/quadcast2s; })
-          # nyx merges its packages into pkgs (e.g. proton-cachyos, and the
-          # linuxPackages_cachyos kernel set for the NixOS side).
           chaotic.overlays.default
-          # NUR only adds pkgs.nur.repos.<user>.<pkg>; it does not merge
-          # packages to the top level.
           nur.overlays.default
         ];
         config = {
@@ -83,46 +61,24 @@
         modules = [
           ./home.nix
           ./modules
-          # plasma-manager: applies KDE settings with kwriteconfig, so
-          # kdeglobals/kwinrc/plasmarc stay writable.
           plasma-manager.homeModules.plasma-manager
         ];
       };
 
-      # =======================================================================
-      # NixOS SYSTEM
-      #
-      # Build/eval with:
-      #   nixos-rebuild build --flake .#coru
-      #
-      # homeConfigurations."coru" above and this system both import the SAME
-      # ./home.nix + ./modules, so they cannot drift apart.
-      # =======================================================================
       nixosConfigurations =
         let
-          # Shared by every NixOS target, so the desktop/laptop/USB builds can
-          # never drift apart.
           common = [
             home-manager.nixosModules.home-manager
-
-            # Adds services.flatpak.packages/remotes and applies them on
-            # activation. See the flatpak block in nixos/services.nix.
             nix-flatpak.nixosModules.nix-flatpak
 
-            # Enables https://nyx-cache.chaotic.cx. WITHOUT THIS, every nyx
-            # package -- including the CachyOS KERNEL and proton-cachyos -- is
-            # built from source instead of downloaded. Verified: both are 404 on
-            # cache.nixos.org and 200 on nyx-cache.
-            #
-            # nyx's README warns the module must be enabled and the SYSTEM BUILT
-            # before you add nyx derivations, which is exactly the order here.
+            # Without the nyx cache every nyx package (incl. the CachyOS kernel)
+            # builds from source.
             chaotic.nixosModules.nyx-cache
 
             {
-              # The same overlays the standalone config uses. Passing them here
-              # is what guarantees identical store paths -- notably
-              # pkgs.usb-port-power-cycle, which the sudoers rule in
-              # nixos/users.nix and the watchdog wrapper must agree on exactly.
+              # Same overlays as the standalone config, so store paths match --
+              # notably pkgs.usb-port-power-cycle, which a sudoers rule and a
+              # wrapper both pin.
               nixpkgs.overlays = [
                 (import ./pkgs { quadcast2sSrc = ./vendor/quadcast2s; })
                 chaotic.overlays.default
@@ -131,15 +87,10 @@
               nixpkgs.config.allowUnfree = true;
 
               home-manager = {
-                # Build the user's packages with the system's pkgs (so the
-                # overlays above apply).
                 useGlobalPkgs = true;
-                # Install them into /etc/profiles/per-user/coru rather than
-                # imperatively managing ~/.nix-profile.
                 useUserPackages = true;
-                # Your ~/.local/bin scripts and gtk css are REAL files right
-                # now; home-manager refuses to clobber, so it moves them aside
-                # instead of aborting the activation.
+                # Real files exist where home-manager wants to symlink; move them
+                # aside instead of aborting activation.
                 backupFileExtension = "hm-backup";
 
                 users.coru.imports = [
@@ -157,11 +108,7 @@
           };
         in
         {
-          # The real machine.
           coru = mkNixos [ ];
-
-          # The full system as a live squashfs image, for a stick too small for
-          # a real install (see nixos/iso.nix).
           coru-iso = mkNixos [ ./nixos/iso.nix ];
         };
     };

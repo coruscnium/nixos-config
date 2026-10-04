@@ -1,26 +1,11 @@
-# Wallpaper Engine integration for Plasma 6 — the CaptSilver fork.
+# Wallpaper Engine integration for Plasma 6 -- the CaptSilver fork.
 #
-# In nixpkgs, nyx and NUR: nowhere. This builds the exact commit you are running
-# on CachyOS: 1.5.r97.gc1f55bd == rev c1f55bd. That is the "native C++, no
-# Python" rewrite, and it is a FORK of the original cat-in-136 plugin.
+# !! NEVER COMPILED. Evaluation is verified; the build is not. Expect to iterate
+# !! on buildInputs the first time it actually builds.
 #
-# It has a GIT SUBMODULE (src/backend_scene -> CaptSilver/wallpaper-scene-renderer),
-# so the source MUST be fetched with fetchSubmodules. A plain fetchFromGitHub
-# tarball has an empty src/backend_scene and will not build.
-#
-# !! NEVER COMPILED. Evaluation is verified; the build is not, because this
-# !! machine has no nix-daemon and cannot build anything as coru. Expect to
-# !! iterate on buildInputs the first time it actually builds.
-#
-# Dependencies come from upstream CMakeLists.txt, not from guessing:
-#   top-level: find_package(ECM), find_package(Plasma REQUIRED),
-#              KF6 Package Config Notifications Crash I18n
-#              (+ GlobalAccel CoreAddons, PlasmaActivities)
-#   src/:      Qt6 >= 6.7 Quick Qml Core DBus Network
-#              WebEngineCore WebEngineQuick   <-- REQUIRED, so qtwebengine is
-#                                                 mandatory (and heavy)
-#              KF6XmlGui (optional)
-#   Arch PKGBUILD: mpv, gst-libav, lz4, vulkan-icd-loader
+# Has a git submodule (src/backend_scene), so fetchSubmodules is required -- a
+# plain tarball has an empty submodule and will not build. Deps come from
+# upstream CMakeLists.txt.
 final: prev:
 let
   inherit (prev) lib;
@@ -69,13 +54,9 @@ in
       vulkan-headers
     ];
 
-    # This is a PLASMA PLUGIN (a shared library loaded by plasmashell), not a
-    # standalone application, so it must NOT be wrapped with a Qt environment:
-    # the host process already provides one. qtbase's setup hook demands you
-    # declare which you mean, and fails with
-    #   "this derivation depends on qtbase, but no wrapping behavior was specified"
-    # if you do neither. Since there is no executable to wrap, this is the
-    # correct answer rather than adding wrapQtAppsHook.
+    # It is a Plasma plugin (loaded by plasmashell), not a standalone app, so it
+    # must NOT be wrapped with a Qt environment. qtbase's setup hook demands you
+    # choose; there is no executable to wrap.
     dontWrapQtApps = true;
 
     cmakeBuildType = "Release";

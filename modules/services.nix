@@ -1,40 +1,21 @@
 { pkgs, lib, config, ... }:
 
-# Custom systemd USER units, ported from ~/.config/systemd/user/.
+# Custom systemd USER units, ported from ~/.config/systemd/user/. Every
+# /usr/bin/... path is replaced with a store path.
 #
-# Every /usr/bin/... path from the originals is replaced with a store path —
-# that substitution is the whole point, since on NixOS those paths do not exist.
-#
-# DELIBERATELY NOT PORTED:
-#   lock-displays.service           excluded on your instruction
-#   shelly-notifications.service    excluded (Shelly is ALPM/Arch-only)
-#   pwctl-chain@.service            generated at runtime by PipeWire Controller;
-#                                   hand-porting it would fight the app
-#   voxtype.service                 dropped
-#   hyprpolkitagent / xdg-desktop-portal-hyprland drop-ins -- Hyprland remnants
-#   quadcast2s.service.d/restart.conf  written by quadcast2s-gui at runtime
-#   octoeverywhere.service          moved to nixos/octoeverywhere.nix: it needs
-#                                   root + Docker, so it cannot be a user unit
-
+# Deliberately NOT ported: lock-displays, shelly-notifications (ALPM-only),
+# pwctl-chain@ (generated at runtime by PipeWire Controller), voxtype, the
+# Hyprland drop-ins, and octoeverywhere.service (needs root -- see
+# nixos/octoeverywhere.nix).
 let
   hm = config.home.homeDirectory;
 in
 {
   systemd.user.services = {
-    # ------------------------------------------------------------------ Stream Deck
-    # NOTE: there is deliberately NO streamcontroller.service here.
-    #
-    # StreamController autostarts ITSELF. With its `system.autostart` setting on
-    # (the default) it writes ~/.config/autostart/StreamController.desktop with
-    # `Exec=streamcontroller -b` on every launch. A second, systemd-side launcher
-    # only races it -- and whichever starts second is worse than redundant: the
-    # app's quit_running() finds the instance already up and fires a DBus
-    # `reopen` at it, which PRESENTS the window. That is precisely the "opens as
-    # a full window on every login / nixup" bug. So: one launcher only, the
-    # app's own (it passes -b, which hides the window).
-    #
-    # The watchdog below is what keeps the deck honest (USB power-cycle +
-    # relaunch); it pkills before it relaunches, so it never triggers a reopen.
+    # No streamcontroller.service on purpose: StreamController autostarts itself
+    # (writing ~/.config/autostart), and a second launcher races it -- the loser's
+    # quit_running() fires a DBus reopen that presents the window. The watchdog
+    # below pkills before it relaunches, so it never triggers a reopen.
     streamcontroller-watchdog = {
       Unit = {
         Description = "StreamController Watchdog";
@@ -56,12 +37,10 @@ in
         StandardOutput = "journal";
         StandardError = "journal";
       };
-      # No Install: it is driven by the timer below.
     };
 
-    # --------------------------------------------------------------- QuadCast 2 S
-    # Mirrors systemd/quadcast2s.service from your own repo. ExecStart keeps
-    # $QUADCAST2S_ARGS unquoted so systemd splits it into separate arguments.
+    # Mirrors systemd/quadcast2s.service from the vendor tree. $QUADCAST2S_ARGS is
+    # unquoted so systemd splits it into arguments.
     quadcast2s = {
       Unit = {
         Description = "QuadCast 2 S RGB lighting";
@@ -78,9 +57,8 @@ in
       Install.WantedBy = [ "default.target" ];
     };
 
-    # Started by udev via SYSTEMD_USER_WANTS in 70-quadcast2s.rules, which is
-    # installed on the NixOS side with services.udev.packages = [ pkgs.quadcast2s ].
-    # A no-op unless the user has opted in.
+    # Started by udev (SYSTEMD_USER_WANTS in the quadcast2s rule). No-op unless
+    # the user opts in.
     quadcast2s-hotplug = {
       Unit = {
         Description = "Start QuadCast 2 S lighting when the microphone is connected";
@@ -92,7 +70,6 @@ in
       };
     };
 
-    # ------------------------------------------------------------------- lsyncd
     lsyncd = {
       Unit.Description = "lsyncd mirror";
       Service = {
@@ -103,11 +80,8 @@ in
       Install.WantedBy = [ "default.target" ];
     };
 
-    # ----------------------------------------------------------------- mcp-proxy
-    # NOTE: this deliberately does NOT use pkgs.mcp-proxy. That package is a
-    # different tool (stdio <-> SSE). Yours is the uv-installed PyPI package
-    # whose CLI takes --port / --named-server-config. uv keeps it entirely under
-    # ~/.local/share/uv (its own interpreter included), so it survives on NixOS.
+    # NOT pkgs.mcp-proxy (a different tool). This is the uv-installed PyPI one,
+    # which keeps its interpreter under ~/.local/share/uv.
     mcp-proxy = {
       Unit.Description = "Centralized MCP proxy (all stdio servers)";
       Service = {
@@ -120,7 +94,6 @@ in
       Install.WantedBy = [ "default.target" ];
     };
 
-    # ----------------------------------------------------------------- MEGA cloud
     mega-mount = {
       Unit = {
         Description = "MEGA cloud storage mount";

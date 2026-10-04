@@ -1,7 +1,6 @@
 { pkgs, ... }:
 
 # Video, screen capture, image viewing/editing.
-# mpv is driven by the mpv-single wrapper (pkgs/scripts.nix supplies its socat).
 {
   home.packages = with pkgs; [
     mpv

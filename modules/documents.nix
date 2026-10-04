@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
-# Notes, scanning, document search.
-# naps2 pairs with brscan5, which is a NixOS-side driver (unfree .deb repack).
+# Notes, scanning, document search. naps2 pairs with the brscan5 driver
+# (nixos/desktop.nix).
 {
   home.packages = with pkgs; [
     obsidian

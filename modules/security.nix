@@ -1,9 +1,7 @@
 { pkgs, ... }:
 
-# Password managers, 2FA, encrypted mail, privacy tooling.
-# windscribe is deliberately absent: it is not in nixpkgs, nyx or NUR, and
-# packaging it means owning its root helper, setgid GUI and self-updater.
-# See PACKAGING-LEDGER.md.
+# Password managers, 2FA, encrypted mail, privacy. windscribe is absent -- it is
+# not in nixpkgs/nyx/NUR and would mean owning its root helper and self-updater.
 {
   home.packages = with pkgs; [
     proton-pass

@@ -1,7 +1,6 @@
 { pkgs, ... }:
 
-# One Discord client only (equibop). vesktop and legcord were dropped --
-# three Vencord-family wrappers were doing the same job.
+# One Discord client only (equibop).
 {
   home.packages = with pkgs; [
     equibop

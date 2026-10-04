@@ -1,13 +1,8 @@
 { pkgs, ... }:
 
-# Game launchers, mod clients, Proton/compat tooling, overlays.
-#
-# proton-cachyos comes from chaotic-nyx (the CachyOS-on-NixOS bridge) and is
-# the equivalent of your proton-cachyos-native. On the NixOS side, register it
-# with programs.steam.extraCompatPackages rather than installing it here alone.
-#
-# mangohud / gamemode / steam themselves are NixOS modules (programs.*), not
-# home packages.
+# Game launchers, mod clients, Proton/compat tooling, overlays. steam / gamemode
+# / mangohud are NixOS modules; proton-cachyos is registered with Steam there too
+# (programs.steam.extraCompatPackages).
 {
   home.packages = with pkgs; [
     lutris
@@ -23,15 +18,9 @@
     protontricks
     reigntweak                    # Elden Ring: Nightreign ultrawide / 60fps
 
-    # goverlay is DROPPED, not omitted by accident: it is a Lazarus/Free Pascal
-    # app, so it pulls in lazarus-qt6, which fails to build on this nixpkgs
-    # revision with
-    #   #error --prefix NIX_LDFLAGS would introduce an empty PATH-like segment
-    # That is a nixpkgs-side bug in the lazarus derivation (it dies in the final
-    # check, after make install). Verified with:
-    #   nix why-depends --derivation <nixos-vm.drv> <lazarus-qt6.drv>
-    # mangojuice below covers MangoHud configuration, so nothing is lost.
-    mangojuice                    # MangoHud config GUI
+    # goverlay is dropped: it pulls in lazarus-qt6, which fails to build on this
+    # nixpkgs revision. mangojuice covers MangoHud config.
+    mangojuice
     vkbasalt
     lsfg-vk
     wineWow64Packages.stable
@@ -39,9 +28,7 @@
     pince                         # primary game-memory tool
   ];
 
-  # The user-facing `mangohud` command plus its config file. Steam needs its own
-  # copy inside the sandbox (programs.steam.extraPackages, nixos/gaming.nix);
-  # this one covers lutris, heroic and a plain terminal, and lets mangojuice's
-  # output land where MangoHud reads it. pkgs.mangohud bundles the 32-bit build.
+  # User-facing mangohud + its config. Steam gets its own copy inside the sandbox
+  # (nixos/gaming.nix); this covers a plain terminal.
   programs.mangohud.enable = true;
 }

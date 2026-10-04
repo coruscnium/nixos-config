@@ -1,7 +1,6 @@
 { pkgs, ... }:
 
 # Players plus the PipeWire / EasyEffects tooling.
-# deepfilternet was dropped per your instruction (tinkering, not in use).
 {
   home.packages = with pkgs; [
     harmonoid
@@ -16,7 +15,7 @@
     helvum
     qpwgraph
     pavucontrol
-    coppwr                         # replaces pipewire-controller
+    coppwr
     pipewire-control-center        # target of toggle_pw_control_center.sh
   ];
 }
