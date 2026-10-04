@@ -67,6 +67,21 @@
       "org.upscayl.Upscayl"
       "page.codeberg.libre_menu_editor.LibreMenuEditor"
     ];
+
+    # Sober (Roblox) needs the Discord IPC socket and an input device, or it
+    # comes up a black window with no controller. Declarative form of:
+    #   flatpak override --user \
+    #     --filesystem=xdg-run/app/com.discordapp.Discord:create \
+    #     --filesystem=xdg-run/discord-ipc-0 \
+    #     --device=input org.vinegarhq.Sober
+    # writeMode defaults to "merge", so any hand-made override keys survive.
+    overrides.settings."org.vinegarhq.Sober".Context = {
+      filesystems = [
+        "xdg-run/app/com.discordapp.Discord:create"
+        "xdg-run/discord-ipc-0"
+      ];
+      devices = [ "input" ];
+    };
   };
 
   # ---- Hardware hooks -------------------------------------------------------
