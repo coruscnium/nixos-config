@@ -9,6 +9,8 @@
 {
   home.packages = with pkgs; [
     quadcast2s
+    streamcontroller               # Stream Deck; autostarts itself, kept honest
+                                   # by the watchdog unit (modules/services.nix)
     solaar
     input-remapper
     lact

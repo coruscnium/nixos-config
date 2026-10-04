@@ -19,7 +19,6 @@
     ./hardware.nix       # peripherals, monitoring, Wayland input
     ./ai.nix
     ./fonts.nix
-    ./script-deps.nix    # runtime deps of ~/.local/bin scripts
     ./scripts.nix        # those scripts, as real packages
     ./services.nix       # custom systemd user units
     ./theming.nix        # Carl suite + the custom GTK port
