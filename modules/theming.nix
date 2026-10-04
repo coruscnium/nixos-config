@@ -39,7 +39,9 @@ in
     bibata-cursors                 # provides Bibata-Modern-Classic
                                    # (nixpkgs name is bibata-cursors, NOT
                                    # bibata-cursor-theme — that is the Arch name)
-    beautyline-icons               # BeautyLine (chaotic-nyx)
+    # beautyline-icons (chaotic-nyx) is deliberately NOT installed: it ships an
+    # empty BeautyLine (index.theme + a 648K cache, but the apps/devices/actions
+    # dirs are empty), so anything pointing at it just renders broken fallbacks.
     beautysolar                    # BeautySolar -- our package; nixpkgs carries
                                    # BeautyLine but not this sibling, which is
                                    # why the old iconTheme name silently failed
@@ -163,6 +165,15 @@ in
         menuFont = "Noto Sans,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0";
         smallestReadableFont = "Noto Sans,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0";
         toolBarFont = "Noto Sans,12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0";
+      };
+
+      # The typed workspace.iconTheme above only drives `plasma-changeicons`
+      # from a login-time desktop script, so it does nothing until the Plasma
+      # session restarts -- which is why the desktop sat on the stale, broken
+      # BeautyLine. Writing the value here applies it at activation instead, and
+      # the running plasmashell picks it up from kdeglobals.
+      "kdeglobals"."Icons" = {
+        Theme = "BeautySolar";
       };
     };
   };

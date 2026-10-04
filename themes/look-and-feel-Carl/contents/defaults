@@ -1,5 +1,5 @@
 [kcminputrc][Mouse]
-cursorTheme=WhiteSur-cursors
+cursorTheme=Bibata-Modern-Classic
 
 [kdeglobals][General]
 ColorScheme=Carl
@@ -8,7 +8,7 @@ ColorScheme=Carl
 widgetStyle=kvantum-dark
 
 [kdeglobals][Icons]
-Theme=kora
+Theme=BeautySolar
 
 [kwinrc][DesktopSwitcher]
 LayoutName=org.kde.breeze.desktop
@@ -17,7 +17,7 @@ LayoutName=org.kde.breeze.desktop
 LayoutName=preview_stack
 
 [kwinrc][org.kde.kdecoration2]
-library=org.kde.kwin.aurorae
+library=org.kde.kwin.aurorae.v2
 theme=__aurorae__svg__Carl
 
 [plasmarc][Theme]
