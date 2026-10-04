@@ -74,8 +74,20 @@ in
     ".config/gtk-4.0/colors.css".source = "${themes}/gtk-4.0/colors.css";
     ".config/gtk-4.0/thunar.css".source = "${themes}/gtk-4.0/thunar.css";
 
-    # Mirrors the GTK settings for non-GTK toolkits
-    ".config/xsettingsd/xsettingsd.conf".source = "${themes}/xsettingsd.conf";
+    # Mirrors the GTK settings for non-GTK toolkits.
+    #
+    # force = true because a KDE GTK-sync daemon rewrites this file at runtime,
+    # replacing home-manager's symlink with a real file (observed 2026-10-03:
+    # something flipped Net/IconThemeName back to "BeautyLine" at 21:50). The
+    # blanket assumption above -- "nothing writes them" -- does not hold here.
+    # Without force, the next activation tries to back that real file up and
+    # aborts, because the .hm-backup from the first activation still exists:
+    # "Existing file '...xsettingsd.conf.hm-backup' would be clobbered". force
+    # makes home-manager overwrite the daemon's copy rather than preserve it.
+    ".config/xsettingsd/xsettingsd.conf" = {
+      source = "${themes}/xsettingsd.conf";
+      force = true;
+    };
   };
 
   # ------------------------------------------- KDE settings (kwriteconfig)
