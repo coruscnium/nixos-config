@@ -1,0 +1,8 @@
+# `nix fmt` config -- nixfmt (RFC style) over the tree, via treefmt.
+# _sources/ is nvfetcher output and is never formatted.
+on-unmatched = "info"
+
+[formatter.nixfmt]
+command = "nixfmt"
+includes = ["*.nix"]
+excludes = ["_sources/*"]

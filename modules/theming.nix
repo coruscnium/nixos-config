@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 # The Carl suite plus our GTK port. Carl comes from pling/KDE Store, which serves
 # a bot challenge, so it is vendored under ../themes rather than fetched. KDE
@@ -64,8 +69,8 @@ in
       # the explicit theme options below and apply the LNF's contents/defaults
       # (which name themes not installed here), half-theming the desktop.
       theme = "Carl";
-      iconTheme = "BeautySolar";       # pkgs/beautysolar.nix
-      widgetStyle = "kvantum-dark";    # kdeglobals value, not "kvantum"
+      iconTheme = "BeautySolar"; # pkgs/beautysolar.nix
+      widgetStyle = "kvantum-dark"; # kdeglobals value, not "kvantum"
       soundTheme = "ocean";
       cursor = {
         theme = "Bibata-Modern-Classic";

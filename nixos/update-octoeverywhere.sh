@@ -23,12 +23,7 @@ python3 -c '
 import json, sys, pathlib
 d = json.loads(sys.argv[1])
 pathlib.Path(sys.argv[2]).write_text(
-    "# Pinned OctoEverywhere container image.\n"
-    "#\n"
-    "# Regenerate with:   ./nixos/update-octoeverywhere.sh\n"
-    "# Then rebuild. `imageDigest` identifies the manifest; `sha256` is the hash of\n"
-    "# the docker-loadable tarball that dockerTools.pullImage produces, which is why\n"
-    "# the image lands in the Nix store instead of being pulled at runtime.\n"
+    "# Pinned OctoEverywhere image -- regenerate with ./nixos/update-octoeverywhere.sh.\n"
     "{\n"
     f"  imageName = \"{d['imageName']}\";\n"
     f"  imageDigest = \"{d['imageDigest']}\";\n"

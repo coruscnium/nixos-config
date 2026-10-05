@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # Limine on the 1 GiB ESP. Keep everything on lib.mkDefault -- never mkForce.
 {
@@ -53,15 +58,14 @@
   boot.kernelParams = [
     "quiet"
     "nowatchdog"
-  ] ++ (
+  ]
+  ++ (
     let
-      rootSubvol = builtins.filter
-        (o: lib.hasPrefix "subvol=" o)
-        config.fileSystems."/".options;
+      rootSubvol = builtins.filter (o: lib.hasPrefix "subvol=" o) config.fileSystems."/".options;
     in
-    lib.optionals
-      (config.fileSystems."/".fsType == "btrfs" && rootSubvol != [ ])
-      [ "rootflags=${builtins.head rootSubvol}" ]
+    lib.optionals (config.fileSystems."/".fsType == "btrfs" && rootSubvol != [ ]) [
+      "rootflags=${builtins.head rootSubvol}"
+    ]
   );
 
   boot.initrd.supportedFilesystems = [ "btrfs" ];

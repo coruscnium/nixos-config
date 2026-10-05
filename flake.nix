@@ -38,7 +38,16 @@
   };
 
   outputs =
-    { nixpkgs, home-manager, chaotic, nur, plasma-manager, nix-flatpak, nixpkgs-equibop, ... }:
+    {
+      nixpkgs,
+      home-manager,
+      chaotic,
+      nur,
+      plasma-manager,
+      nix-flatpak,
+      nixpkgs-equibop,
+      ...
+    }:
     let
       system = "x86_64-linux";
 
@@ -61,6 +70,16 @@
       };
     in
     {
+      # `nix fmt` -- nixfmt (RFC style) across the tree via treefmt (see ./treefmt.toml).
+      formatter.${system} = pkgs.writeShellApplication {
+        name = "treefmt";
+        runtimeInputs = [
+          pkgs.treefmt
+          pkgs.nixfmt
+        ];
+        text = ''exec treefmt --config-file ${./treefmt.toml} "$@"'';
+      };
+
       homeConfigurations."coru" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
@@ -108,10 +127,12 @@
             }
           ];
 
-          mkNixos = extra: nixpkgs.lib.nixosSystem {
-            inherit system;
-            modules = [ ./nixos ] ++ extra ++ common;
-          };
+          mkNixos =
+            extra:
+            nixpkgs.lib.nixosSystem {
+              inherit system;
+              modules = [ ./nixos ] ++ extra ++ common;
+            };
         in
         {
           coru = mkNixos [ ];

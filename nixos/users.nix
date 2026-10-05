@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # coru, uid 1000 -- matching the old CachyOS account so /home/coru ownership is
 # already correct.
@@ -9,7 +14,7 @@
     home = "/home/coru";
     shell = pkgs.zsh;
     description = "coru";
-    initialPassword = "changeme";   # set a real one with `passwd` after boot
+    initialPassword = "changeme"; # set a real one with `passwd` after boot
 
     extraGroups = [
       "wheel"

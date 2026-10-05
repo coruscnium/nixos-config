@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # Plasma 6 desktop and everything the session needs.
 {
@@ -68,7 +73,7 @@
     enable = true;
     extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ];
   };
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";       # Wayland for Electron
+  environment.sessionVariables.NIXOS_OZONE_WL = "1"; # Wayland for Electron
 
   # MUST be "kde" on Plasma -- "qt6ct" makes app widgets read qt6ct's palette while
   # Plasma chrome stays dark (the half-light/half-dark bug).
@@ -79,8 +84,8 @@
   # /var/lib/plasmalogin) and cannot read coru's home or per-user profile, so
   # whatever it should show has to be in /run/current-system/sw.
   environment.systemPackages = with pkgs; [
-    carl-theme     # colour scheme + Look-and-Feel + desktop theme + Aurorae
-    beautysolar    # icon theme (see pkgs/beautysolar.nix)
+    carl-theme # colour scheme + Look-and-Feel + desktop theme + Aurorae
+    beautysolar # icon theme (see pkgs/beautysolar.nix)
     bibata-cursors # cursor theme (nixpkgs name -- not bibata-cursor-theme)
   ];
 

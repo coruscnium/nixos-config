@@ -1,9 +1,14 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # System services that need root / a system daemon / global state.
 {
   networking.networkmanager.enable = true;
-  networking.firewall.allowedTCPPorts = [ 1883 ];   # OctoEverywhere MQTT relay
+  networking.firewall.allowedTCPPorts = [ 1883 ]; # OctoEverywhere MQTT relay
 
   virtualisation.docker.enable = true;
 

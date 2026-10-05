@@ -12,6 +12,6 @@
     calf
     lsp-plugins
 
-    pipewire-control-center        # target of toggle_pw_control_center.sh
+    pipewire-control-center # target of toggle_pw_control_center.sh
   ];
 }

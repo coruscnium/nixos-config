@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 # NixOS system configuration. Hardware facts and UUIDs live in hardware.nix.
 {

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # Filesystems, CPU/GPU and firmware. UUIDs read off this machine.
 #
@@ -28,7 +33,10 @@
     "/boot" = {
       device = "/dev/disk/by-uuid/3FAA-B683";
       fsType = "vfat";
-      options = [ "fmask=0077" "dmask=0077" ];
+      options = [
+        "fmask=0077"
+        "dmask=0077"
+      ];
     };
 
     # Steam libraries resolve at /mnt/ssd{2,3}/Games/Steam. nofail so an unplugged
@@ -36,13 +44,21 @@
     "/mnt/ssd2" = {
       device = "/dev/disk/by-uuid/0c5412da-2b1f-4f1b-a3db-13a2ce9bdea1";
       fsType = "btrfs";
-      options = [ "noatime" "nodatacow" "nofail" ];
+      options = [
+        "noatime"
+        "nodatacow"
+        "nofail"
+      ];
     };
 
     "/mnt/ssd3" = {
       device = "/dev/disk/by-uuid/fb803c53-b07d-48a2-a7cb-fedbe9a5b7d4";
       fsType = "btrfs";
-      options = [ "noatime" "nodatacow" "nofail" ];
+      options = [
+        "noatime"
+        "nodatacow"
+        "nofail"
+      ];
     };
   };
 

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # Identity, locale, nix daemon settings, admin tooling.
 {
@@ -15,8 +20,14 @@
   system.stateVersion = "25.11";
 
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    trusted-users = [ "root" "coru" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    trusted-users = [
+      "root"
+      "coru"
+    ];
     auto-optimise-store = true;
   };
 

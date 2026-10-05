@@ -15,14 +15,15 @@
 #
 # The portal (>= 1.21) also needs an app id backed by an installed .desktop file;
 # it resolves the id "CherryStudio", so the file MUST keep that exact name.
-{ lib
-, stdenv
-, appimageTools
-, makeWrapper
-, callPackage
-, util-linux
-, python3
-, pkgs
+{
+  lib,
+  stdenv,
+  appimageTools,
+  makeWrapper,
+  callPackage,
+  util-linux,
+  python3,
+  pkgs,
 }:
 
 let
@@ -70,7 +71,10 @@ stdenv.mkDerivation {
   inherit version;
   src = contents;
 
-  nativeBuildInputs = [ makeWrapper python3 ];
+  nativeBuildInputs = [
+    makeWrapper
+    python3
+  ];
 
   dontConfigure = true;
   dontBuild = true;

@@ -1,10 +1,15 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # Peripherals and Wayland input. solaar / input-remapper are NOT listed -- their
 # NixOS modules install the packages and udev rules (nixos/desktop.nix).
 {
   home.packages = with pkgs; [
-    streamcontroller               # autostarts itself; watchdog in services.nix
+    streamcontroller # autostarts itself; watchdog in services.nix
     lact
     openrgb
     brightnessctl

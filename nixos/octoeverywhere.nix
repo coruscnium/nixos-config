@@ -4,13 +4,23 @@
 # ./octoeverywhere-image.nix and fetched at build time, so there is no registry
 # pull at unit start. Replaces the old ~/.config/systemd/user unit.
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   pin = import ./octoeverywhere-image.nix;
 
   imageTarball = pkgs.dockerTools.pullImage {
-    inherit (pin) imageName imageDigest finalImageName finalImageTag;
+    inherit (pin)
+      imageName
+      imageDigest
+      finalImageName
+      finalImageTag
+      ;
     inherit (pin) sha256;
   };
 in

@@ -16,7 +16,7 @@
     protonplus
     proton-cachyos
     protontricks
-    reigntweak                    # Elden Ring: Nightreign ultrawide / 60fps
+    reigntweak # Elden Ring: Nightreign ultrawide / 60fps
 
     # goverlay is dropped: it pulls in lazarus-qt6, which fails to build on this
     # nixpkgs revision. mangojuice covers MangoHud config.
@@ -25,7 +25,7 @@
     lsfg-vk
     wineWow64Packages.stable
 
-    pince                         # primary game-memory tool
+    pince # primary game-memory tool
   ];
 
   # User-facing mangohud + its config. Steam gets its own copy inside the sandbox

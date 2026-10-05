@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # System-level gaming glue only. The apps themselves live in modules/gaming.nix.
 {

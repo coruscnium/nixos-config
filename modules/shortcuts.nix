@@ -1,19 +1,11 @@
 { pkgs, ... }:
 
-# Global keyboard shortcuts (kglobalshortcutsrc). Attribute names are the section
-# names. plasma-manager merges, so anything not listed keeps whatever KDE has.
-#
-# To bind a key to a *script* -- KDE can only bind a desktop entry's action, not
-# a bare command -- two pieces are needed:
-#   - a home.file desktop entry at ~/.local/share/applications/<id>.desktop with
-#     X-KDE-GlobalAccel-CommandShortcut=true, and
-#   - a "services/<id>.desktop"._launch = "<key>" line in the block below.
-# Exec must be a package wrapper: scripts/<name> starts with #!/bin/bash, which
-# does not exist on NixOS. Do not reach for plasma-manager's `hotkeys.commands`
-# module -- it writes the key to a top-level section that kglobalacceld does not
-# read (upstream plasma-manager#526, #571).
+# Globalshortcut sections; plasma-manager merges, so unlisted keys keep KDE's value.
+# Binding a *script* needs a wrapper-backed .desktop (X-KDE-GlobalAccel-CommandShortcut=true)
+# plus its "services/<id>.desktop"._launch line, never `hotkeys.commands` (plasma-manager#526).
+# Full rationale: vault 50-Flake/Shortcuts.md.
 {
-  # pipewire-control-center ships no desktop entry of its own -- write one (see above).
+  # pipewire-control-center ships no desktop entry -- write one.
   home.file.".local/share/applications/net.local.toggle_pw_control_center.sh.desktop".text = ''
     [Desktop Entry]
     Type=Application
@@ -39,10 +31,8 @@
       "Switch to Desktop 5" = "Meta+5";
       "Window Fullscreen" = "Meta+F";
 
-      # Move focused window to desktop N and follow. Our script (kwin-scripts/
-      # move-window-to-desktop), since KWin's native actions do not follow.
-      # Written as shifted symbols: KGlobalAccel canonicalises Shift+<digit> to
-      # the symbol, so a literal "Meta+Shift+1" never matches.
+      # Our kwin-scripts/move-window-to-desktop (native actions do not follow).
+      # Shifted symbols: KGlobalAccel canonicalises Shift+<digit>, so "Meta+Shift+1" never matches.
       "MoveWindowToDesktop1" = "Meta+!";
       "MoveWindowToDesktop2" = "Meta+@";
       "MoveWindowToDesktop3" = "Meta+#";

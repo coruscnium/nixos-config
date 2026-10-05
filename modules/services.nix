@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 # Custom systemd USER units, ported from ~/.config/systemd/user/. Every
 # /usr/bin/... path is replaced with a store path.
@@ -71,7 +76,15 @@ in
       };
       Service = {
         Type = "simple";
-        Environment = [ "PATH=${lib.makeBinPath [ pkgs.megacmd pkgs.procps pkgs.coreutils ]}" ];
+        Environment = [
+          "PATH=${
+            lib.makeBinPath [
+              pkgs.megacmd
+              pkgs.procps
+              pkgs.coreutils
+            ]
+          }"
+        ];
         ExecStart = "${pkgs.bash}/bin/sh -c 'mega-cmd-server & sleep 3 && mega-fuse-enable %h/MEGA && wait'";
         ExecStop = "${pkgs.bash}/bin/sh -c 'mega-fuse-disable %h/MEGA 2>/dev/null; mega-quit 2>/dev/null; pkill mega-cmd-server'";
         Restart = "on-failure";

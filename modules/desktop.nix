@@ -15,8 +15,8 @@
     kdePackages.partitionmanager
     kdePackages.spectacle
 
-    micro                          # terminal editor, preferred sudoedit
-    wallpaper-engine-kde-plugin    # pkgs/wallpaper-engine.nix (CaptSilver fork)
+    micro # terminal editor, preferred sudoedit
+    wallpaper-engine-kde-plugin # pkgs/wallpaper-engine.nix (CaptSilver fork)
   ];
 
   # Vendored Plasma additions, referenced from the repo instead of hand-installed.
@@ -25,8 +25,7 @@
       ../plasma-widgets/plasma-simple-weather;
 
     # Dir name must match the script's metadata Id.
-    ".local/share/kwin/scripts/movewindowtodesktop".source =
-      ../kwin-scripts/move-window-to-desktop;
+    ".local/share/kwin/scripts/movewindowtodesktop".source = ../kwin-scripts/move-window-to-desktop;
   };
 
   # The script ships EnabledByDefault=false, so KWin has to be told to load it.
