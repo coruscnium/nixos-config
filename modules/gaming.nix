@@ -13,7 +13,7 @@
 
     protonup-qt
     protonplus
-    proton-cachyos
+    proton-cachyos_x86_64_v3 # CachyOS Proton (SLR), x86-64-v3 for znver4
     protontricks
     reigntweak # Elden Ring: Nightreign ultrawide / 60fps
 
