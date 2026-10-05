@@ -22,8 +22,8 @@ and a broken boot.
 - **The MCP tool knows upstream nixpkgs only.** It does not see this repo's overlays (chaotic/nyx,
   NUR) or the custom packages in `pkgs/`. If something is missing from it, check those sources before
   concluding it does not exist.
-- **Read `PACKAGING-LEDGER.md` before adding anything.** It may already be installed, or be
-  deliberately excluded.
+- **Check before adding anything.** It may already be installed, or be deliberately excluded. Scan
+  `modules/`/`nixos/` for the package; the vault's packaging ledger holds the exclusion list.
 
 ## Directory contract
 
@@ -82,12 +82,16 @@ cd ~/Projects/NixClone/nixos-config
 
 env -u LD_LIBRARY_PATH nix flake show --no-write-lock-file       # evaluate all outputs
 env -u LD_LIBRARY_PATH nixos-rebuild build --flake .#coru        # build, activate nothing
+env -u LD_LIBRARY_PATH nix fmt                                   # format -- run after editing .nix
 ```
 
 A change is not done until it evaluates. `build` produces `./result` and changes nothing about the
 running system — that is the proof.
 
-## Documentation in this repo
+Run `nix fmt` after editing `.nix` files. The flake's `formatter` (treefmt + nixfmt, RFC style, config
+in `treefmt.toml`) is authoritative for layout — do not hand-format. `_sources/` is excluded.
 
-- **`PACKAGING-LEDGER.md`** — why each thing is packaged as it is, and what is deliberately excluded.
-- **`MIGRATION.md`** — the CachyOS→NixOS and systemd-boot→Limine runbook, with hard ordering rules.
+## Documentation
+
+This repo carries only this file and the config. The two "why" documents — the packaging ledger and
+the CachyOS→NixOS / systemd-boot→Limine runbook — live in Vesta's vault, not the repo.
