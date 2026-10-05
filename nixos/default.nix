@@ -11,6 +11,5 @@
     ./users.nix
     ./system.nix
     ./octoeverywhere.nix
-    ./vm.nix
   ];
 }

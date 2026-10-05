@@ -4,7 +4,6 @@
 # NixOS modules install the packages and udev rules (nixos/desktop.nix).
 {
   home.packages = with pkgs; [
-    quadcast2s
     streamcontroller               # autostarts itself; watchdog in services.nix
     lact
     openrgb

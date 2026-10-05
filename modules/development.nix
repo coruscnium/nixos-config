@@ -10,12 +10,9 @@
     uv
     nodejs
     pnpm
-    gradle
     jdk17
-    dotnet-sdk_8
     rustc
     cargo
-    android-tools
     python3Packages.keyboard
   ];
 }

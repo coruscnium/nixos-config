@@ -39,37 +39,6 @@ in
       };
     };
 
-    # Mirrors systemd/quadcast2s.service from the vendor tree. $QUADCAST2S_ARGS is
-    # unquoted so systemd splits it into arguments.
-    quadcast2s = {
-      Unit = {
-        Description = "QuadCast 2 S RGB lighting";
-        After = [ "graphical-session.target" ];
-      };
-      Service = {
-        Type = "simple";
-        Environment = [ "QUADCAST2S_ARGS=solid ff0000" ];
-        EnvironmentFile = "-%h/.config/quadcast2s/service.env";
-        ExecStart = "${pkgs.quadcast2s}/bin/quadcast2s --foreground --wait $QUADCAST2S_ARGS";
-        Restart = "on-failure";
-        RestartSec = 2;
-      };
-      Install.WantedBy = [ "default.target" ];
-    };
-
-    # Started by udev (SYSTEMD_USER_WANTS in the quadcast2s rule). No-op unless
-    # the user opts in.
-    quadcast2s-hotplug = {
-      Unit = {
-        Description = "Start QuadCast 2 S lighting when the microphone is connected";
-        ConditionPathExists = "%h/.config/quadcast2s/start-on-connect";
-      };
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${pkgs.systemd}/bin/systemctl --user start quadcast2s.service";
-      };
-    };
-
     lsyncd = {
       Unit.Description = "lsyncd mirror";
       Service = {

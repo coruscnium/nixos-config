@@ -33,29 +33,14 @@ in
 
   script-cover-extract = mkScript {
     name = "cover-extract.sh";
-    src = ../scripts/cover-extract.sh;
+    src = ../scripts/music/cover-extract.sh;
     inputs = [ prev.ffmpeg prev.findutils prev.gawk prev.coreutils ];
   };
 
   script-embed-lyrics = mkScript {
     name = "embed_lyrics.sh";
-    src = ../scripts/embed_lyrics.sh;
+    src = ../scripts/music/embed_lyrics.sh;
     inputs = [ prev.kid3 prev.findutils prev.coreutils ];
-  };
-
-  script-extract-here = mkScript {
-    name = "extract-here.sh";
-    src = ../scripts/extract-here.sh;
-    inputs = [
-      prev.gnutar prev.unzip prev.p7zip prev.unrar
-      prev.gzip prev.bzip2 prev.xz prev.zstd prev.coreutils
-    ];
-  };
-
-  script-jan-clean = mkScript {
-    name = "jan-clean";
-    src = ../scripts/jan-clean;
-    inputs = [ prev.coreutils ];
   };
 
   script-toggle-pw-control-center = mkScript {

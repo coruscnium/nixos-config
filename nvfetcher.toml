@@ -5,7 +5,7 @@
 #   nix run nixpkgs#nvfetcher && nixos-rebuild switch --flake .#coru
 #
 # NOT covered (deliberate): themes/ (pling serves a bot challenge), scripts/ (our
-# code), vendor/quadcast2s (no remote yet).
+# own code).
 #
 # Table names go at the ROOT -- nvfetcher 0.8 rejects a [sources.*] wrapper.
 

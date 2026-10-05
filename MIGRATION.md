@@ -149,13 +149,3 @@ sudo nixos-rebuild switch --rollback
 
 If Limine itself misbehaves, systemd-boot's entry is still in the firmware boot
 menu (until step 4) — pick it there.
-
----
-
-## Note on the other targets
-
-`coru-iso` is a live medium. It deliberately forces `boot.loader.limine.enable`
-and `boot.loader.grub.enable` off (`nixos/iso.nix:45-47`) and uses NixOS's own
-EFI loader for the image, which is unrelated to what the *installed* system
-boots. That is why `nixos/boot.nix` uses `lib.mkDefault` for the Limine settings
-rather than `lib.mkForce`: a blanket force would break the ISO build.

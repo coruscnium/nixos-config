@@ -4,7 +4,6 @@ result-*
 
 # NOTE: everything else here is intentionally tracked, including:
 #   themes/                        3.3 MB vendored Carl suite (pling is unautomatable)
-#   vendor/quadcast2s/             376 KB vendored project source
 # The flake copies only files TRACKED BY GIT into the store, so anything you
 # leave untracked will be missing at build time.
 

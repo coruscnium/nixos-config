@@ -9,10 +9,6 @@ let
 in
 {
   home.packages = with pkgs; [
-    bibata-cursors                 # nixpkgs name -- NOT bibata-cursor-theme (Arch)
-    # beautyline-icons is NOT installed: chaotic-nyx's BeautyLine ships empty
-    # icon dirs and renders broken fallbacks.
-    beautysolar                    # nixpkgs has BeautyLine, not this sibling
     kdePackages.qtstyleplugin-kvantum
   ];
 

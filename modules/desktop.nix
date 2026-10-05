@@ -14,8 +14,6 @@
     kdePackages.okular
     kdePackages.partitionmanager
     kdePackages.spectacle
-    kdePackages.qt6ct
-    libsForQt5.qt5ct
 
     micro                          # terminal editor, preferred sudoedit
     wallpaper-engine-kde-plugin    # pkgs/wallpaper-engine.nix (CaptSilver fork)

@@ -2,7 +2,7 @@
 #
 # Imported as an overlay in flake.nix. Scripts live in ./scripts.nix so that
 # modules/services.nix can reference the same store paths.
-{ quadcast2sSrc }:
+{ equibopPkgs }:
 final: prev:
 let
   lib = prev.lib;
@@ -29,65 +29,6 @@ in
   # System-wide Carl suite for the Plasma Login Manager greeter, which cannot see
   # coru's home.
   carl-theme = prev.callPackage ./carl-theme.nix { themesDir = ../themes; };
-
-  # ----------------------------------------------------------------- quadcast2s
-  # RGB lighting for the HyperX QuadCast 2 S. Source is a local checkout passed
-  # from flake.nix -- swap for fetchFromGitHub once it has a public remote.
-  quadcast2s = prev.python3Packages.buildPythonApplication rec {
-    pname = "quadcast2s";
-    version = "0.2.0";
-    pyproject = true;
-
-    src = quadcast2sSrc;
-
-    build-system = [ prev.python3Packages.setuptools ];
-    dependencies = [
-      prev.python3Packages.pyusb
-      prev.python3Packages.pyside6
-    ];
-
-    doCheck = false;   # upstream tests want a real microphone
-
-    # The checkout carries stale build artifacts whose wheels declare the same
-    # console script, so the installer would write bin/quadcast2s twice.
-    postPatch = ''
-      rm -rf dist build src/*.egg-info
-    '';
-
-    postInstall = ''
-      appid=xyz.coruscnium.quadcast2s
-
-      install -Dm644 udev/70-quadcast2s.rules \
-        $out/lib/udev/rules.d/70-quadcast2s.rules
-
-      install -Dm644 desktop/$appid.desktop \
-        $out/share/applications/$appid.desktop
-      install -Dm644 desktop/$appid.metainfo.xml \
-        $out/share/metainfo/$appid.metainfo.xml
-      install -Dm644 desktop/quadcast2s.svg \
-        $out/share/icons/hicolor/scalable/apps/quadcast2s.svg
-
-      install -Dm644 LICENSE $out/share/licenses/$pname/LICENSE
-      install -Dm644 README.md $out/share/doc/$pname/README.md
-      for doc in docs/*.md; do
-        install -Dm644 "$doc" $out/share/doc/$pname/$(basename "$doc")
-      done
-
-      # Reference copies only -- real units come from modules/services.nix.
-      install -Dm644 systemd/quadcast2s.service \
-        $out/share/doc/$pname/quadcast2s.service
-      install -Dm644 systemd/quadcast2s-hotplug.service \
-        $out/share/doc/$pname/quadcast2s-hotplug.service
-    '';
-
-    meta = {
-      description = "RGB lighting control for the HyperX QuadCast 2 S microphone";
-      homepage = "https://github.com/Coruscnium/quadcast2s";
-      license = lib.licenses.agpl3Only;
-      mainProgram = "quadcast2s";
-      platforms = lib.platforms.linux;
-    };
-  };
 
   # ----------------------------------------------------------------- reigntweak
   # Elden Ring: Nightreign ultrawide / 60 FPS patcher, built from source (plain
@@ -131,4 +72,10 @@ in
   # glfw consumer on 3.4. Both consumers pick this up: programs.mangohud and
   # programs.steam.extraPackages.
   mangohud = prev.mangohud.override { glfw = glfw33; };
+
+  # -------------------------------------------------------------------- equibop
+  # 3.3.0 rewrote screen-share capture onto venmic 7.x, which broke Wayland
+  # sharing. Held at the last venmic 6.1.0 build (3.2.2) by building it from the
+  # pinned nixpkgs-equibop input in flake.nix.
+  equibop = equibopPkgs.equibop;
 }

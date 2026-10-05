@@ -10,6 +10,9 @@ and a broken boot.
   correct change; do not restructure working code to make a small edit prettier.
 - **Never `git commit`, `git push`, or `nixos-rebuild switch` unless the user explicitly asks in that
   moment.** Draft the change, prove it builds, and hand it back. (No `sudo` on this machine anyway.)
+- **Attribute commits to the user, never to an AI.** When asked to commit, add no `Co-Authored-By`,
+  no "Generated with", no Claude/AI contributor trailer of any kind. The work lands under the user's
+  name, because it is their repo.
 - **Prefix `nix`, `git` (https), and `curl` with `env -u LD_LIBRARY_PATH`.** The host app exports an
   `LD_LIBRARY_PATH` carrying a GnuTLS libcurl that shadows the OpenSSL one; without the prefix these
   commands die with `version 'CURL_OPENSSL_4' not found`. SSH git is unaffected.
@@ -31,7 +34,6 @@ and a broken boot.
 | `pkgs/` | overlay | custom packages; `default.nix` is the overlay function |
 | `scripts/` | raw shell | wrapped into derivations by `pkgs/scripts.nix` |
 | `themes/` | vendored | the Carl KDE/GTK theme suite |
-| `vendor/` | vendored | `quadcast2s` source tree |
 | `_sources/` | **generated** | nvfetcher output — never hand-edit |
 
 `modules/` is what the user owns; `nixos/` is the machine. Both `modules/default.nix` and
@@ -50,14 +52,14 @@ and a broken boot.
 ## Hard rules — do not break these
 
 1. **Only git-tracked files reach the store.** The flake copies tracked files into `/nix/store`, so
-   `themes/` and `vendor/quadcast2s/` must stay tracked. `.gitignore`
+   `themes/` must stay tracked. `.gitignore`
    ignores only `result*` and editor cruft — keep it that way.
 2. **`pkgs.usb-port-power-cycle` is identity-critical.** A sudoers rule (`nixos/users.nix`) and a
    watchdog wrapper both pin its store path. Do not redefine it elsewhere.
 3. **Package config lives in `flake.nix`, not `~/.config/nixpkgs`.** Because `pkgs` is passed
    explicitly to `homeManagerConfiguration`, home-manager ignores its own `nixpkgs.config`.
    `allowUnfree`, overlays, and `permittedInsecurePackages` must be in `flake.nix`.
-4. **Keep Limine on `lib.mkDefault`** in `nixos/boot.nix` — `mkForce` breaks the `coru-iso` build.
+4. **Keep the Limine settings on `lib.mkDefault`** in `nixos/boot.nix` — never `mkForce` them.
    Same caution for `efiSupport`, `efiInstallAsRemovable`, `maxGenerations`, `canTouchEfiVariables`.
 5. **`rootflags=` is derived** from `fileSystems."/".options`; never hardcode it, and do not add
    `subvol=@` or `x-initrd.mount` to `/`.
@@ -72,8 +74,6 @@ and a broken boot.
     forgotten, nothing installed twice.
 12. **The nyx cache module is required.** `chaotic.nixosModules.nyx-cache` must stay enabled, or every
     nyx package (including the CachyOS kernel) is built from source instead of downloaded.
-13. **`vendor/quadcast2s/` has its own `CLAUDE.md`.** Obey it; it carries a licensing boundary
-    (do not port code from `../quadcastrgb`) and hardware/protocol warnings.
 
 ## Build and verify
 

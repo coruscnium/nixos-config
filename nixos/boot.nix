@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... }:
 
-# Limine on the 1 GiB ESP. Keep everything on lib.mkDefault -- mkForce breaks the
-# coru-iso build.
+# Limine on the 1 GiB ESP. Keep everything on lib.mkDefault -- never mkForce.
 {
   boot.loader.limine = {
     enable = lib.mkDefault true;

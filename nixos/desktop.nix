@@ -81,7 +81,7 @@
   environment.systemPackages = with pkgs; [
     carl-theme     # colour scheme + Look-and-Feel + desktop theme + Aurorae
     beautysolar    # icon theme (see pkgs/beautysolar.nix)
-    bibata-cursors # cursor theme
+    bibata-cursors # cursor theme (nixpkgs name -- not bibata-cursor-theme)
   ];
 
   # systemPackages links only the share/ subdirs named here. (/share/icons is
@@ -98,6 +98,8 @@
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
     nerd-fonts.jetbrains-mono
+    nerd-fonts.fira-code
+    nerd-fonts.meslo-lg
   ];
 
   # ---- Make the greeter match the desktop -----------------------------------

@@ -33,7 +33,6 @@
       "com.unity.UnityHub"
       "com.usebottles.bottles"
       "io.github.loot.loot"
-      "io.github.mhogomchungu.sirikali"
       "io.gitlab.adhami3310.Footage"
       "org.nickvision.tubeconverter"
       "org.onlyoffice.desktopeditors"
@@ -51,9 +50,6 @@
       devices = [ "input" ];
     };
   };
-
-  # Installs the quadcast2s udev rule (incl. its SYSTEMD_USER_WANTS tag).
-  services.udev.packages = [ pkgs.quadcast2s ];
 
   services.gnome.gnome-keyring.enable = true;
   services.fwupd.enable = true;

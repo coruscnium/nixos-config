@@ -19,7 +19,6 @@
     ./security.nix
     ./hardware.nix
     ./ai.nix
-    ./fonts.nix
     ./scripts.nix
     ./services.nix
     ./theming.nix

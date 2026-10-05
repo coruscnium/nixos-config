@@ -12,10 +12,16 @@ file is that nothing gets forgotten and nothing gets installed twice.
 | NUR packages (e.g. `forkprince.nuvio`) | ride the NUR input, so `nix flake update` |
 | OctoEverywhere container image | `./nixos/update-octoeverywhere.sh --rebuild` |
 | `reigntweak` | bump `rev` + `hash` in `pkgs/default.nix` — `nix-prefetch-github Minksh ReignTweak --rev <sha>` |
-| `quadcast2s` | re-copy the project over `vendor/quadcast2s` (exclude `.git`, `.venv`, `dist`, `build`, `*.egg-info`) |
 | `themes/` (Carl) | manual — pling.com serves a bot challenge, so there is no fetchable URL |
 | Flatpaks | declarative — `services.flatpak.packages` via nix-flatpak; set `services.flatpak.update.onActivation = true` to update on rebuild |
 | AppImages | manual (that is the cost of being an AppImage) |
+| `equibop` | **pinned** at 3.2.2 — `nixpkgs-equibop` flake input at the 3.2.2 rev; an exact-rev input cannot be moved by `nix flake update` |
+
+**Pinned single package.** `equibop` is held at 3.2.2 (venmic 6.1.0) because
+3.3.0 rewrote Wayland screen-share capture onto venmic 7.x, which broke sharing.
+The pin is a second nixpkgs input, `nixpkgs-equibop` (`flake.nix`), pinned to the
+3.2.2 rev; `pkgs/default.nix` sets `equibop = equibopPkgs.equibop`. Unpin by
+deleting the input + that one line once a venmic-7 build works.
 
 ## A. Becomes a NixOS system module (not a home package)
 
@@ -82,10 +88,6 @@ anvil-organizer.
 
 ## C. Custom packages written for this config
 
-    quadcast2s   -> pkgs/default.nix. Built from the checkout via the
-                    `quadcast2sSrc` flake input (`flake = false` path input, so
-                    pure eval works and the space in the path is percent-encoded).
-                    Ships the wheel, udev rule, desktop entry, icon and docs.
     reigntweak   -> pkgs/default.nix. Built from source — github:Minksh/ReignTweak
                     pinned by rev. Plain C++17 against the standard library plus
                     pthread, no external deps.
@@ -103,9 +105,6 @@ anvil-organizer.
                     nvfetcher CANNOT replace the rest of the vendoring:
                       themes/             pling.com serves a bot challenge.
                       scripts/            our own code.
-                      vendor/quadcast2s   our own project, no remote yet. Once
-                                          it has one, add a [quadcast2s] src.git
-                                          entry and drop the vendored copy.
 
     windscribe   -> NOT PACKAGED, deferred. It is not "just an unpacked .deb":
                     Windscribe publishes its own Arch package, and the payload is
@@ -133,7 +132,7 @@ flathub remote and installs/removes on activation. `uninstallUnmanaged` stays
 off, so flatpaks installed by hand are left alone.
 
     Sober         -> org.vinegarhq.Sober  (Roblox; Flatpak-only)
-    ...the other eleven in nixos/services.nix (shelly is NOT here -- see §G)
+    ...the other ten in nixos/services.nix (shelly is NOT here -- see §G)
 
 cherry-studio is NOT a flatpak here — it is packaged in-repo
 (pkgs/cherry-studio.nix, built from the upstream AppImage).

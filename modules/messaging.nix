@@ -7,6 +7,5 @@
     signal-desktop
     telegram-desktop
     element-desktop
-    session-desktop
   ];
 }

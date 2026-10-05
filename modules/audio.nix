@@ -12,10 +12,6 @@
     calf
     lsp-plugins
 
-    helvum
-    qpwgraph
-    pavucontrol
-    coppwr
     pipewire-control-center        # target of toggle_pw_control_center.sh
   ];
 }
