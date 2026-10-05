@@ -1,3 +1,0 @@
-#!/bin/bash
-unset PYTHONHOME PYTHONPATH LD_LIBRARY_PATH
-exec "$@"
