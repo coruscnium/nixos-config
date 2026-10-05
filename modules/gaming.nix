@@ -5,7 +5,6 @@
 # (programs.steam.extraCompatPackages).
 {
   home.packages = with pkgs; [
-    lutris
     heroic
     prismlauncher
     r2modman
