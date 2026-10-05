@@ -1,9 +1,32 @@
-{ ... }:
+{ pkgs, ... }:
 
 # Global keyboard shortcuts (kglobalshortcutsrc). Attribute names are the section
 # names. plasma-manager merges, so anything not listed keeps whatever KDE has.
+#
+# To bind a key to a *script* -- KDE can only bind a desktop entry's action, not
+# a bare command -- two pieces are needed:
+#   - a home.file desktop entry at ~/.local/share/applications/<id>.desktop with
+#     X-KDE-GlobalAccel-CommandShortcut=true, and
+#   - a "services/<id>.desktop"._launch = "<key>" line in the block below.
+# Exec must be a package wrapper: scripts/<name> starts with #!/bin/bash, which
+# does not exist on NixOS. Do not reach for plasma-manager's `hotkeys.commands`
+# module -- it writes the key to a top-level section that kglobalacceld does not
+# read (upstream plasma-manager#526, #571).
 {
+  # pipewire-control-center ships no desktop entry of its own -- write one (see above).
+  home.file.".local/share/applications/net.local.toggle_pw_control_center.sh.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=toggle_pw_control_center
+    Exec=${pkgs.script-toggle-pw-control-center}/bin/toggle_pw_control_center.sh
+    NoDisplay=true
+    StartupNotify=false
+    X-KDE-GlobalAccel-CommandShortcut=true
+  '';
+
   programs.plasma.shortcuts = {
+    "services/net.local.toggle_pw_control_center.sh.desktop"._launch = "Meta+A";
+
     "services/floorp.desktop".new-window = "Meta+B";
     "services/org.kde.dolphin.desktop"._launch = "Meta+E";
     "services/org.kde.konsole.desktop"._launch = "Meta+X";
