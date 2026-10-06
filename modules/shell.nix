@@ -5,6 +5,11 @@
   programs.zsh = {
     enable = true;
 
+    # zsh defaults to NOT treating `#` as a comment in interactive shells, so an
+    # inline `# note` runs as a command and a bare `v=1  # note` assignment is lost.
+    # INTERACTIVE_COMMENTS makes `#` start a comment interactively, as in bash.
+    setOptions = [ "INTERACTIVE_COMMENTS" ];
+
     # zsh-autocomplete runs compinit itself and owns the completion system, so
     # home-manager's completion init must be off. It also owns Tab and the history
     # keys, so autosuggestions / history-substring-search / fzf-tab are absent --
