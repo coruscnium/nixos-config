@@ -35,6 +35,12 @@
     # broke sharing. Held at the last venmic 6.1.0 build (equibop 3.2.2) by exact
     # rev, so `nix flake update` cannot move it.
     nixpkgs-equibop.url = "github:NixOS/nixpkgs/c59305bab2065cfecc4944690d9eedbb56f3a9fa";
+
+    # Windscribe VPN client -- prebuilt repackage + NixOS module.
+    windscribe = {
+      url = "github:coruscnium/windscribe-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -46,6 +52,7 @@
       plasma-manager,
       nix-flatpak,
       nixpkgs-equibop,
+      windscribe,
       ...
     }:
     let
@@ -93,6 +100,7 @@
       nixosConfigurations =
         let
           common = [
+            windscribe.nixosModules.default
             home-manager.nixosModules.home-manager
             nix-flatpak.nixosModules.nix-flatpak
 
@@ -105,6 +113,7 @@
               # notably pkgs.usb-port-power-cycle, which a sudoers rule and a
               # wrapper both pin.
               nixpkgs.overlays = [
+                windscribe.overlays.default
                 (import ./pkgs { inherit equibopPkgs; })
                 chaotic.overlays.default
                 nur.overlays.default

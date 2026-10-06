@@ -16,5 +16,6 @@
     ./users.nix
     ./system.nix
     ./octoeverywhere.nix
+    ./windscribe.nix
   ];
 }
