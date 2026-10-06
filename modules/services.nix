@@ -17,6 +17,23 @@ let
 in
 {
   systemd.user.services = {
+    # input-remapper's daemon only autoloads once a logged-in user has told it
+    # where the config lives, and at boot the mouse is already plugged in, so the
+    # udev autoload (off by default) would have fired too early. Re-apply the
+    # G502X preset at session start instead -- the preset itself is seeded by
+    # modules/hardware.nix from input-remapper/.
+    input-remapper-autoload = {
+      Unit = {
+        Description = "Apply the input-remapper G502X preset";
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.input-remapper}/bin/input-remapper-control --command start --device 'Logitech G502 X LIGHTSPEED' --preset G502X";
+      };
+      Install.WantedBy = [ "default.target" ];
+    };
+
     # No streamcontroller.service on purpose: StreamController autostarts itself
     # (writing ~/.config/autostart), and a second launcher races it -- the loser's
     # quit_running() fires a DBus reopen that presents the window. The watchdog
