@@ -44,6 +44,11 @@
 
   security.sudo = {
     enable = true;
+    # sudoedit opens micro, by absolute store path so it can't fall back to a
+    # system editor (nano/vim are gone) or depend on sudo's secure_path.
+    extraConfig = ''
+      Defaults editor = ${pkgs.micro}/bin/micro
+    '';
     # Only this one helper is passwordless. pkgs.usb-port-power-cycle is defined
     # in the overlay so this rule and the watchdog wrapper pin the same path.
     extraRules = [
