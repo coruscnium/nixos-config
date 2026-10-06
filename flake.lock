@@ -209,11 +209,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791261923,
-        "narHash": "sha256-eTKjo9Psdtv6YXndlWKUWdGQTQH8R0RhIJk7dNhMIrw=",
+        "lastModified": 1791267059,
+        "narHash": "sha256-94Xqdd254LOp9sR+3FcTvGKD5tZfdUE85fMfwNbHsik=",
         "owner": "coruscnium",
         "repo": "windscribe-nix",
-        "rev": "c3bbcd52e8bebf3a05399a9dce23dbaa5141247d",
+        "rev": "3aa97ccfac1b85d319e141d018f0593e5115ef0f",
         "type": "github"
       },
       "original": {
