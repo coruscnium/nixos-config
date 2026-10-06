@@ -36,6 +36,13 @@
   programs.nix-ld.enable = true;
   programs.appimage.enable = true;
 
+  # No system text editor: nano's module defaults to on and vim was the other
+  # entry in systemPackages below -- both dropped. micro (home-manager,
+  # modules/desktop.nix) is the editor Coru uses. nixpkgs points EDITOR at nano,
+  # so repoint it rather than leave it dangling.
+  programs.nano.enable = false;
+  environment.variables.EDITOR = lib.mkForce "micro";
+
   # Admin/system tooling only -- btop, ripgrep, duf, ... are per-user in modules/.
   environment.systemPackages = with pkgs; [
     btrfs-progs
@@ -54,7 +61,6 @@
     gptfdisk
     rsync
     git
-    vim
     curl
     wget
     jq

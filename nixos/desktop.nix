@@ -14,6 +14,10 @@
   services.desktopManager.plasma6.enable = true;
   services.xserver.enable = true;
 
+  # discover (Plasma's GUI package store) rides in on the plasma6 module whenever
+  # flatpak is enabled. Packages here are declarative, so drop it.
+  environment.plasma6.excludePackages = [ pkgs.kdePackages.discover ];
+
   # ---- Audio ----------------------------------------------------------------
   services.pipewire = {
     enable = true;

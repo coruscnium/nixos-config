@@ -15,10 +15,13 @@
     btrfs-assistant
     plocate
 
-    # Modern CLI replacements for find/cat/ls, plus a fuzzy finder.
+    # Modern CLI replacements for find/cat/ls, plus a fuzzy finder, a directory
+    # tree, and tldr's short man pages.
     fd
     bat
     eza
     fzf
+    tree
+    tldr
   ];
 }
