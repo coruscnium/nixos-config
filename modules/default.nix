@@ -3,6 +3,7 @@
 {
   imports = [
     ./desktop.nix
+    ./mimeapps.nix
     ./browsing.nix
     ./messaging.nix
     ./media.nix
