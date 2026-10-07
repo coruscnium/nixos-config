@@ -14,6 +14,7 @@
     gparted
     btrfs-assistant
     plocate
+    warehouse # GTK GUI for browsing/installing Flatpaks (Flatseal is a flatpak, nixos/services.nix)
 
     # Modern CLI replacements for find/cat/ls, plus a fuzzy finder, a directory
     # tree, and tldr's short man pages.

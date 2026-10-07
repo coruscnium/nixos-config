@@ -47,6 +47,7 @@
     packages = [
       "org.vinegarhq.Sober"
       "app.fluxer.Fluxer"
+      "com.github.tchx84.Flatseal"
       "com.stremio.Stremio"
       "com.unity.UnityHub"
       "com.usebottles.bottles"
