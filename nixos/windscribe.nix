@@ -1,9 +1,10 @@
-{ pkgs, ... }:
+# ParkerrDev/nixpkgs-windscribe's module is self-contained: it installs the
+# package, declares the windscribe user/group, wires the setgid engine wrapper
+# and the /opt/windscribe bind mount, and runs both services. Nothing else here.
 {
-  services.windscribe.enable = true;
-
-  # The GUI runs as coru and needs to reach the helper's group-owned socket.
-  users.users.coru.extraGroups = [ "windscribe" ];
-
-  environment.systemPackages = [ pkgs.windscribe ];
+  services.windscribe = {
+    enable = true;
+    variant = "gui";
+    autoStart = true;
+  };
 }

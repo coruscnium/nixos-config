@@ -36,9 +36,12 @@
     # rev, so `nix flake update` cannot move it.
     nixpkgs-equibop.url = "github:NixOS/nixpkgs/c59305bab2065cfecc4944690d9eedbb56f3a9fa";
 
-    # Windscribe VPN client -- prebuilt repackage + NixOS module.
+    # Windscribe VPN client -- ParkerrDev's community flake (binary .deb repack
+    # + NixOS module). Replaced our own windscribe-nix: his module handles the
+    # helper's hardcoded PATH and the realpath("/opt/windscribe") check ours did
+    # not, and is VM-tested across every protocol.
     windscribe = {
-      url = "github:coruscnium/windscribe-nix";
+      url = "github:ParkerrDev/nixpkgs-windscribe";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -113,7 +116,6 @@
               # notably pkgs.usb-port-power-cycle, which a sudoers rule and a
               # wrapper both pin.
               nixpkgs.overlays = [
-                windscribe.overlays.default
                 (import ./pkgs { inherit equibopPkgs; })
                 chaotic.overlays.default
                 nur.overlays.default
