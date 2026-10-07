@@ -5,12 +5,6 @@
   ...
 }:
 
-# Filesystems, CPU/GPU and firmware. UUIDs read off this machine.
-#
-# Root is the btrfs DEFAULT subvolume, so "/" deliberately has NO subvol= option
-# (adding one would point the initrd at a subvolume that does not exist). The
-# older CachyOS subvolumes (/root, /srv, /var/cache, /var/log, /var/tmp) are not
-# present here and must not be declared.
 {
   fileSystems = {
     "/" = {
