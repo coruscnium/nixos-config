@@ -36,6 +36,22 @@
   programs.nix-ld.enable = true;
   programs.appimage.enable = true;
 
+  # nh wraps nixos-rebuild and prints a readable generation diff. NH_FLAKE makes
+  # `nh os switch` (and `nh home switch`) resolve this flake with no argument.
+  programs.nh = {
+    enable = true;
+    flake = "/home/coru/Projects/NixClone/nixos-config";
+  };
+
+  # comma -- `, <cmd>` runs any nixpkgs binary without installing it. Installing
+  # it here (not in modules/) means the binary and its zsh command-not-found
+  # handler come from one place. The handler is the flake-friendly replacement
+  # for programs.command-not-found, which only works on channels.
+  programs.comma = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   # No system text editor: nano's module defaults to on and vim was the other
   # entry in systemPackages below -- both dropped. micro (home-manager,
   # modules/desktop.nix) is the editor Coru uses. nixpkgs points EDITOR at nano,

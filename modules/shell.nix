@@ -48,17 +48,35 @@
       '')
     ];
 
+    # nh wraps nixos-rebuild and prints a readable generation diff (packages
+    # added/removed, version bumps, closure delta). NH_FLAKE is set by the
+    # programs.nh module, but pass the path so the alias stands alone.
     shellAliases = {
-      nixup = "sudo nixos-rebuild switch --flake ~/Projects/NixClone/nixos-config#coru";
-      nixbuild = "sudo nixos-rebuild build --flake ~/Projects/NixClone/nixos-config#coru";
-      nixboot = "sudo nixos-rebuild boot --flake ~/Projects/NixClone/nixos-config#coru";
+      nixup = "nh os switch ~/Projects/NixClone/nixos-config";
+      nixbuild = "nh os build ~/Projects/NixClone/nixos-config";
+      nixboot = "nh os boot ~/Projects/NixClone/nixos-config";
       nixupd = "nix flake update --flake ~/Projects/NixClone/nixos-config";
       nixgc = "sudo nix-collect-garbage -d";
       nixcfg = "cd ~/Projects/NixClone/nixos-config";
     };
   };
 
+  # zsh-autocomplete installs the dist chpwd_recent_dirs hook, whose cache lives
+  # under ${XDG_DATA_HOME:-~/.local/share}/zsh/ -- but nothing creates that dir, so
+  # the write on every cd fails ("no such file or directory"). Creating it is the
+  # whole fix: the hook then writes the file itself.
+  home.activation.zshRecentDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    run mkdir -p "''${XDG_DATA_HOME:-$HOME/.local/share}/zsh"
+  '';
+
   programs.fastfetch.enable = true;
+
+  # Frecency `cd`: `z <fragment>` jumps to the dir you actually visit. Binds only
+  # z/zi, so it does not contend with zsh-autocomplete.
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
 
   home.file.".p10k.zsh".source = ../zsh/p10k.zsh;
 }

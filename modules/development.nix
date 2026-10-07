@@ -15,4 +15,11 @@
     cargo
     python3Packages.keyboard
   ];
+
+  # Auto-load a dev shell per directory: an .envrc with `use flake` enters the
+  # project's nix develop shell on cd. nix-direnv caches the result.
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
 }
