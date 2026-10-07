@@ -24,20 +24,53 @@
     "services/org.kde.konsole.desktop"._launch = "Meta+X";
 
     kwin = {
-      "Switch to Desktop 1" = "Meta+1";
-      "Switch to Desktop 2" = "Meta+2";
-      "Switch to Desktop 3" = "Meta+3";
-      "Switch to Desktop 4" = "Meta+4";
-      "Switch to Desktop 5" = "Meta+5";
+      # "Num" is Qt's portable-text name for the keypad modifier, so "Meta+Num+1" is
+      # Meta plus numpad 1 (NumLock on). Lists become tab-separated alternatives in
+      # kglobalshortcutsrc; the row keeps its old binding alongside the numpad one.
+      "Switch to Desktop 1" = [
+        "Meta+1"
+        "Meta+Num+1"
+      ];
+      "Switch to Desktop 2" = [
+        "Meta+2"
+        "Meta+Num+2"
+      ];
+      "Switch to Desktop 3" = [
+        "Meta+3"
+        "Meta+Num+3"
+      ];
+      "Switch to Desktop 4" = [
+        "Meta+4"
+        "Meta+Num+4"
+      ];
+      "Switch to Desktop 5" = [
+        "Meta+5"
+        "Meta+Num+5"
+      ];
       "Window Fullscreen" = "Meta+F";
 
       # Our kwin-scripts/move-window-to-desktop (native actions do not follow).
       # Shifted symbols: KGlobalAccel canonicalises Shift+<digit>, so "Meta+Shift+1" never matches.
-      "MoveWindowToDesktop1" = "Meta+!";
-      "MoveWindowToDesktop2" = "Meta+@";
-      "MoveWindowToDesktop3" = "Meta+#";
-      "MoveWindowToDesktop4" = "Meta+$";
-      "MoveWindowToDesktop5" = "Meta+%";
+      "MoveWindowToDesktop1" = [
+        "Meta+!"
+        "Meta+Alt+Num+1"
+      ];
+      "MoveWindowToDesktop2" = [
+        "Meta+@"
+        "Meta+Alt+Num+2"
+      ];
+      "MoveWindowToDesktop3" = [
+        "Meta+#"
+        "Meta+Alt+Num+3"
+      ];
+      "MoveWindowToDesktop4" = [
+        "Meta+$"
+        "Meta+Alt+Num+4"
+      ];
+      "MoveWindowToDesktop5" = [
+        "Meta+%"
+        "Meta+Alt+Num+5"
+      ];
     };
   };
 }
