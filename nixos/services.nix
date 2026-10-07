@@ -10,6 +10,19 @@
   networking.networkmanager.enable = true;
   networking.firewall.allowedTCPPorts = [ 1883 ]; # OctoEverywhere MQTT relay
 
+  # NextDNS over DoH via the official client. The module only runs `nextdns run`
+  # (listening on 127.0.0.1:53) and never touches resolv.conf, so the resolver
+  # wiring is on us; NM owns resolv.conf here, hence `dns = "none"`.
+  services.nextdns = {
+    enable = true;
+    arguments = [
+      "-profile"
+      "a8561e"
+    ];
+  };
+  networking.networkmanager.dns = "none";
+  networking.nameservers = [ "127.0.0.1" ];
+
   virtualisation.docker.enable = true;
 
   services.btrfs.autoScrub = {
