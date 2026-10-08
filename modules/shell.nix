@@ -55,8 +55,14 @@
       nixup = "nh os switch ~/Projects/NixClone/nixos-config";
       nixbuild = "nh os build ~/Projects/NixClone/nixos-config";
       nixboot = "nh os boot ~/Projects/NixClone/nixos-config";
-      nixupd = "nix flake update --flake ~/Projects/NixClone/nixos-config";
-      nixgc = "sudo nix-collect-garbage -d";
+      # Both halves of the source set: flake.lock inputs (nix flake update) plus
+      # the nvfetcher-pinned AppImages (cherry-studio, elegooslicer) that nix
+      # flake update cannot see. The subshell keeps your cwd put -- nvfetcher
+      # writes _sources/ relative to cwd, so it has to run inside the repo.
+      nixupd = "(cd ~/Projects/NixClone/nixos-config && nix flake update && nix run nixpkgs#nvfetcher)";
+      # nh raises its own elevation (doas/sudo/run0/pkexec), so no `sudo` here.
+      # Keeps 3 generations per profile (nh defaults to 1) for rollback headroom.
+      nixgc = "nh clean all -k 3";
       nixcfg = "cd ~/Projects/NixClone/nixos-config";
     };
   };
