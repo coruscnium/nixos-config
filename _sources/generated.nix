@@ -15,4 +15,13 @@
       sha256 = "sha256-A8fKKhg+ODiTMMvWHyJu1WhcJ0hR+VFFCGGbqWFzMbs=";
     };
   };
+  elegooslicer = {
+    pname = "elegooslicer";
+    version = "1.5.3.5";
+    src = fetchurl {
+      url = "https://github.com/elegooofficial/ElegooSlicer/releases/download/v1.5.3.5/ElegooSlicer_Linux_V1.5.3.5.AppImage";
+      name = "ElegooSlicer_Linux_V1.5.3.5.AppImage";
+      sha256 = "sha256-ezs/CODQ1Ru0cshYZdG+mwwoOFQj2rocsMOyJdAQGvw=";
+    };
+  };
 }

@@ -16,3 +16,12 @@ src.github = "CherryHQ/cherry-studio"
 src.prefix = "v"
 fetch.url = "https://github.com/CherryHQ/cherry-studio/releases/download/v$ver/Cherry-Studio-$ver-linux-x64.AppImage"
 url.name = "Cherry-Studio-$ver-linux-x64.AppImage"
+
+[elegooslicer]
+# Elegoo's OrcaSlicer fork; only shipped as a Linux AppImage. Tags are "v1.5.3.5"
+# but the asset keeps a literal capital V. NOTE: v1.5.2.2 named its asset
+# "..._Linux_Ubuntu2404_V<ver>.AppImage" -- if that form returns, this URL 404s.
+src.github = "elegooofficial/ElegooSlicer"
+src.prefix = "v"
+fetch.url = "https://github.com/elegooofficial/ElegooSlicer/releases/download/v$ver/ElegooSlicer_Linux_V$ver.AppImage"
+url.name = "ElegooSlicer_Linux_V$ver.AppImage"

@@ -20,6 +20,7 @@
     ./security.nix
     ./hardware.nix
     ./ai.nix
+    ./maker.nix
     ./scripts.nix
     ./services.nix
     ./theming.nix

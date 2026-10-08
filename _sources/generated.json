@@ -13,5 +13,20 @@
             "url": "https://github.com/CherryHQ/cherry-studio/releases/download/v2.1.4/Cherry-Studio-2.1.4-linux-x64.AppImage"
         },
         "version": "2.1.4"
+    },
+    "elegooslicer": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "elegooslicer",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": "ElegooSlicer_Linux_V1.5.3.5.AppImage",
+            "sha256": "sha256-ezs/CODQ1Ru0cshYZdG+mwwoOFQj2rocsMOyJdAQGvw=",
+            "type": "url",
+            "url": "https://github.com/elegooofficial/ElegooSlicer/releases/download/v1.5.3.5/ElegooSlicer_Linux_V1.5.3.5.AppImage"
+        },
+        "version": "1.5.3.5"
     }
 }
