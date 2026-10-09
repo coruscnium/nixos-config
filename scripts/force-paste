@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Force a paste: type text into the focused window as real keystrokes. For
+# anything that ignores the compositor's paste -- gamescope never sees Ctrl+V at
+# all, and plenty of other apps swallow it. Injects through /dev/uinput instead.
+# Meant to hang off a hotkey, hence the pause: it gives the modifier keys time to
+# come back up before we start synthesizing, so they don't corrupt the first
+# characters.
+#
+#   force-paste            type the clipboard
+#   force-paste "text"     type "text"
+#
+# Knobs: PASTE_DELAY (seconds, default 1.5), KEY_DELAY_MS (ms per key event,
+# default 12 -- lower is faster, but too low and the game drops characters).
+
+set -euo pipefail
+
+SOCKET="${YDOTOOL_SOCKET:-${XDG_RUNTIME_DIR:-/tmp}/.ydotool_socket}"
+DELAY="${PASTE_DELAY:-1.5}"
+KEY_DELAY="${KEY_DELAY_MS:-12}"
+
+# ydotoold owns /dev/uinput; ydotool only talks to it. Start it if it isn't up,
+# clearing the socket first -- a dead daemon leaves the socket behind and
+# "Connection refused" then looks exactly like a missing daemon. `key 0:0` is a
+# pure delay (no keystroke), so it doubles as a harmless liveness probe.
+if ! ydotool key 0:0 >/dev/null 2>&1; then
+    rm -f "$SOCKET"
+    setsid ydotoold -o "$(id -u):$(id -g)" >/dev/null 2>&1 &
+    for _ in $(seq 1 50); do
+        [ -S "$SOCKET" ] && break
+        sleep 0.1
+    done
+    if [ ! -S "$SOCKET" ]; then
+        echo "force-paste: ydotoold did not start" >&2
+        exit 1
+    fi
+fi
+
+sleep "$DELAY"
+
+if [ "$#" -gt 0 ]; then
+    printf '%s' "$*"
+else
+    wl-paste -n
+fi | ydotool type -d "$KEY_DELAY" -f -

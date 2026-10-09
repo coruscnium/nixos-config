@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# autoclicker: toggle a 20 cps left-click, for the XF86Calculator key.
+#
+# ydotool spends two --next-delay per click (button down, delay, button up,
+# delay), so 25 ms per event == 50 ms per click == 20 cps.
+#
+#   press -> start clicking, press again -> stop
+#
+# Knob: EVENT_DELAY (ms per event; two per click).
+
+set -euo pipefail
+
+SOCKET="${YDOTOOL_SOCKET:-${XDG_RUNTIME_DIR:-/tmp}/.ydotool_socket}"
+PIDFILE="${XDG_RUNTIME_DIR:-/tmp}/autoclicker.pid"
+EVENT_DELAY="${EVENT_DELAY:-25}"   # ms; two per click -> 20 clicks/sec
+
+# ydotoold owns /dev/uinput; ydotool only talks to it. Start it if it isn't up,
+# clearing the socket first -- a dead daemon leaves it behind and "Connection
+# refused" then looks exactly like a missing daemon. `key 0:0` is a pure delay
+# (no keystroke), so it doubles as a harmless liveness probe.
+if ! ydotool key 0:0 >/dev/null 2>&1; then
+    rm -f "$SOCKET"
+    setsid ydotoold -o "$(id -u):$(id -g)" >/dev/null 2>&1 &
+    for _ in $(seq 1 50); do
+        [ -S "$SOCKET" ] && break
+        sleep 0.1
+    done
+    if [ ! -S "$SOCKET" ]; then
+        echo "autoclicker: ydotoold did not start" >&2
+        exit 1
+    fi
+fi
+
+# Already clicking? Then this press is the stop.
+if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+    pid=$(cat "$PIDFILE")
+    kill "$pid"
+    rm -f "$PIDFILE"
+    # Cut off mid-click the button is still held -- wait for the clicker to die
+    # so nothing can re-press, then force the release. A duplicate up is a no-op.
+    for _ in $(seq 1 50); do
+        kill -0 "$pid" 2>/dev/null || break
+        sleep 0.02
+    done
+    ydotool click 0x80 || true   # left button up
+    exit 0
+fi
+rm -f "$PIDFILE"
+
+# setsid detaches the clicker from this script's session so it outlives the
+# script (and the shortcut's process-group cleanup); $! is its pid.
+setsid ydotool click --next-delay "$EVENT_DELAY" --repeat 2147483647 0xC0 >/dev/null 2>&1 &
+echo $! > "$PIDFILE"

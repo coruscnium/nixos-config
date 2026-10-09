@@ -16,8 +16,31 @@
     X-KDE-GlobalAccel-CommandShortcut=true
   '';
 
+  # force-paste is a script too, so it needs the same wrapper-backed .desktop.
+  home.file.".local/share/applications/net.local.force-paste.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=force-paste
+    Exec=${pkgs.script-force-paste}/bin/force-paste
+    NoDisplay=true
+    StartupNotify=false
+    X-KDE-GlobalAccel-CommandShortcut=true
+  '';
+
+  home.file.".local/share/applications/net.local.autoclicker.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=autoclicker
+    Exec=${pkgs.script-autoclicker}/bin/autoclicker
+    NoDisplay=true
+    StartupNotify=false
+    X-KDE-GlobalAccel-CommandShortcut=true
+  '';
+
   programs.plasma.shortcuts = {
     "services/net.local.toggle_pw_control_center.sh.desktop"._launch = "Meta+A";
+    "services/net.local.force-paste.desktop"._launch = "Meta+Ctrl+V";
+    "services/net.local.autoclicker.desktop"._launch = "Calculator";
 
     "services/floorp.desktop".new-window = "Meta+B";
     "services/org.kde.dolphin.desktop"._launch = "Meta+E";

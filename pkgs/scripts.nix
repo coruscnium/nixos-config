@@ -76,6 +76,29 @@ in
     ];
   };
 
+  # ydotoold AND ydotool ship in the one package; the script starts the daemon
+  # itself and then talks to it.
+  script-force-paste = mkScript {
+    name = "force-paste";
+    src = ../scripts/force-paste;
+    inputs = [
+      prev.ydotool
+      prev.wl-clipboard
+      prev.util-linux
+      prev.coreutils
+    ];
+  };
+
+  script-autoclicker = mkScript {
+    name = "autoclicker";
+    src = ../scripts/autoclicker;
+    inputs = [
+      prev.ydotool
+      prev.util-linux
+      prev.coreutils
+    ];
+  };
+
   # The embedded python heredoc needs dbus-python on PATH. Two /usr paths are
   # substituted: the app binary and the sudo'd usb helper.
   script-streamcontroller-watchdog = mkScript {
