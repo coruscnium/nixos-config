@@ -17,6 +17,16 @@
 
     micro # terminal editor, preferred sudoedit
     wallpaper-engine-kde-plugin # pkgs/wallpaper-engine.nix (CaptSilver fork)
+
+    # The plugin's web backend (QtWebView.qml) does `import QtWebEngine` and
+    # `import QtWebChannel` -- and those resolve in plasmashell's QML engine, not
+    # the plugin's. plasmashell has no reason to build-depend on them, so they are
+    # on none of its import paths; the profile's lib/qt-6/qml IS on the session's
+    # QML2_IMPORT_PATH, so landing them here is what makes the imports resolve.
+    # Do NOT instead patch the plugin to call QQmlEngine::addImportPath() from
+    # initializeEngine() -- that runs mid-load and segfaults Qt 6.11's type loader.
+    kdePackages.qtwebchannel
+    kdePackages.qtwebengine
   ];
 
   # Vendored Plasma additions, referenced from the repo instead of hand-installed.

@@ -1,8 +1,5 @@
 # Wallpaper Engine integration for Plasma 6 -- the CaptSilver fork.
 #
-# !! NEVER COMPILED. Evaluation is verified; the build is not. Expect to iterate
-# !! on buildInputs the first time it actually builds.
-#
 # Has a git submodule (src/backend_scene), so fetchSubmodules is required -- a
 # plain tarball has an empty submodule and will not build. Deps come from
 # upstream CMakeLists.txt.
