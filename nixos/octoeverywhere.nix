@@ -38,7 +38,7 @@ in
 
         environment = {
           COMPANION_MODE = "elegoo_cc2";
-          PRINTER_IP = "192.168.1.106";
+          PRINTER_IP = "192.168.1.82";
 
           # The printer has its access code disabled, so this is the documented
           # default. Enable it on the printer and this must move to a root-only
