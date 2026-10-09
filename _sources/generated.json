@@ -1,4 +1,19 @@
 {
+    "astra": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "astra",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": "Astra-0.8.0-beta-Linux.AppImage",
+            "sha256": "sha256-ZckQjlpS09t1PpqXYP5L8FR/Aq0tiyMgTbhNJgMwCc8=",
+            "type": "url",
+            "url": "https://github.com/Boof2015/astra/releases/download/v0.8.0-beta/Astra-0.8.0-beta-Linux.AppImage"
+        },
+        "version": "0.8.0-beta"
+    },
     "cherry-studio": {
         "cargoLock": null,
         "date": null,

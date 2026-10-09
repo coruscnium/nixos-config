@@ -6,6 +6,15 @@
   dockerTools,
 }:
 {
+  astra = {
+    pname = "astra";
+    version = "0.8.0-beta";
+    src = fetchurl {
+      url = "https://github.com/Boof2015/astra/releases/download/v0.8.0-beta/Astra-0.8.0-beta-Linux.AppImage";
+      name = "Astra-0.8.0-beta-Linux.AppImage";
+      sha256 = "sha256-ZckQjlpS09t1PpqXYP5L8FR/Aq0tiyMgTbhNJgMwCc8=";
+    };
+  };
   cherry-studio = {
     pname = "cherry-studio";
     version = "2.1.4";

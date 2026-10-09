@@ -25,3 +25,12 @@ src.github = "elegooofficial/ElegooSlicer"
 src.prefix = "v"
 fetch.url = "https://github.com/elegooofficial/ElegooSlicer/releases/download/v$ver/ElegooSlicer_Linux_V$ver.AppImage"
 url.name = "ElegooSlicer_Linux_V$ver.AppImage"
+
+[astra]
+# Boof2015/astra -- audiophile music player (Electron). nixpkgs has nothing and
+# upstream posts no source, only AppImage / deb / rpm. Tags carry a "-beta"
+# suffix, so the version nvfetcher resolves is "0.8.0-beta".
+src.github = "Boof2015/astra"
+src.prefix = "v"
+fetch.url = "https://github.com/Boof2015/astra/releases/download/v$ver/Astra-$ver-Linux.AppImage"
+url.name = "Astra-$ver-Linux.AppImage"

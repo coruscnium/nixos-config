@@ -7,6 +7,7 @@
     spotify
     spicetify-cli
     lrcget
+    astra
 
     easyeffects
     calf

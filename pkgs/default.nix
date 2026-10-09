@@ -26,6 +26,7 @@ in
 // {
   cherry-studio = prev.callPackage ./cherry-studio.nix { pkgs = prev; };
   elegooslicer = prev.callPackage ./elegooslicer.nix { };
+  astra = prev.callPackage ./astra.nix { };
   beautysolar = prev.callPackage ./beautysolar.nix { };
   # System-wide Carl suite for the Plasma Login Manager greeter, which cannot see
   # coru's home.
