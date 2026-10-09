@@ -11,6 +11,5 @@
     gthumb
     easytag
     converseen
-    linux-wallpaperengine
   ];
 }
