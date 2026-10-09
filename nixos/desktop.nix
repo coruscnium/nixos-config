@@ -46,6 +46,14 @@
   # preset is seeded by modules/hardware.nix.
   services.input-remapper.enable = true;
 
+  # input-remapper can still own its D-Bus name for a moment after it is stopped, so
+  # a restart can start the replacement too early: it exits with "Is the service
+  # already running?" and the unit fails, which fails the whole activation. Give the
+  # bus a moment to release the name before the start.
+  systemd.services.input-remapper.serviceConfig.ExecStopPost = [
+    "${pkgs.coreutils}/bin/sleep 1"
+  ];
+
   # The G502 X LIGHTSPEED is a USB wakeup source, so any movement wakes suspend or
   # hibernate. Disable it on the device node (its parent hubs are already off).
   services.udev.extraRules = ''
