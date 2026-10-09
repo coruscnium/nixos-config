@@ -98,8 +98,8 @@
                 "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
             }
         ],
-        "target_uinput": "keyboard",
-        "output_symbol": "Left",
+        "target_uinput": "mouse",
+        "output_symbol": "event(EV_REL, REL_HWHEEL, -1).event(EV_REL, REL_HWHEEL_HI_RES, -120).if_tap(None, hold(event(EV_REL, REL_HWHEEL, -1).event(EV_REL, REL_HWHEEL_HI_RES, -120).wait(50)), 400)",
         "name": "Scroll left (Wheel tilt left)",
         "mapping_type": "key_macro"
     },
@@ -111,8 +111,8 @@
                 "origin_hash": "0cb33d27871ac2bbbe381a3a4cee41da"
             }
         ],
-        "target_uinput": "keyboard",
-        "output_symbol": "Right",
+        "target_uinput": "mouse",
+        "output_symbol": "event(EV_REL, REL_HWHEEL, 1).event(EV_REL, REL_HWHEEL_HI_RES, 120).if_tap(None, hold(event(EV_REL, REL_HWHEEL, 1).event(EV_REL, REL_HWHEEL_HI_RES, 120).wait(50)), 400)",
         "name": "Scroll right (Wheel tilt right)",
         "mapping_type": "key_macro"
     }
