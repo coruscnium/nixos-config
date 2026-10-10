@@ -91,6 +91,14 @@
   # Plasma chrome stays dark (the half-light/half-dark bug).
   environment.sessionVariables.QT_QPA_PLATFORMTHEME = "kde";
 
+  # ---- Screen capture -------------------------------------------------------
+  # KMS capture grabs the framebuffer through gsr-kms-server, which needs
+  # CAP_SYS_ADMIN. Without a setcap wrapper the recorder shells out to pkexec and
+  # pops a polkit password prompt on every start. This installs the recorder
+  # system-wide and creates /run/wrappers/bin/gsr-kms-server with cap_sys_admin,
+  # making capture promptless. The GTK frontend stays per-user (modules/media.nix).
+  programs.gpu-screen-recorder.enable = true;
+
   # ---- Login screen theming ------------------------------------------------
   # The Plasma Login Manager greeter runs as its own user (plasmalogin, home
   # /var/lib/plasmalogin) and cannot read coru's home or per-user profile, so
