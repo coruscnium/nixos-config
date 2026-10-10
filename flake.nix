@@ -128,6 +128,12 @@
                 # Real files exist where home-manager wants to symlink; move them
                 # aside instead of aborting activation.
                 backupFileExtension = "hm-backup";
+                # ...and overwrite a stale backup from an earlier collision instead
+                # of erroring. KDE periodically rewrites mimeapps.list (a HM-owned
+                # symlink) into a real file; that re-triggers the backup on the
+                # next activation, and without this the second occurrence collides
+                # with the first backup and fails the whole switch.
+                overwriteBackup = true;
 
                 users.coru.imports = [
                   ./home.nix
