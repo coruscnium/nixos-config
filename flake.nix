@@ -44,6 +44,15 @@
       url = "github:ParkerrDev/nixpkgs-windscribe";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # macOS compatibility layer -- runs macOS binaries on Linux (Wine-shaped, not
+    # a launcher). A flake, not in nixpkgs. nixpkgs.follows shares our eval so
+    # SDL3 (needs >= 3.4.0) and the Rust toolchain resolve against nixos-unstable;
+    # drop the follows if it ever fails to build against our nixpkgs.
+    rosemary = {
+      url = "github:microlift/rosemary";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -56,6 +65,7 @@
       nix-flatpak,
       nixpkgs-equibop,
       windscribe,
+      rosemary,
       ...
     }:
     let
@@ -64,13 +74,17 @@
       # equibop's pinned rev (its build uses venmic 6.1.0 -- see the input above).
       equibopPkgs = import nixpkgs-equibop { inherit system; };
 
+      # Rosemary's CLI (`rosemary` and `default` are the same derivation). Built
+      # by its own flake; pkgs/default.nix republishes it as pkgs.rosemary.
+      rosemaryPkg = rosemary.packages.${system}.rosemary;
+
       # `pkgs` is passed explicitly to homeManagerConfiguration, so home-manager
       # ignores its own nixpkgs.config -- package config (unfree, overlays) MUST
       # live here.
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
-          (import ./pkgs { inherit equibopPkgs; })
+          (import ./pkgs { inherit equibopPkgs rosemaryPkg; })
           chaotic.overlays.default
           nur.overlays.default
         ];
@@ -97,6 +111,7 @@
           ./home.nix
           ./modules
           plasma-manager.homeModules.plasma-manager
+          rosemary.homeManagerModules.default
         ];
       };
 
@@ -116,7 +131,7 @@
               # notably pkgs.usb-port-power-cycle, which a sudoers rule and a
               # wrapper both pin.
               nixpkgs.overlays = [
-                (import ./pkgs { inherit equibopPkgs; })
+                (import ./pkgs { inherit equibopPkgs rosemaryPkg; })
                 chaotic.overlays.default
                 nur.overlays.default
               ];
@@ -139,6 +154,7 @@
                   ./home.nix
                   ./modules
                   plasma-manager.homeModules.plasma-manager
+                  rosemary.homeManagerModules.default
                 ];
               };
             }

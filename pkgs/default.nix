@@ -2,7 +2,7 @@
 #
 # Imported as an overlay in flake.nix. Scripts live in ./scripts.nix so that
 # modules/services.nix can reference the same store paths.
-{ equibopPkgs }:
+{ equibopPkgs, rosemaryPkg }:
 final: prev:
 let
   lib = prev.lib;
@@ -80,4 +80,22 @@ in
   # sharing. Held at the last venmic 6.1.0 build (3.2.2) by building it from the
   # pinned nixpkgs-equibop input in flake.nix.
   equibop = equibopPkgs.equibop;
+
+  # ---------------------------------------------------------------- rosemary
+  # macOS compatibility layer -- runs macOS binaries on Linux (Wine-shaped).
+  # Flake input (flake.nix); installed from nixos/system.nix; prefixes live in
+  # ~/.local/share/rosemary.
+  #
+  # Built with upstream's `fullnative` Cargo profile (LTO, codegen-units=1,
+  # panic=abort -- their Cargo.toml) and native CPU flags, rather than the
+  # release profile its flake exposes. --profile changes the target dir, so this
+  # rebuilds every dependency; worth it once, not on every rebuild. RUSTFLAGS is
+  # not otherwise set, so nothing is clobbered. target-cpu=native bakes in this
+  # host's CPU, which is the point -- single-host flake, not portable by design.
+  rosemary = rosemaryPkg.overrideAttrs (_: {
+    CARGO_PROFILE = "fullnative";
+    RUSTFLAGS = "-C target-cpu=native";
+    CFLAGS = "-march=native";
+    CXXFLAGS = "-march=native";
+  });
 }

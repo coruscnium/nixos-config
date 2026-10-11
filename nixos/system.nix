@@ -89,6 +89,12 @@
     inetutils
     screen
     tmux
+
+    # macOS compatibility layer (Wine-shaped) -- runs macOS binaries. A
+    # system-level runtime, so it sits here with nix-ld/appimage rather than in
+    # modules/gaming.nix. From the `rosemary` flake input (see pkgs/default.nix);
+    # it keeps its prefixes in ~/.local/share/rosemary.
+    rosemary
   ];
 
   # sshd is deliberately off: a listening sshd is a decision, not a default.

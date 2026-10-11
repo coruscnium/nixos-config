@@ -42,4 +42,14 @@
   # User-facing mangohud + its config. Steam gets its own copy inside the sandbox
   # (nixos/gaming.nix); this covers a plain terminal.
   programs.mangohud.enable = true;
+
+  # Rosemary as a Steam compatibility tool -- drops it into
+  # compatibilitytools.d so a macOS app runs under Steam's "Rosemary" entry.
+  # Rosemary itself is a system runtime (nixos/system.nix, pkgs.rosemary);
+  # pin `package` to that build so the tool reuses it instead of the flake's
+  # own default derivation. Upstream module: rosemary.homeManagerModules.default.
+  programs.rosemary = {
+    steam.enable = true;
+    package = pkgs.rosemary;
+  };
 }
