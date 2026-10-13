@@ -22,12 +22,12 @@
         "passthru": null,
         "pinned": false,
         "src": {
-            "name": "Cherry-Studio-2.1.4-linux-x64.AppImage",
-            "sha256": "sha256-A8fKKhg+ODiTMMvWHyJu1WhcJ0hR+VFFCGGbqWFzMbs=",
+            "name": "Cherry-Studio-2.1.6-linux-x64.AppImage",
+            "sha256": "sha256-0jvk4QoPLles2P87iSdkvM8RWsg34pIppTLVxEI+EfE=",
             "type": "url",
-            "url": "https://github.com/CherryHQ/cherry-studio/releases/download/v2.1.4/Cherry-Studio-2.1.4-linux-x64.AppImage"
+            "url": "https://github.com/CherryHQ/cherry-studio/releases/download/v2.1.6/Cherry-Studio-2.1.6-linux-x64.AppImage"
         },
-        "version": "2.1.4"
+        "version": "2.1.6"
     },
     "elegooslicer": {
         "cargoLock": null,
