@@ -34,6 +34,95 @@
   # REQUIRED: prebuilt binaries (AppImages, Resolve, LM Studio) need an FHS
   # dynamic loader NixOS does not provide.
   programs.nix-ld.enable = true;
+
+  # nix-ld exposes ONLY the lib dirs of the packages listed here -- never their
+  # transitive deps -- so a GUI binary needs its whole closure named. The module
+  # default is 14 bare libs; the Unity Editor (VRChat avatar work, launched
+  # natively by ALCOM) needs the GTK3/X11/GL stack on top. Its own DT_NEEDED is
+  # libGL libX11 libXcursor libXrandr libgtk-3 libgdk-3 libgdk_pixbuf libgio
+  # libglib libgobject libudev libxml2.so.2 libz; the rest below is that closure.
+  # Verified 2026-10-12 by running the Editor against exactly this set:
+  # `NIX_LD_LIBRARY_PATH=<these>/lib Unity -version` -> 2022.3.22f1, exit 0.
+  #
+  # libxml2 here is 2.15 (soname libxml2.so.16) but the Editor was built against
+  # libxml2.so.2 -> libxml2_13. Defining `libraries` REPLACES the module default,
+  # so the base set is repeated first.
+  programs.nix-ld.libraries = with pkgs; [
+    # module default (repeated because defining `libraries` drops it)
+    zlib
+    zstd
+    stdenv.cc.cc
+    curl
+    openssl
+    attr
+    libssh
+    bzip2
+    libxml2
+    acl
+    libsodium
+    util-linux
+    xz
+    systemd
+
+    # GTK3 + GL
+    gtk3
+    gdk-pixbuf
+    glib
+    pango
+    cairo
+    atk
+    harfbuzz
+    fontconfig
+    freetype
+    fribidi
+    libpng
+    brotli
+    pixman
+    expat
+    graphite2
+    libthai
+    libdatrie
+    libepoxy
+    libffi
+    pcre2
+    libselinux
+    json-glib
+    tinysparql
+    libjpeg_turbo
+    libnotify
+    gsettings-desktop-schemas
+    libglvnd
+    libxkbcommon
+    dbus
+    nss
+    nspr
+    icu
+    alsa-lib
+    wayland
+    libxml2_13
+
+    # X11
+    libX11
+    libXcursor
+    libXrandr
+    libXinerama
+    libXext
+    libXfixes
+    libXcomposite
+    libXdamage
+    libXrender
+    libXi
+    libXtst
+    libXxf86vm
+    libxcb
+    libXau
+    libXdmcp
+    libSM
+    libICE
+    libXScrnSaver
+    libxshmfence
+  ];
+
   programs.appimage.enable = true;
 
   # nh wraps nixos-rebuild and prints a readable generation diff. NH_FLAKE makes
