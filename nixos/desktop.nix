@@ -54,6 +54,12 @@
     "${pkgs.coreutils}/bin/sleep 1"
   ];
 
+  # Keychron keyboards (K0 Max, K3 v3) share vendor 3434. Upstream rules: uaccess on
+  # the hidraw node so the seated user can open the 0xFF60 vendor channel (Keychron
+  # Launcher / VIA over WebHID), and clear the joystick flag these NKRO boards get
+  # mislabelled with. uaccess is per-seat, unlike a world-writable node.
+  services.udev.packages = [ pkgs.keychron-udev-rules ];
+
   # The G502 X LIGHTSPEED is a USB wakeup source, so any movement wakes suspend or
   # hibernate. Disable it on the device node (its parent hubs are already off).
   services.udev.extraRules = ''
