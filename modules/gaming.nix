@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 # Game launchers, mod clients, Proton/compat tooling, overlays. steam / gamemode
 # / mangohud are NixOS modules; proton-cachyos is registered with Steam there too
@@ -25,7 +25,28 @@
     wineWow64Packages.stable
 
     pince # primary game-memory tool
+
+    # VR. The WiVRn server, its Monado runtime, and -- via
+    # config.json.application -- the wayvr overlay all come from services.wivrn
+    # (nixos/gaming.nix), so they are NOT listed here (nothing installed twice).
+    xrizer # OpenVR -> OpenXR, so SteamVR titles (VRChat) run under WiVRn
+    olsvr # Wayland OLED burn-in screensaver (pkgs/olsvr.nix)
   ];
+
+  # Point the OpenVR runtime at xrizer, which translates OpenVR -> OpenXR and
+  # hands the game to WiVRn. Without this SteamVR stays the OpenVR runtime and
+  # every OpenVR title (VRChat) launches the broken SteamVR instead. SteamVR
+  # writes this file itself, so it is a store symlink -- read-only, SteamVR
+  # cannot put itself back. SteamVR's config/log dirs are preserved for if it
+  # is ever used directly.
+  xdg.configFile."openvr/openvrpaths.vrpath".text = builtins.toJSON {
+    version = 1;
+    jsonid = "vrpathreg";
+    external_drivers = null;
+    runtime = [ "${pkgs.xrizer}/lib/xrizer" ];
+    config = [ "${config.xdg.dataHome}/Steam/config" ];
+    log = [ "${config.xdg.dataHome}/Steam/logs" ];
+  };
 
   # NixOS registers our custom Proton with Steam via STEAM_EXTRA_COMPAT_TOOLS_PATHS,
   # but only inside Steam's own FHS profile. Tools run standalone (protontricks,

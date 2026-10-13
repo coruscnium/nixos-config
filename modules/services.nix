@@ -110,6 +110,24 @@ in
       Install.WantedBy = [ "default.target" ];
     };
 
+    # olsvr -- OLED burn-in screensaver. Idle-activated, which is exactly what a
+    # VR session looks like to the desktop: input goes to the headset, so the
+    # monitor sits idle and the panel blanks instead of holding a static frame.
+    # Any keyboard/mouse input dismisses it. Triggered manually with
+    # `olsvr run --now`.
+    olsvr = {
+      Unit = {
+        Description = "olsvr OLED screensaver";
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.olsvr}/bin/olsvr run";
+        Restart = "on-failure";
+        RestartSec = 5;
+      };
+      Install.WantedBy = [ "default.target" ];
+    };
+
     mega-cache-clean = {
       Unit.Description = "Clean MEGA FUSE cache older than 7 days";
       Service = {

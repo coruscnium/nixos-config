@@ -44,10 +44,17 @@ rustPlatform.buildRustPackage rec {
     vulkan-loader
   ];
 
-  # wgpu loads the Vulkan loader at runtime (dlopen), which the binary's RPATH
-  # does not cover.
+  # wgpu (vulkan-loader) and wayland-backend (libwayland-client) both dlopen
+  # their libraries at runtime, which the binary's RPATH does not cover -- without
+  # this olsvr dies with "Failed to connect to Wayland: NoWaylandLib".
   postInstall = ''
-    wrapProgram $out/bin/olsvr --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ vulkan-loader ]}
+    wrapProgram $out/bin/olsvr --prefix LD_LIBRARY_PATH : ${
+      lib.makeLibraryPath [
+        wayland
+        libxkbcommon
+        vulkan-loader
+      ]
+    }
   '';
 
   meta = {
