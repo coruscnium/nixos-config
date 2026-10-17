@@ -73,7 +73,7 @@ and a broken boot.
 11. **Never install the same package in both `modules/` and `nixos/`.** The ledger's rule: nothing
     forgotten, nothing installed twice.
 12. **The nyx cache module is required.** `chaotic.nixosModules.nyx-cache` must stay enabled, or every
-    nyx package (including the CachyOS kernel) is built from source instead of downloaded.
+    nyx package (proton-cachyos) is built from source instead of downloaded.
 
 ## Build and verify
 

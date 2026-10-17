@@ -9,7 +9,8 @@
     };
 
     chaotic = {
-      # CachyOS-on-NixOS bridge: linux-cachyos (incl. znver4), proton-cachyos.
+      # CachyOS-on-NixOS bridge. The linux-cachyos kernel was dropped for the
+      # stock one (nixos/boot.nix); proton-cachyos is still wanted.
       url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -122,8 +123,8 @@
             home-manager.nixosModules.home-manager
             nix-flatpak.nixosModules.nix-flatpak
 
-            # Without the nyx cache every nyx package (incl. the CachyOS kernel)
-            # builds from source.
+            # Without the nyx cache every nyx package (proton-cachyos) builds
+            # from source.
             chaotic.nixosModules.nyx-cache
 
             {

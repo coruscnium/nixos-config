@@ -41,9 +41,10 @@
     };
   };
 
-  # RDNA4 needs a recent kernel+mesa; the CachyOS kernel supplies both. The only
-  # newer variant is an RC.
-  boot.kernelPackages = pkgs.linuxPackages_cachyos;
+  # RDNA4 needs a recent kernel. linuxPackages_latest carries the same version
+  # the CachyOS kernel shipped (7.2.9) without its patchset -- dropped back to
+  # the stock kernel 2026-10-14, the patches had started causing bugs.
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   boot.plymouth.enable = true;
 
