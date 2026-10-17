@@ -8,6 +8,11 @@
     heroic
     prismlauncher
     r2modman
+    # Beat Saber. BSManager is BSMG's recommended mod installer and downgrader,
+    # so a game update cannot break mods out from under it. In nixpkgs, so it is
+    # a home package -- unlike Amethyst (services.flatpak), whose AppImage has
+    # stripped section headers and cannot be wrapped.
+    bs-manager
     winboat
     vinegar
 
