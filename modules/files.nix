@@ -24,5 +24,17 @@
     fzf
     tree
     tldr
+
+    # Archive tooling. ark (modules/desktop.nix) finds its CLI backends on the
+    # session PATH -- the kerfuffle plugins call QStandardPaths::findExecutable --
+    # and nothing here provided them, so its rar/unarchiver plugins were dead on
+    # arrival: rar, StuffIt, arj all silently did nothing. unar is the rar backend
+    # (RAR1.3 through RAR5 incl. AES, plus StuffIt/ACE/ZOO/LZH/ARJ); 7-Zip covers
+    # zip/7z/tar/iso at the command line. _7zz is the free build -- only reach for
+    # _7zz-rar if some archive defeats unar's decoder.
+    unar
+    _7zz
+    zip
+    unzip
   ];
 }
