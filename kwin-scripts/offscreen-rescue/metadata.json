@@ -1,0 +1,14 @@
+{
+    "KPackageStructure": "KWin/Script",
+    "KPlugin": {
+        "Id": "offscreenrescue",
+        "Name": "Off-screen Window Rescue",
+        "Description": "Pulls windows whose frame misses every output onto the screen under the cursor.",
+        "Icon": "preferences-system-windows",
+        "License": "MIT",
+        "Version": "1.0.0",
+        "EnabledByDefault": false
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

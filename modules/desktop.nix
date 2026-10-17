@@ -36,8 +36,15 @@
 
     # Dir name must match the script's metadata Id.
     ".local/share/kwin/scripts/movewindowtodesktop".source = ../kwin-scripts/move-window-to-desktop;
+
+    # Rescues windows whose frame misses every output (stale saved geometry,
+    # layout changes). Id is offscreenrescue, so the dir and the enable key match it.
+    ".local/share/kwin/scripts/offscreenrescue".source = ../kwin-scripts/offscreen-rescue;
   };
 
-  # The script ships EnabledByDefault=false, so KWin has to be told to load it.
-  programs.plasma.configFile."kwinrc"."Plugins".movewindowtodesktopEnabled = true;
+  # The scripts ship EnabledByDefault=false, so KWin has to be told to load them.
+  programs.plasma.configFile."kwinrc"."Plugins" = {
+    movewindowtodesktopEnabled = true;
+    offscreenrescueEnabled = true;
+  };
 }
