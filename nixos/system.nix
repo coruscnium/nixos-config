@@ -92,6 +92,15 @@
     libnotify
     gsettings-desktop-schemas
     libglvnd
+    # Poiyomi refuses to compile on OpenGL, so the Editor needs Vulkan. Unity
+    # dlopens libvulkan.so.1 itself (it is not a DT_NEEDED of the binary), and
+    # that loader is the one piece this set lacked -- without it the Editor logs
+    # "LoadVulkanLibrary failed to load libvulkan.so.1", falls back to OpenGL,
+    # and Poiyomi aborts. The mesa ICDs are already reachable via
+    # /run/opengl-driver/share/vulkan/icd.d, so the loader alone closes the gap.
+    # vulkan-loader/lib is the loader; it finds libvulkan_radeon.so by absolute
+    # path from the ICD json, so no driver package belongs here.
+    vulkan-loader
     libxkbcommon
     dbus
     nss
