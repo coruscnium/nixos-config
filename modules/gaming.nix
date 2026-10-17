@@ -11,6 +11,13 @@
     winboat
     vinegar
 
+    # Roblox, the other way round: nutmeg runs the *macOS* client through
+    # rosemary (pkgs/nutmeg.nix), where vinegar/Sober run the Android one. Two
+    # independent clients -- installing nutmeg does not disturb Sober. Its
+    # roblox: URL handlers are registered per-user by `nutmeg install-desktop`,
+    # not declaratively.
+    nutmeg
+
     protonup-qt
     protonplus
     proton-cachyos_x86_64_v3 # CachyOS Proton (SLR), x86-64-v3 for znver4

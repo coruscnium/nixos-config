@@ -1,0 +1,24 @@
+diff --git a/nutmeg/desktop.py b/nutmeg/desktop.py
+index 65a2233..8a3fdf5 100644
+--- a/nutmeg/desktop.py
++++ b/nutmeg/desktop.py
+@@ -62,13 +62,12 @@ def nutmeg_command() -> list[str]:
+     working. A copy that is not installed (a source checkout) is found through
+     PYTHONPATH.
+     """
+-    if not sys.executable:
+-        raise NutmegError("Cannot tell which Python interpreter is running nutmeg.")
+-    package_parent = Path(__file__).resolve().parent.parent
+-    command = [sys.executable, "-m", "nutmeg"]
+-    if not _on_default_path(package_parent):
+-        command = ["env", f"PYTHONPATH={package_parent}"] + command
+-    return command
++    # Under Nix, sys.executable is the shared interpreter: PyGObject and the GI
++    # typelibs reach it only through the `nutmeg` launcher's wrapper environment,
++    # so an interpreter invoked bare from a desktop entry cannot import Gtk. The
++    # launcher on PATH is this same installation, and as a profile symlink it
++    # also survives a rebuild that moves the package.
++    return ["nutmeg"]
+ 
+ 
+ def _entry(fields: list[tuple[str, str]]) -> str:
