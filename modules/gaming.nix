@@ -13,6 +13,7 @@
     # a home package -- unlike Amethyst (services.flatpak), whose AppImage has
     # stripped section headers and cannot be wrapped.
     bs-manager
+    ddmm # Helldivers 2 mod manager, Tauri binary (pkgs/ddmm.nix)
     winboat
     vinegar
 

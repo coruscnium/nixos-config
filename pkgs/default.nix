@@ -27,6 +27,7 @@ in
   cherry-studio = prev.callPackage ./cherry-studio.nix { pkgs = prev; };
   elegooslicer = prev.callPackage ./elegooslicer.nix { };
   astra = prev.callPackage ./astra.nix { };
+  ddmm = prev.callPackage ./ddmm.nix { };
   beautysolar = prev.callPackage ./beautysolar.nix { };
   olsvr = prev.callPackage ./olsvr.nix { };
   nutmeg = prev.callPackage ./nutmeg.nix { };
