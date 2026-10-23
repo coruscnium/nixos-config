@@ -22,16 +22,20 @@ in
     # udev autoload (off by default) would have fired too early. Re-apply the
     # G502X preset at session start instead -- the preset itself is seeded by
     # modules/hardware.nix from input-remapper/.
+    #
+    # WantedBy=graphical-session.target, NOT default.target + After=graphical-session.target.
+    # A target orders after everything it wants, so that pair closed a loop
+    # (default.target -> this unit -> the session -> plasma-core -> drkonqi -> default.target)
+    # and systemd broke it at every login by deleting a KDE job -- polkit agent, powerdevil,
+    # xembedsniproxy, kaccess. Being wanted by the session target starts the unit with the
+    # session without ordering anything after it.
     input-remapper-autoload = {
-      Unit = {
-        Description = "Apply the input-remapper G502X preset";
-        After = [ "graphical-session.target" ];
-      };
+      Unit.Description = "Apply the input-remapper G502X preset";
       Service = {
         Type = "oneshot";
         ExecStart = "${pkgs.input-remapper}/bin/input-remapper-control --command start --device 'Logitech G502 X LIGHTSPEED' --preset G502X";
       };
-      Install.WantedBy = [ "default.target" ];
+      Install.WantedBy = [ "graphical-session.target" ];
     };
 
     # No streamcontroller.service on purpose: StreamController autostarts itself
@@ -48,13 +52,11 @@ in
         Restart = "always";
         RestartSec = 5;
         KillMode = "process";
-        Environment = [
-          "DISPLAY=:0"
-          "WAYLAND_DISPLAY=wayland-0"
-          "XDG_RUNTIME_DIR=/run/user/1000"
-          "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
-          "GSK_RENDERER=ngl"
-        ];
+        # The session vars (DISPLAY, WAYLAND_DISPLAY, XDG_RUNTIME_DIR, DBus) come
+        # from the systemd user manager. Pinning WAYLAND_DISPLAY here is what broke
+        # the watchdog: kwin came up on wayland-1 and every relaunch died on a
+        # missing wayland-0 socket. The script resolves the socket per cycle.
+        Environment = [ "GSK_RENDERER=ngl" ];
         ExecStart = "${pkgs.script-streamcontroller-watchdog}/bin/streamcontroller-watchdog";
         StandardOutput = "journal";
         StandardError = "journal";
@@ -115,17 +117,17 @@ in
     # monitor sits idle and the panel blanks instead of holding a static frame.
     # Any keyboard/mouse input dismisses it. Triggered manually with
     # `olsvr run --now`.
+    # Same ordering rule as input-remapper-autoload above: wanted by the session
+    # target rather than ordered after it, or default.target loops through the
+    # session chain again.
     olsvr = {
-      Unit = {
-        Description = "olsvr OLED screensaver";
-        After = [ "graphical-session.target" ];
-      };
+      Unit.Description = "olsvr OLED screensaver";
       Service = {
         ExecStart = "${pkgs.olsvr}/bin/olsvr run";
         Restart = "on-failure";
         RestartSec = 5;
       };
-      Install.WantedBy = [ "default.target" ];
+      Install.WantedBy = [ "graphical-session.target" ];
     };
 
     mega-cache-clean = {

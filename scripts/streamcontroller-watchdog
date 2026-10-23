@@ -10,6 +10,24 @@ MAX_HOLD=30            # safety cap: inhibitor self-releases after this no matte
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
+# kwin names its socket per session (wayland-0, -1, ...), so a fixed name goes
+# stale the moment the compositor restarts. Trust the inherited name only while
+# its socket exists, otherwise take the newest one and export it for the app.
+resolve_wayland() {
+    local dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}" sock
+    if [ -n "${WAYLAND_DISPLAY:-}" ] && [ -S "$dir/$WAYLAND_DISPLAY" ]; then
+        return
+    fi
+    for sock in $(ls -t "$dir"/wayland-* 2>/dev/null); do
+        if [ -S "$sock" ]; then
+            export WAYLAND_DISPLAY="${sock##*/}"
+            log "Wayland socket resolved to $WAYLAND_DISPLAY"
+            return
+        fi
+    done
+    log "WARNING: no Wayland socket in $dir"
+}
+
 usage() {
     cat >&2 <<EOF
 Usage: ${0##*/} [-r] [-h]
@@ -21,6 +39,7 @@ EOF
 
 run_cycle() {
     local devpath="" devdir="" product="" ready="" inhibit_pid=""
+    resolve_wayland
 
     # ── Kill ───────────────────────────────────────────────
     log "Killing all streamcontroller processes..."
