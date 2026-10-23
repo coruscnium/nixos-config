@@ -99,6 +99,8 @@
     };
   };
 
-  services.gnome.gnome-keyring.enable = true;
+  # Deliberately no gnome-keyring: KWallet (ksecretd) is the Secret Service on
+  # Plasma. Running both made the D-Bus provider a boot race, and Electron
+  # safeStorage keys are tied to whichever daemon answered first (broke Tuta).
   services.fwupd.enable = true;
 }
