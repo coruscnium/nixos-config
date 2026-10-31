@@ -10,7 +10,6 @@
 {
   home.packages = with pkgs; [
     streamcontroller # autostarts itself; watchdog in services.nix
-    lact
     openrgb
     brightnessctl
     uhubctl

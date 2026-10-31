@@ -158,6 +158,14 @@
   programs.nano.enable = false;
   environment.variables.EDITOR = lib.mkForce "micro";
 
+  # LACT, and it has to be the service, not a package. LACT is a root daemon
+  # plus a thin client: `lact` in home.packages gives a GUI with nothing to
+  # connect to. The daemon needs root to write power caps and clocks, on the
+  # desktop's 9070 XT and the laptop's 4050 alike. Both hosts get it here
+  # because the rule is identical on both. The amdgpu ppfeaturemask unlock is
+  # the one desktop-only piece, and it lives in hosts/coru/hardware.nix.
+  services.lact.enable = true;
+
   # Admin/system tooling only -- btop, ripgrep, duf, ... are per-user in modules/.
   environment.systemPackages = with pkgs; [
     btrfs-progs

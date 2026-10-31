@@ -77,6 +77,12 @@
   hardware.cpu.amd.updateMicrocode = true;
   hardware.enableRedistributableFirmware = true;
 
+  # LACT reaches the 9070 XT through sysfs, and clocks/voltage offsets stay
+  # locked behind ppfeaturemask without overdrive. RDNA4 on a desktop chassis,
+  # so unlike the laptop the fan curve LACT writes here is a real one.
+  # 0xfffd7fff is the module default, kept on purpose -- 0xffffffff flickers.
+  hardware.amdgpu.overdrive.enable = true;
+
   # Radeon RX 9070 XT (RDNA4). ROCm for Blender Cycles / Resolve / LM Studio; the
   # desktop itself uses the mesa/vulkan path.
   hardware.graphics = {
