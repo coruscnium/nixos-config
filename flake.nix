@@ -2,7 +2,15 @@
   description = "coru's NixOS + Home Manager flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # Held at the last rev shipping Plasma 6.8.0. 6.8.1 regressed mixed-refresh
+    # compositing (KDE bug 527668): Overview and fullscreen animations stutter on
+    # 240 + 144 + 60 Hz while every counter reads idle, and disabling the two
+    # slower outputs on 6.8.1 makes it smooth again. The whole rev is pinned, not
+    # just kdePackages -- swapping only the KDE scope drags Qt 6.11 against our
+    # 6.12 and rebuilds the entire Qt/KF stack from source, since no cache has
+    # that combination. A rev-pinned URL also stops `nix flake update` moving it;
+    # go back to nixos-unstable once 6.8.2 is in.
+    nixpkgs.url = "github:nixos/nixpkgs/fe13242281a67641c0102cdb1087f0ebe586c7df";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -54,6 +62,20 @@
       url = "github:microlift/rosemary";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # CoruFrame -- Coru's own Warframe companion (relic HUD, inventory ledger,
+    # market tools). Ships packages plus NixOS/home-manager modules. Its Rust and
+    # Tauri builds are pinned by cargoHash/pnpmDeps, so it must follow our nixpkgs
+    # or the pinned hashes break.
+    #
+    # Tracks the `nightly` branch: the lockfile holds a commit, so "latest" means
+    # `nix flake update coruframe` before rebuilding -- a plain build keeps
+    # whatever commit was last locked. Release tags were the pin until
+    # 2026-10-28; nightly still carries zbus 5, so it is not the v1.0.0 breakage.
+    coruframe = {
+      url = "github:coruscnium/CoruFrame/nightly";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -67,6 +89,7 @@
       nixpkgs-equibop,
       windscribe,
       rosemary,
+      coruframe,
       ...
     }:
     let
@@ -86,6 +109,7 @@
         inherit system;
         overlays = [
           (import ./pkgs { inherit equibopPkgs rosemaryPkg; })
+          windscribe.overlays.default
           chaotic.overlays.default
           nur.overlays.default
         ];
@@ -113,6 +137,7 @@
           ./modules
           plasma-manager.homeModules.plasma-manager
           rosemary.homeManagerModules.default
+          coruframe.homeManagerModules.default
         ];
       };
 
@@ -133,6 +158,7 @@
               # wrapper both pin.
               nixpkgs.overlays = [
                 (import ./pkgs { inherit equibopPkgs rosemaryPkg; })
+                windscribe.overlays.default
                 chaotic.overlays.default
                 nur.overlays.default
               ];
@@ -150,26 +176,45 @@
                 # next activation, and without this the second occurrence collides
                 # with the first backup and fails the whole switch.
                 overwriteBackup = true;
-
-                users.coru.imports = [
-                  ./home.nix
-                  ./modules
-                  plasma-manager.homeModules.plasma-manager
-                  rosemary.homeManagerModules.default
-                ];
               };
             }
           ];
 
+          # Each host supplies its own machine modules and its own user profile --
+          # that split is the point of hosts/. The flake inputs a user profile needs
+          # (plasma-manager, rosemary, coruframe) are in lexical scope here, which
+          # is why the list is passed in rather than written inside each host.
           mkNixos =
-            extra:
+            { extra, hm }:
             nixpkgs.lib.nixosSystem {
               inherit system;
-              modules = [ ./nixos ] ++ extra ++ common;
+              modules = extra ++ common ++ [ { home-manager.users.coru.imports = hm; } ];
             };
         in
         {
-          coru = mkNixos [ ];
+          coru = mkNixos {
+            extra = [ ./hosts/coru ];
+            hm = [
+              ./home.nix
+              ./modules
+              plasma-manager.homeModules.plasma-manager
+              rosemary.homeManagerModules.default
+              coruframe.homeManagerModules.default
+            ];
+          };
+
+          # Attribute names must equal networking.hostName (hosts/*/default.nix):
+          # `nh os switch` and `nixos-rebuild --flake .` both infer the attribute
+          # from the machine's hostname, so a short label like `laptop` makes
+          # every one of them fail with "does not provide attribute".
+          coru-laptop = mkNixos {
+            extra = [ ./hosts/laptop ];
+            hm = [
+              ./home.nix
+              ./hosts/laptop/hm.nix
+              plasma-manager.homeModules.plasma-manager
+            ];
+          };
         };
     };
 }

@@ -49,18 +49,5 @@
     extraConfig = ''
       Defaults editor = ${pkgs.micro}/bin/micro
     '';
-    # Only this one helper is passwordless. pkgs.usb-port-power-cycle is defined
-    # in the overlay so this rule and the watchdog wrapper pin the same path.
-    extraRules = [
-      {
-        users = [ "coru" ];
-        commands = [
-          {
-            command = "${pkgs.usb-port-power-cycle}/bin/usb-port-power-cycle";
-            options = [ "NOPASSWD" ];
-          }
-        ];
-      }
-    ];
   };
 }

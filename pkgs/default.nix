@@ -2,7 +2,10 @@
 #
 # Imported as an overlay in flake.nix. Scripts live in ./scripts.nix so that
 # modules/services.nix can reference the same store paths.
-{ equibopPkgs, rosemaryPkg }:
+{
+  equibopPkgs,
+  rosemaryPkg,
+}:
 final: prev:
 let
   lib = prev.lib;
@@ -77,6 +80,13 @@ in
   # glfw consumer on 3.4. Both consumers pick this up: programs.mangohud and
   # programs.steam.extraPackages.
   mangohud = prev.mangohud.override { glfw = glfw33; };
+
+  # --------------------------------------------------------------------- pince
+  # pince needs no override on this nixpkgs. The makeWrapperArgs re-split that
+  # fixed "makeCWrapper: Unknown argument --chdir ..." only applies from the
+  # 2026-10-23 rev, where structured attrs flatten the list -- applied here the
+  # wrap phase dies with "--chdir takes 1 argument" instead. Re-add it when
+  # nixpkgs moves forward again.
 
   # -------------------------------------------------------------------- equibop
   # 3.3.0 rewrote screen-share capture onto venmic 7.x, which broke Wayland

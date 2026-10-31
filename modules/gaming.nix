@@ -77,6 +77,12 @@
   # (nixos/gaming.nix); this covers a plain terminal.
   programs.mangohud.enable = true;
 
+  # CoruFrame -- Coru's Warframe companion (relic reward HUD, inventory ledger,
+  # market tools). Upstream flake's home-manager module; the one package carries
+  # both `coruframe-app` and the `coruframe` CLI, with Tesseract on their PATH.
+  # The HUD needs KWin's wlr-layer-shell plus a one-time portal screencast grant.
+  programs.coruframe.enable = true;
+
   # Rosemary as a Steam compatibility tool -- drops it into
   # compatibilitytools.d so a macOS app runs under Steam's "Rosemary" entry.
   # Rosemary itself is a system runtime (nixos/system.nix, pkgs.rosemary);

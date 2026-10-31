@@ -42,6 +42,16 @@
     ".local/share/kwin/scripts/offscreenrescue".source = ../kwin-scripts/offscreen-rescue;
   };
 
+  # baloo's file extractor is a QGuiApplication in a headless process. When
+  # kde-baloo.service starts before the compositor exports WAYLAND_DISPLAY, Qt
+  # aborts in init_platform -- once per queued file. On the laptop that was
+  # ~17.9k aborts in eight seconds (4.1 GiB of cores); the desktop logs the
+  # same signature. offscreen makes the indexer independent of the session.
+  xdg.configFile."systemd/user/kde-baloo.service.d/qt-platform.conf".text = ''
+    [Service]
+    Environment=QT_QPA_PLATFORM=offscreen
+  '';
+
   # The scripts ship EnabledByDefault=false, so KWin has to be told to load them.
   programs.plasma.configFile."kwinrc"."Plugins" = {
     movewindowtodesktopEnabled = true;

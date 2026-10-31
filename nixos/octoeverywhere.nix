@@ -25,6 +25,10 @@ let
   };
 in
 {
+  # The companion's MQTT relay. Kept here rather than in services.nix because it
+  # exists only for this container.
+  networking.firewall.allowedTCPPorts = [ 1883 ];
+
   virtualisation = {
     # docker.enable is set in nixos/services.nix, not here.
     oci-containers = {

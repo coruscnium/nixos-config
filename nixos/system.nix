@@ -7,8 +7,6 @@
 
 # Identity, locale, nix daemon settings, admin tooling.
 {
-  networking.hostName = "coru";
-
   # Feeds NAME/PRETTY_NAME in /etc/os-release. ID stays "nixos" so fastfetch keeps
   # its snowflake logo. Drop for stock NixOS.
   system.nixos.distroName = "CoruscOS";
@@ -16,8 +14,6 @@
   time.timeZone = "America/Chicago";
   i18n.defaultLocale = "en_US.UTF-8";
   console.keyMap = "us";
-
-  system.stateVersion = "25.11";
 
   nix.settings = {
     experimental-features = [
@@ -30,6 +26,11 @@
     ];
     auto-optimise-store = true;
   };
+
+  # A crash loop must not be able to put gigabytes of cores on disk: the baloo
+  # abort storm on 2026-10-30 wrote 4.1 GiB in eight seconds. This keeps the
+  # newest cores and evicts the oldest.
+  systemd.coredump.settings.Coredump.MaxUse = "1G";
 
   # REQUIRED: prebuilt binaries (AppImages, Resolve, LM Studio) need an FHS
   # dynamic loader NixOS does not provide.
@@ -187,12 +188,6 @@
     inetutils
     screen
     tmux
-
-    # macOS compatibility layer (Wine-shaped) -- runs macOS binaries. A
-    # system-level runtime, so it sits here with nix-ld/appimage rather than in
-    # modules/gaming.nix. From the `rosemary` flake input (see pkgs/default.nix);
-    # it keeps its prefixes in ~/.local/share/rosemary.
-    rosemary
   ];
 
   # sshd is deliberately off: a listening sshd is a decision, not a default.

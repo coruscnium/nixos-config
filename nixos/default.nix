@@ -5,12 +5,13 @@
   ...
 }:
 
-# NixOS system configuration. Hardware facts and UUIDs live in hardware.nix.
+# Shared machine policy: everything true of every host. Per-host facts -- disk
+# UUIDs, the ESP, the bootloader, the hostname -- live in ../hosts/<name>/.
 {
   imports = [
-    ./hardware.nix
     ./boot.nix
     ./desktop.nix
+    ./flatpaks.nix
     ./services.nix
     ./gaming.nix
     ./users.nix

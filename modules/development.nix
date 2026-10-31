@@ -7,6 +7,7 @@
   home.packages = with pkgs; [
     vscode
     claude-code
+    gh
     uv
     nodejs
     pnpm

@@ -23,6 +23,7 @@
     ./maker.nix
     ./scripts.nix
     ./services.nix
+    ./services-desktop.nix
     ./theming.nix
   ];
 }

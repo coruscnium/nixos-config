@@ -30,14 +30,16 @@ and a broken boot.
 | Dir | Level | What belongs |
 |---|---|---|
 | `modules/` | Home Manager — per-user | `home.packages`, `home.file`, `systemd.user.*`, `programs.*` |
-| `nixos/` | NixOS — machine | `boot`, `fileSystems`, `services.*`, `users.users`, `environment.systemPackages` |
+| `nixos/` | NixOS — shared | policy true of every host: `services.*`, `users.users`, `environment.systemPackages` |
+| `hosts/<name>/` | NixOS — per-host | `hardware.nix` (UUIDs, GPUs), `boot.nix` (loader, ESP), `networking.hostName` |
 | `pkgs/` | overlay | custom packages; `default.nix` is the overlay function |
 | `scripts/` | raw shell | wrapped into derivations by `pkgs/scripts.nix` |
 | `themes/` | vendored | the Carl KDE/GTK theme suite |
 | `_sources/` | **generated** | nvfetcher output — never hand-edit |
 
-`modules/` is what the user owns; `nixos/` is the machine. Both `modules/default.nix` and
-`nixos/default.nix` are pure `imports = [ ... ]` aggregators.
+`modules/` is what the user owns, `nixos/` is the policy every machine shares, and `hosts/<name>/` is
+what makes one box that box. `modules/default.nix`, `nixos/default.nix` and each
+`hosts/<name>/default.nix` are pure `imports = [ ... ]` aggregators.
 
 ## Where a new thing goes, in preference order
 
@@ -59,7 +61,7 @@ and a broken boot.
 3. **Package config lives in `flake.nix`, not `~/.config/nixpkgs`.** Because `pkgs` is passed
    explicitly to `homeManagerConfiguration`, home-manager ignores its own `nixpkgs.config`.
    `allowUnfree`, overlays, and `permittedInsecurePackages` must be in `flake.nix`.
-4. **Keep the Limine settings on `lib.mkDefault`** in `nixos/boot.nix` — never `mkForce` them.
+4. **Keep the Limine settings on `lib.mkDefault`** in `hosts/coru/boot.nix` — never `mkForce` them.
    Same caution for `efiSupport`, `efiInstallAsRemovable`, `maxGenerations`, `canTouchEfiVariables`.
 5. **`rootflags=` is derived** from `fileSystems."/".options`; never hardcode it, and do not add
    `subvol=@` or `x-initrd.mount` to `/`.

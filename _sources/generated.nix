@@ -17,11 +17,11 @@
   };
   cherry-studio = {
     pname = "cherry-studio";
-    version = "2.1.7";
+    version = "2.1.8";
     src = fetchurl {
-      url = "https://github.com/CherryHQ/cherry-studio/releases/download/v2.1.7/Cherry-Studio-2.1.7-linux-x64.AppImage";
-      name = "Cherry-Studio-2.1.7-linux-x64.AppImage";
-      sha256 = "sha256-eM5t8ql6VXA0RtzKnZM50SfMhrYe7OAvgQlNGQ2oQKQ=";
+      url = "https://github.com/CherryHQ/cherry-studio/releases/download/v2.1.8/Cherry-Studio-2.1.8-linux-x64.AppImage";
+      name = "Cherry-Studio-2.1.8-linux-x64.AppImage";
+      sha256 = "sha256-fxkdc1QK9FYWYmb5GHuCXT0tDukURydfZx7LL4Vp4ZM=";
     };
   };
   elegooslicer = {
