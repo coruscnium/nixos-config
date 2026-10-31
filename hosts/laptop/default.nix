@@ -85,12 +85,4 @@ in
     ${kbdOobeLevel}
     ${asusKbdOobe}/bin/asus-kbd-oobe "$level" || true
   '';
-
-  # TEMPORARY (2026-10-30): the migration runs over ssh from the desktop, and
-  # this host's config replaces the installer's one -- which is what currently
-  # carries these three lines. Remove them and switch again when the transfer is
-  # done. AGENTS.md rule 10: sshd off is the default, this is a decision.
-  services.openssh.enable = true;
-  services.openssh.authorizedKeysFiles = [ ".ssh/authorized_keys" ];
-  networking.firewall.allowedTCPPorts = [ 22 ];
 }
