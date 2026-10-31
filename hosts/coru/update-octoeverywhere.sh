@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Refresh the pinned OctoEverywhere image to the newest upstream release.
 #
-#   ./nixos/update-octoeverywhere.sh            # rewrite the pin only
-#   ./nixos/update-octoeverywhere.sh --rebuild  # rewrite, then nixos-rebuild
+#   ./hosts/coru/update-octoeverywhere.sh            # rewrite the pin only
+#   ./hosts/coru/update-octoeverywhere.sh --rebuild  # rewrite, then nixos-rebuild
 #
 # This is the container equivalent of `nix flake update`: Nix cannot resolve a
 # `docker://` flake input (verified unsupported), so the digest pair is kept in
@@ -23,7 +23,7 @@ python3 -c '
 import json, sys, pathlib
 d = json.loads(sys.argv[1])
 pathlib.Path(sys.argv[2]).write_text(
-    "# Pinned OctoEverywhere image -- regenerate with ./nixos/update-octoeverywhere.sh.\n"
+    "# Pinned OctoEverywhere image -- regenerate with ./hosts/coru/update-octoeverywhere.sh.\n"
     "{\n"
     f"  imageName = \"{d['imageName']}\";\n"
     f"  imageDigest = \"{d['imageDigest']}\";\n"

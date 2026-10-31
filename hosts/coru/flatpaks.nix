@@ -1,11 +1,11 @@
 # The declared flatpak set. Split out of services.nix because it is a list of
 # this machine's apps, not a service policy -- the laptop declares none.
+# `services.flatpak.enable` itself is in services.nix: that is policy, and the
+# laptop needs flatpak even with an empty list.
 {
   # Apps are declared here; nix-flatpak installs/removes them on activation.
   # Hand-installed flatpaks are left alone (uninstallUnmanaged off).
   services.flatpak = {
-    enable = true;
-
     # Declaring `remotes` REPLACES the module's flathub default, so flathub is
     # listed explicitly. modmanager-origin is Amethyst Mod Manager's own signed
     # repo (chrisdkn.github.io) -- the app is not on flathub. The GPG key is

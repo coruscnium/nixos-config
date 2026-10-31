@@ -10,6 +10,5 @@
     script-mpv-single
     script-force-paste
     script-autoclicker
-    script-streamcontroller-watchdog
   ];
 }

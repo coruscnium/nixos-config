@@ -11,11 +11,16 @@
 # Deliberately NOT ported: lock-displays, shelly-notifications (ALPM-only),
 # pwctl-chain@ (generated at runtime by PipeWire Controller), voxtype, the
 # Hyprland drop-ins, and octoeverywhere.service (needs root -- see
-# nixos/octoeverywhere.nix).
+# hosts/coru/octoeverywhere.nix).
 let
   hm = config.home.homeDirectory;
 in
 {
+  # The unit below pins olsvr's store path, so it runs on both hosts regardless.
+  # Listing it here keeps the binary on PATH for `olsvr run --now` -- the unit and
+  # its package are one declaration, not two files that can drift.
+  home.packages = [ pkgs.olsvr ];
+
   systemd.user.services = {
     lsyncd = {
       Unit.Description = "lsyncd mirror";
@@ -71,9 +76,9 @@ in
     # monitor sits idle and the panel blanks instead of holding a static frame.
     # Any keyboard/mouse input dismisses it. Triggered manually with
     # `olsvr run --now`.
-    # Same ordering rule as input-remapper-autoload above: wanted by the session
-    # target rather than ordered after it, or default.target loops through the
-    # session chain again.
+    # Same ordering rule as input-remapper-autoload (services-desktop.nix):
+    # wanted by the session target rather than ordered after it, or default.target
+    # loops through the session chain again.
     olsvr = {
       Unit.Description = "olsvr OLED screensaver";
       Service = {

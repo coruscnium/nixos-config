@@ -29,22 +29,33 @@ and a broken boot.
 
 | Dir | Level | What belongs |
 |---|---|---|
-| `modules/` | Home Manager — per-user | `home.packages`, `home.file`, `systemd.user.*`, `programs.*` |
-| `nixos/` | NixOS — shared | policy true of every host: `services.*`, `users.users`, `environment.systemPackages` |
-| `hosts/<name>/` | NixOS — per-host | `hardware.nix` (UUIDs, GPUs), `boot.nix` (loader, ESP), `networking.hostName` |
+| `modules/` | Home Manager — **shared by both hosts** | `home.packages`, `home.file`, `systemd.user.*`, `programs.*` — what the *user* wants on any machine |
+| `nixos/` | NixOS — **shared by both hosts** | policy true of every host: `services.*`, `users.users`, `environment.systemPackages`. Nothing machine-specific |
+| `hosts/<name>/` | per-host, NixOS **and** Home Manager | `hardware.nix` (UUIDs, GPUs), `boot.nix` (loader, ESP), `networking.hostName`, `hm.nix` (desk-bound home config), that machine's `flatpaks.nix` and any host-only service |
 | `pkgs/` | overlay | custom packages; `default.nix` is the overlay function |
 | `scripts/` | raw shell | wrapped into derivations by `pkgs/scripts.nix` |
 | `themes/` | vendored | the Carl KDE/GTK theme suite |
 | `_sources/` | **generated** | nvfetcher output — never hand-edit |
 
-`modules/` is what the user owns, `nixos/` is the policy every machine shares, and `hosts/<name>/` is
-what makes one box that box. `modules/default.nix`, `nixos/default.nix` and each
+`modules/` is what the user owns on every machine, `nixos/` is the policy every machine shares, and
+`hosts/<name>/` is what makes one box that box. `modules/default.nix`, `nixos/default.nix` and each
 `hosts/<name>/default.nix` are pure `imports = [ ... ]` aggregators.
+
+**Both hosts import `nixos/default.nix` and `modules/default.nix` whole — never a hand-picked list.**
+A machine that needs a subset is a sign the thing belongs in `hosts/<name>/`, not a reason to
+enumerate. This is load-bearing: the hand-maintained lists were how the laptop silently lost flatpak
+(and, later, Steam) while the desktop kept working. To give one machine an extra, put it in
+`hosts/<name>/`; to give both, put it in `nixos/` or `modules/`.
+
+Each host has an `hm.nix`. `hosts/coru/hm.nix` imports the desk-only categories
+(`modules/hardware.nix`, `modules/maker.nix`, `modules/services-desktop.nix`); `hosts/laptop/hm.nix`
+is just `imports = [ ../../modules ]`.
 
 ## Where a new thing goes, in preference order
 
 1. **In nixpkgs** → `home.packages` in the matching `modules/<category>.nix`. Admin/system tooling →
-   `environment.systemPackages` in `nixos/system.nix`.
+   `environment.systemPackages` in `nixos/system.nix`. If it only makes sense on the desktop, or only
+   on the laptop, it goes in `hosts/<name>/` instead — the shared dirs are for what both want.
 2. **In chaotic-nyx** → top-level `pkgs`.
 3. **In NUR** → `pkgs.nur.repos.<user>.<pkg>` only (it does not merge into `pkgs`). Unvetted.
 4. **Custom package** → new `pkgs/<name>.nix`, called from `pkgs/default.nix`.
@@ -76,6 +87,9 @@ what makes one box that box. `modules/default.nix`, `nixos/default.nix` and each
     forgotten, nothing installed twice.
 12. **The nyx cache module is required.** `chaotic.nixosModules.nyx-cache` must stay enabled, or every
     nyx package (proton-cachyos) is built from source instead of downloaded.
+13. **Nothing machine-specific in `nixos/` or `modules/`.** Both are imported whole by both hosts. A
+    flatpak list, a printer, a peripheral, a VR runtime — anything only one box wants — belongs in
+    `hosts/<name>/`. If you find yourself hand-picking modules for a host, that is the bug.
 
 ## Build and verify
 

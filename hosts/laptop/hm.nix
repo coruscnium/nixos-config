@@ -1,25 +1,6 @@
-# The laptop's user profile. Everything desk-bound is left out on purpose:
-# gaming, VR, the 3D-printing tools, the G502/ydotool stack, the desk scripts,
-# and the user units that drive them.
+# The laptop's user profile: the shared category set and nothing else. Everything
+# desk-bound -- VR, the Roblox routes, the ultrawide fix, the peripherals, the
+# 3D-printing tools, the desk's user units -- is imported by hosts/coru/hm.nix.
 {
-  imports = [
-    ../../modules/desktop.nix
-    ../../modules/mimeapps.nix
-    ../../modules/browsing.nix
-    ../../modules/messaging.nix
-    ../../modules/media.nix
-    ../../modules/audio.nix
-    ../../modules/graphics.nix
-    ../../modules/development.nix
-    ../../modules/documents.nix
-    ../../modules/net.nix
-    ../../modules/files.nix
-    ../../modules/shell.nix
-    ../../modules/shortcuts.nix
-    ../../modules/session.nix
-    ../../modules/security.nix
-    ../../modules/ai.nix
-    ../../modules/theming.nix
-    ../../modules/services.nix
-  ];
+  imports = [ ../../modules ];
 }

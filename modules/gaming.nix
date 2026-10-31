@@ -1,65 +1,25 @@
-{ pkgs, config, ... }:
+{ pkgs, ... }:
 
-# Game launchers, mod clients, Proton/compat tooling, overlays. steam / gamemode
-# / mangohud are NixOS modules; proton-cachyos is registered with Steam there too
-# (programs.steam.extraCompatPackages).
+# The basic gaming userland every host gets: launchers, mod clients, and the
+# Proton/compat tooling that has to resolve the same Proton Steam does. Desk-only
+# pieces -- VR, the Roblox routes, the ultrawide fix -- live in hosts/coru/hm.nix.
 {
   home.packages = with pkgs; [
     heroic
     prismlauncher
     r2modman
-    # Beat Saber. BSManager is BSMG's recommended mod installer and downgrader,
-    # so a game update cannot break mods out from under it. In nixpkgs, so it is
-    # a home package -- unlike Amethyst (services.flatpak), whose AppImage has
-    # stripped section headers and cannot be wrapped.
-    bs-manager
-    ddmm # Helldivers 2 mod manager, Tauri binary (pkgs/ddmm.nix)
-    winboat
-    vinegar
-
-    # Roblox, the other way round: nutmeg runs the *macOS* client through
-    # rosemary (pkgs/nutmeg.nix), where vinegar/Sober run the Android one. Two
-    # independent clients -- installing nutmeg does not disturb Sober. Its
-    # roblox: URL handlers are registered per-user by `nutmeg install-desktop`,
-    # not declaratively.
-    nutmeg
 
     protonup-qt
     protonplus
-    proton-cachyos_x86_64_v3 # CachyOS Proton (SLR), x86-64-v3 for znver4
+    proton-cachyos_x86_64_v3 # CachyOS Proton (SLR), x86-64-v3
     protontricks
-    reigntweak # Elden Ring: Nightreign ultrawide / 60fps
 
     # goverlay is dropped: it pulls in lazarus-qt6, which fails to build on this
     # nixpkgs revision. mangojuice covers MangoHud config.
     mangojuice
     vkbasalt
     lsfg-vk
-    wineWow64Packages.stable
-
-    pince # primary game-memory tool
-
-    # VR. The WiVRn server, its Monado runtime, and -- via
-    # config.json.application -- the wayvr overlay all come from services.wivrn
-    # (nixos/gaming.nix), so they are NOT listed here (nothing installed twice).
-    xrizer # OpenVR -> OpenXR, so SteamVR titles (VRChat) run under WiVRn
-    olsvr # Wayland OLED burn-in screensaver (pkgs/olsvr.nix)
   ];
-
-  # Point the OpenVR runtime at xrizer, which translates OpenVR -> OpenXR and
-  # hands the game to WiVRn. Without this SteamVR stays the OpenVR runtime and
-  # every OpenVR title (VRChat) launches the broken SteamVR instead. SteamVR
-  # writes this file itself, so it is a store symlink -- read-only, SteamVR
-  # cannot put itself back. SteamVR's config/log dirs are preserved for if it
-  # is ever used directly.
-  xdg.configFile."openvr/openvrpaths.vrpath".text = builtins.toJSON {
-    version = 1;
-    jsonid = "vrpathreg";
-    external_drivers = null;
-    runtime = [ "${pkgs.xrizer}/lib/xrizer" ];
-    config = [ "${config.xdg.dataHome}/Steam/config" ];
-    log = [ "${config.xdg.dataHome}/Steam/logs" ];
-  };
 
   # NixOS registers our custom Proton with Steam via STEAM_EXTRA_COMPAT_TOOLS_PATHS,
   # but only inside Steam's own FHS profile. Tools run standalone (protontricks,
@@ -81,15 +41,6 @@
   # market tools). Upstream flake's home-manager module; the one package carries
   # both `coruframe-app` and the `coruframe` CLI, with Tesseract on their PATH.
   # The HUD needs KWin's wlr-layer-shell plus a one-time portal screencast grant.
+  # Both hosts run Plasma 6, so it is shared.
   programs.coruframe.enable = true;
-
-  # Rosemary as a Steam compatibility tool -- drops it into
-  # compatibilitytools.d so a macOS app runs under Steam's "Rosemary" entry.
-  # Rosemary itself is a system runtime (nixos/system.nix, pkgs.rosemary);
-  # pin `package` to that build so the tool reuses it instead of the flake's
-  # own default derivation. Upstream module: rosemary.homeManagerModules.default.
-  programs.rosemary = {
-    steam.enable = true;
-    package = pkgs.rosemary;
-  };
 }

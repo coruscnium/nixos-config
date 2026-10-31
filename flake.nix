@@ -66,7 +66,8 @@
     # CoruFrame -- Coru's own Warframe companion (relic HUD, inventory ledger,
     # market tools). Ships packages plus NixOS/home-manager modules. Its Rust and
     # Tauri builds are pinned by cargoHash/pnpmDeps, so it must follow our nixpkgs
-    # or the pinned hashes break.
+    # or the pinned hashes break. Both hosts enable it (modules/gaming.nix), so
+    # both home-manager module lists carry coruframe.homeManagerModules.default.
     #
     # Tracks the `nightly` branch: the lockfile holds a commit, so "latest" means
     # `nix flake update coruframe` before rebuilding -- a plain build keeps
@@ -129,18 +130,6 @@
         text = ''exec treefmt --config-file ${./treefmt.toml} "$@"'';
       };
 
-      homeConfigurations."coru" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-
-        modules = [
-          ./home.nix
-          ./modules
-          plasma-manager.homeModules.plasma-manager
-          rosemary.homeManagerModules.default
-          coruframe.homeManagerModules.default
-        ];
-      };
-
       nixosConfigurations =
         let
           common = [
@@ -153,9 +142,10 @@
             chaotic.nixosModules.nyx-cache
 
             {
-              # Same overlays as the standalone config, so store paths match --
-              # notably pkgs.usb-port-power-cycle, which a sudoers rule and a
-              # wrapper both pin.
+              # One overlay set for both hosts, so every machine resolves the
+              # same attribute to the same store path -- notably
+              # pkgs.usb-port-power-cycle, which a sudoers rule and a wrapper
+              # both pin.
               nixpkgs.overlays = [
                 (import ./pkgs { inherit equibopPkgs rosemaryPkg; })
                 windscribe.overlays.default
@@ -197,6 +187,7 @@
             hm = [
               ./home.nix
               ./modules
+              ./hosts/coru/hm.nix
               plasma-manager.homeModules.plasma-manager
               rosemary.homeManagerModules.default
               coruframe.homeManagerModules.default
@@ -213,6 +204,7 @@
               ./home.nix
               ./hosts/laptop/hm.nix
               plasma-manager.homeModules.plasma-manager
+              coruframe.homeManagerModules.default
             ];
           };
         };

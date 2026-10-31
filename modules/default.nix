@@ -1,5 +1,9 @@
-# Category modules for coru's home-manager configuration.
-# Imported by flake.nix as a single module; add new categories to this list.
+# Category modules for coru's home-manager configuration. Both hosts import this
+# whole set -- it is what the *user* wants on any machine. Desk-bound categories
+# (peripherals, 3D printing, the desk's user units) are NOT listed here: they are
+# imported by ../hosts/coru/hm.nix, so the laptop never carries them.
+#
+# Add a new shared category to this list; add a desk-only one to hosts/coru/hm.nix.
 {
   imports = [
     ./desktop.nix
@@ -18,12 +22,9 @@
     ./shortcuts.nix
     ./session.nix
     ./security.nix
-    ./hardware.nix
     ./ai.nix
-    ./maker.nix
     ./scripts.nix
     ./services.nix
-    ./services-desktop.nix
     ./theming.nix
   ];
 }
