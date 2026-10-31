@@ -170,6 +170,15 @@
             }
           ];
 
+          # What every user profile gets: the entry point plus the flake-input
+          # modules. The category set (./modules) is imported by each host's own
+          # hm.nix, so the shared/deskbound split stays visible where the host is.
+          commonHm = [
+            ./home.nix
+            plasma-manager.homeModules.plasma-manager
+            coruframe.homeManagerModules.default
+          ];
+
           # Each host supplies its own machine modules and its own user profile --
           # that split is the point of hosts/. The flake inputs a user profile needs
           # (plasma-manager, rosemary, coruframe) are in lexical scope here, which
@@ -178,19 +187,15 @@
             { extra, hm }:
             nixpkgs.lib.nixosSystem {
               inherit system;
-              modules = extra ++ common ++ [ { home-manager.users.coru.imports = hm; } ];
+              modules = extra ++ common ++ [ { home-manager.users.coru.imports = commonHm ++ hm; } ];
             };
         in
         {
           coru = mkNixos {
             extra = [ ./hosts/coru ];
             hm = [
-              ./home.nix
-              ./modules
               ./hosts/coru/hm.nix
-              plasma-manager.homeModules.plasma-manager
               rosemary.homeManagerModules.default
-              coruframe.homeManagerModules.default
             ];
           };
 
@@ -200,12 +205,7 @@
           # every one of them fail with "does not provide attribute".
           coru-laptop = mkNixos {
             extra = [ ./hosts/laptop ];
-            hm = [
-              ./home.nix
-              ./hosts/laptop/hm.nix
-              plasma-manager.homeModules.plasma-manager
-              coruframe.homeManagerModules.default
-            ];
+            hm = [ ./hosts/laptop/hm.nix ];
           };
         };
     };

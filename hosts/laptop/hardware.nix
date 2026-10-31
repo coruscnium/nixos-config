@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ ... }:
 
 # ASUS ProArt PX13 (HN7306WU): Ryzen AI 9 HX 370, Radeon 890M iGPU, AD107M
 # RTX 4050 Max-Q. Disk and ESP facts come from the installer's own
@@ -45,16 +45,7 @@
     "sd_mod"
     "sdhci_pci"
   ];
-  boot.kernelModules = [ "kvm-amd" ];
-
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-
-  hardware.cpu.amd.updateMicrocode = true;
-  hardware.enableRedistributableFirmware = true;
-
-  # Strix Point. Mesa/vulkan drives the panel; the dGPU is offload-only.
-  hardware.graphics.enable = true;
-
+  # Strix Point (Radeon 890M) drives the panel; the dGPU is offload-only.
   # AD107M at c4:00.0, iGPU at c5:00.0. The bus-ID options take DECIMAL while
   # lspci prints hex: 0xc4 = 196, 0xc5 = 197.
   services.xserver.videoDrivers = [

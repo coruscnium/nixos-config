@@ -7,6 +7,7 @@
 # is ../../modules, which the laptop imports wholesale.
 {
   imports = [
+    ../../modules
     ../../modules/hardware.nix
     ../../modules/maker.nix
     ../../modules/services-desktop.nix

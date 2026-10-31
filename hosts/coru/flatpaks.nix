@@ -1,7 +1,6 @@
-# The declared flatpak set. Split out of services.nix because it is a list of
-# this machine's apps, not a service policy -- the laptop declares none.
-# `services.flatpak.enable` itself is in services.nix: that is policy, and the
-# laptop needs flatpak even with an empty list.
+# The desktop's flatpak set. This file is the *app list* -- enable, the update
+# timer and each app's sandbox overrides are shared policy (nixos/services.nix,
+# nixos/flatpaks.nix).
 {
   # Apps are declared here; nix-flatpak installs/removes them on activation.
   # Hand-installed flatpaks are left alone (uninstallUnmanaged off).
@@ -44,19 +43,5 @@
         origin = "modmanager-origin";
       }
     ];
-
-    # Weekly flatpak upgrade via a systemd timer (nix-flatpak has no per-app
-    # scope, so this covers every declared app).
-    update.auto.enable = true;
-
-    # Sober (Roblox) needs the Discord IPC socket + an input device or it comes up
-    # a black window. writeMode defaults to "merge".
-    overrides.settings."org.vinegarhq.Sober".Context = {
-      filesystems = [
-        "xdg-run/app/com.discordapp.Discord:create"
-        "xdg-run/discord-ipc-0"
-      ];
-      devices = [ "input" ];
-    };
   };
 }

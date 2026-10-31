@@ -1,6 +1,4 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
@@ -70,13 +68,6 @@
     "usb_storage"
     "sd_mod"
   ];
-  boot.kernelModules = [ "kvm-amd" ];
-
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-
-  hardware.cpu.amd.updateMicrocode = true;
-  hardware.enableRedistributableFirmware = true;
-
   # LACT reaches the 9070 XT through sysfs, and clocks/voltage offsets stay
   # locked behind ppfeaturemask without overdrive. RDNA4 on a desktop chassis,
   # so unlike the laptop the fan curve LACT writes here is a real one.
@@ -84,13 +75,11 @@
   hardware.amdgpu.overdrive.enable = true;
 
   # Radeon RX 9070 XT (RDNA4). ROCm for Blender Cycles / Resolve / LM Studio; the
-  # desktop itself uses the mesa/vulkan path.
-  hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs; [
-      rocmPackages.clr
-      rocmPackages.rocm-runtime
-      rocmPackages.rocminfo
-    ];
-  };
+  # desktop itself uses the mesa/vulkan path. `enable` is the platform baseline
+  # (nixos/platform.nix).
+  hardware.graphics.extraPackages = with pkgs; [
+    rocmPackages.clr
+    rocmPackages.rocm-runtime
+    rocmPackages.rocminfo
+  ];
 }

@@ -13,7 +13,9 @@
   imports = [
     ./boot.nix
     ./desktop.nix
+    ./flatpaks.nix
     ./gaming.nix
+    ./platform.nix
     ./services.nix
     ./users.nix
     ./system.nix

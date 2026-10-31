@@ -1,7 +1,7 @@
 # The laptop. Same user, different machine. It imports the whole shared set --
 # ../../nixos, which is policy true of both -- and adds only what is this box's:
-# its disks, its loader, and the one flatpak it needs for Roblox (Sober). No
-# printer container, no desk peripherals, no VR.
+# its disks and the one flatpak it needs for Roblox (Sober). No printer
+# container, no desk peripherals, no VR.
 { pkgs, ... }:
 let
   # The PX13's keyboard has its own OOBE state: on a cold boot the backlight
@@ -50,7 +50,6 @@ in
     ../../nixos
     ./flatpaks.nix
     ./hardware.nix
-    ./boot.nix
   ];
 
   networking.hostName = "coru-laptop";

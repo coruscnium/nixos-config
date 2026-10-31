@@ -31,7 +31,7 @@ and a broken boot.
 |---|---|---|
 | `modules/` | Home Manager — **shared by both hosts** | `home.packages`, `home.file`, `systemd.user.*`, `programs.*` — what the *user* wants on any machine |
 | `nixos/` | NixOS — **shared by both hosts** | policy true of every host: `services.*`, `users.users`, `environment.systemPackages`. Nothing machine-specific |
-| `hosts/<name>/` | per-host, NixOS **and** Home Manager | `hardware.nix` (UUIDs, GPUs), `boot.nix` (loader, ESP), `networking.hostName`, `hm.nix` (desk-bound home config), that machine's `flatpaks.nix` and any host-only service |
+| `hosts/<name>/` | per-host, NixOS **and** Home Manager | `hardware.nix` (UUIDs, GPUs), `boot.nix` (only the panel: Limine wallpaper + interface resolution), `networking.hostName`, `hm.nix` (that host's Home Manager aggregator), its `flatpaks.nix` app list, and any host-only service |
 | `pkgs/` | overlay | custom packages; `default.nix` is the overlay function |
 | `scripts/` | raw shell | wrapped into derivations by `pkgs/scripts.nix` |
 | `themes/` | vendored | the Carl KDE/GTK theme suite |
@@ -72,8 +72,10 @@ is just `imports = [ ../../modules ]`.
 3. **Package config lives in `flake.nix`, not `~/.config/nixpkgs`.** Because `pkgs` is passed
    explicitly to `homeManagerConfiguration`, home-manager ignores its own `nixpkgs.config`.
    `allowUnfree`, overlays, and `permittedInsecurePackages` must be in `flake.nix`.
-4. **Keep the Limine settings on `lib.mkDefault`** in `hosts/coru/boot.nix` — never `mkForce` them.
+4. **Keep the Limine settings on `lib.mkDefault`** in `nixos/boot.nix` — never `mkForce` them.
    Same caution for `efiSupport`, `efiInstallAsRemovable`, `maxGenerations`, `canTouchEfiVariables`.
+   The loader, kernel and splash are shared policy; only the wallpaper and interface resolution are
+   per-host (`hosts/<name>/boot.nix`).
 5. **`rootflags=` is derived** from `fileSystems."/".options`; never hardcode it, and do not add
    `subvol=@` or `x-initrd.mount` to `/`.
 6. **plasma-manager: leave `lookAndFeel` unset** — it clashes with the explicit theme block.
