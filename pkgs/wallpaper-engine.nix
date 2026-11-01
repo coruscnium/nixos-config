@@ -58,6 +58,20 @@ in
 
     cmakeBuildType = "Release";
 
+    # backend_scene's SoundManager calls Device::Init({}) with a zeroed
+    # DeviceDesc, so the playback device asks PulseAudio for 0 channels. miniaudio
+    # only overrides that from the sink's sample spec, and when that comes back
+    # empty -- plasmashell loading the wallpaper in the same second PipeWire does
+    # -- libpulse's pa_channel_map_init_extend asserts on pa_channels_valid(0)
+    # and aborts plasmashell. Stereo is what the mixer already assumes; pinning
+    # phyChannels makes ss.channels 2 whatever the sink query returns.
+    # Upstream still has both the zeroed struct and Init({}) at 2026-10-28.
+    postPatch = ''
+      substituteInPlace src/backend_scene/src/Audio/miniaudio-wrapper.hpp \
+        --replace-fail '    ma_uint32              phyChannels;' \
+        '    ma_uint32              phyChannels = 2;'
+    '';
+
     meta = {
       description = "Wallpaper Engine integration for KDE Plasma 6 (native C++, no Python)";
       homepage = "https://github.com/CaptSilver/wallpaper-engine-kde-plugin";
