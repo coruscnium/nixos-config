@@ -47,9 +47,19 @@
   # aborts in init_platform -- once per queued file. On the laptop that was
   # ~17.9k aborts in eight seconds (4.1 GiB of cores); the desktop logs the
   # same signature. offscreen makes the indexer independent of the session.
+  #
+  # LimitCORE is the second half. Every abort left a core, and DrKonqi then
+  # drained the backlog at ~7 spawns/s (1.1 GiB of them, still on disk from
+  # 2026-10-30) -- that, not the indexer, is what the desktop feels. With cores
+  # off, a recurrence costs a restart instead of a storm.
+  #
+  # Indexing scope stays at the defaults: full content search over $HOME, and
+  # baloofilerc remains KDE's to write, so System Settings works. Do not "tame"
+  # baloo here to buy speed -- the crash is the platform plugin, not the scope.
   xdg.configFile."systemd/user/kde-baloo.service.d/qt-platform.conf".text = ''
     [Service]
     Environment=QT_QPA_PLATFORM=offscreen
+    LimitCORE=0
   '';
 
   # The scripts ship EnabledByDefault=false, so KWin has to be told to load them.
