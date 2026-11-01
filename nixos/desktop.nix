@@ -25,6 +25,27 @@
     alsa.support32Bit = true;
     pulse.enable = true;
     jack.enable = true;
+
+    # LE Audio roles, stated explicitly even though PipeWire 1.6.9's compiled
+    # default (bluez5-dbus.c parse_roles) already enables the BAP set -- this
+    # pins the intent so a future upstream default change cannot silently drop
+    # it. HFP is not in that mask; it is governed by bluez5.headset-roles.
+    wireplumber.extraConfig."51-le-audio" = {
+      "monitor.bluez.properties" = {
+        # Quoted: unquoted, Nix reads this as a nested { bluez5 = { roles }; }
+        # and WirePlumber never sees the bluez5.roles property.
+        "bluez5.roles" = [
+          "a2dp_sink"
+          "a2dp_source"
+          "hfp_hf"
+          "hfp_ag"
+          "bap_sink"
+          "bap_source"
+          "bap_bcast_sink"
+          "bap_bcast_source"
+        ];
+      };
+    };
   };
   security.rtkit.enable = true;
 
@@ -46,6 +67,15 @@
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = false;
+    # LE Audio profiles (BAP/GMAP) are .experimental in bluez and
+    # src/profile.c rejects them with -ENOTSUP unless the experimental
+    # D-Bus flag is on. Runtime only -- there is no build flag for this.
+    settings.General = {
+      Experimental = true;
+      # ISO socket, still a kernel experimental feature. Without it bluez
+      # cannot create CIS: LE Audio connects and then never streams.
+      KernelExperimental = "6fbaf188-05e0-496a-9885-d6ddfdb4e03e";
+    };
   };
 
   # ---- Printing and scanning ------------------------------------------------
