@@ -2,7 +2,7 @@
 # ../../nixos, which is policy true of both -- and adds only what is this box's:
 # its disks and the one flatpak it needs for Roblox (Sober). No printer
 # container, no desk peripherals, no VR.
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   # The PX13's keyboard has its own OOBE state: on a cold boot the backlight
   # fades in and out by itself and ignores brightness reports. hid-asus has the
@@ -44,6 +44,27 @@ let
     level=$(cat /sys/class/leds/asus::kbd_backlight/brightness 2>/dev/null || echo 1)
     case "$level" in 1|2|3) ;; *) level=1 ;; esac
   '';
+
+  # The panel is wired to the 890M (card2-eDP-1); the AD107 only drives HDMI-A-1,
+  # so offload is the only way to render on the dGPU. `nvidia-offload` is not
+  # enough for it: it exports __VK_LAYER_NV_optimus=NVIDIA_only, but on driver
+  # 595 that layer leaves the Vulkan device order alone -- `vulkaninfo --summary`
+  # still lists the 890M first -- so DXVK/VKD3D games stay on the iGPU. Naming
+  # the ICD is what binds the 4050. Use the driver package's own file rather
+  # than /run/opengl-driver: the latter is a symlink, and the resolved store
+  # path is what a container can actually mount.
+  nvidiaIcd = pkg: "${pkg}/share/vulkan/icd.d/nvidia_icd.json";
+
+  dgpuRun = pkgs.writeShellScriptBin "dgpu-run" ''
+    export __NV_PRIME_RENDER_OFFLOAD=1
+    export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    # Both architectures: a 32-bit game needs the lib32 manifest, and the loader
+    # silently drops whichever entry does not match its own ELF class.
+    export VK_ICD_FILENAMES=${nvidiaIcd config.hardware.nvidia.package}:${nvidiaIcd config.hardware.nvidia.package.lib32}
+    export VK_DRIVER_FILES="$VK_ICD_FILENAMES"
+    exec "$@"
+  '';
 in
 {
   imports = [
@@ -57,6 +78,12 @@ in
 
   # KDE's power applet drives this. There is no desktop equivalent.
   services.power-profiles-daemon.enable = true;
+
+  # `dgpu-run %command%` as a Steam launch option -- it has to be inside the
+  # sandbox to be on PATH there. The system copy covers everything Steam does
+  # not launch: Heroic, PrismLauncher, a plain terminal.
+  programs.steam.extraPackages = [ dgpuRun ];
+  environment.systemPackages = [ dgpuRun ];
 
   systemd.services.asus-kbd-oobe = {
     description = "Clear the PX13 keyboard's OOBE state so the backlight works";
