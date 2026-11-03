@@ -29,6 +29,13 @@
   boot.initrd.supportedFilesystems = [ "btrfs" ];
   boot.tmp.cleanOnBoot = true;
 
+  # ntsync is Wine's in-kernel replacement for fsync/esync. Proton switches to it
+  # automatically the moment /dev/ntsync exists (opt-out is PROTON_NO_NTSYNC), and
+  # it is what stops VRChat dying with Mono's "SuspendThread loop failed" -- the
+  # fsync path loses thread suspensions the GC is waiting on. CONFIG_NTSYNC is =m
+  # in linuxPackages_latest, so the module has to be asked for explicitly.
+  boot.kernelModules = [ "ntsync" ];
+
   nix.gc = {
     automatic = true;
     dates = "weekly";
