@@ -38,6 +38,19 @@
   '';
 
   programs.plasma.shortcuts = {
+    # plasmashell ships Meta+A (next activity) and Meta+1..5 (activate task
+    # manager entry N). kwin already claims Meta+1..5 via the desktop switch
+    # below, and a key goes to only one component, so on the laptop plasmashell
+    # swallowed both sets -- Meta+A never reached the script. Unbind them here.
+    plasmashell = {
+      "next activity" = [ ];
+      "activate task manager entry 1" = [ ];
+      "activate task manager entry 2" = [ ];
+      "activate task manager entry 3" = [ ];
+      "activate task manager entry 4" = [ ];
+      "activate task manager entry 5" = [ ];
+    };
+
     "services/net.local.toggle_pw_control_center.sh.desktop"._launch = "Meta+A";
     "services/net.local.force-paste.desktop"._launch = "Meta+Ctrl+V";
     "services/net.local.autoclicker.desktop"._launch = "Calculator";
