@@ -2,15 +2,14 @@
   description = "coru's NixOS + Home Manager flake";
 
   inputs = {
-    # Held at the last rev shipping Plasma 6.8.0. 6.8.1 regressed mixed-refresh
-    # compositing (KDE bug 527668): Overview and fullscreen animations stutter on
-    # 240 + 144 + 60 Hz while every counter reads idle, and disabling the two
-    # slower outputs on 6.8.1 makes it smooth again. The whole rev is pinned, not
-    # just kdePackages -- swapping only the KDE scope drags Qt 6.11 against our
-    # 6.12 and rebuilds the entire Qt/KF stack from source, since no cache has
-    # that combination. A rev-pinned URL also stops `nix flake update` moving it;
-    # go back to nixos-unstable once 6.8.2 is in.
-    nixpkgs.url = "github:nixos/nixpkgs/fe13242281a67641c0102cdb1087f0ebe586c7df";
+    # Was held at the last rev shipping Plasma 6.8.0: 6.8.1 regressed mixed-refresh
+    # compositing (KDE bug 527668), where Overview and fullscreen animations stutter
+    # on 240 + 144 + 60 Hz while every counter reads idle. Unpinned for 6.8.2, which
+    # is the first release that fixes kwin's multi-GPU EGL-copy synchronisation
+    # (KDE bug 527591) -- the suspected cause of the laptop freezing when a game
+    # runs fullscreen on the 4050 while kwin composites on the 890M. Re-pin only if
+    # 527668 turns out to have survived into 6.8.2.
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -20,12 +19,6 @@
       # CachyOS-on-NixOS bridge. The linux-cachyos kernel was dropped for the
       # stock one (nixos/boot.nix); proton-cachyos is still wanted.
       url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nur = {
-      # Unvetted; used only as pkgs.nur.repos.<user>.<pkg>.
-      url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -84,7 +77,6 @@
       nixpkgs,
       home-manager,
       chaotic,
-      nur,
       plasma-manager,
       nix-flatpak,
       nixpkgs-equibop,
@@ -112,7 +104,6 @@
           (import ./pkgs { inherit equibopPkgs rosemaryPkg; })
           windscribe.overlays.default
           chaotic.overlays.default
-          nur.overlays.default
         ];
         config = {
           allowUnfree = true;
@@ -150,7 +141,6 @@
                 (import ./pkgs { inherit equibopPkgs rosemaryPkg; })
                 windscribe.overlays.default
                 chaotic.overlays.default
-                nur.overlays.default
               ];
               nixpkgs.config.allowUnfree = true;
 

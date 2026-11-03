@@ -12,7 +12,6 @@
     syncthingtray
     megacmd
     megasync
-    nur.repos.forkprince.nuvio
 
     lsyncd
     wireguard-tools

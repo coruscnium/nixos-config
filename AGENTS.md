@@ -57,10 +57,12 @@ is just `imports = [ ../../modules ]`.
    `environment.systemPackages` in `nixos/system.nix`. If it only makes sense on the desktop, or only
    on the laptop, it goes in `hosts/<name>/` instead — the shared dirs are for what both want.
 2. **In chaotic-nyx** → top-level `pkgs`.
-3. **In NUR** → `pkgs.nur.repos.<user>.<pkg>` only (it does not merge into `pkgs`). Unvetted.
-4. **Custom package** → new `pkgs/<name>.nix`, called from `pkgs/default.nix`.
-5. **nvfetcher-pinned upstream** → root-level table in `nvfetcher.toml`, then `nix run nixpkgs#nvfetcher`.
-6. **Vendored** → drop the tree in and **git-track it**.
+3. **Custom package** → new `pkgs/<name>.nix`, called from `pkgs/default.nix`.
+4. **nvfetcher-pinned upstream** → root-level table in `nvfetcher.toml`, then `nix run nixpkgs#nvfetcher`.
+5. **Vendored** → drop the tree in and **git-track it**.
+
+The NUR input is gone (2026-11-03): its only consumer was `nur.repos.forkprince.nuvio`, dropped
+because NUR's 2026-11-03 revision cannot be unpacked. Re-adding it means re-adding the input first.
 
 ## Hard rules — do not break these
 
