@@ -25,6 +25,14 @@
       "coru"
     ];
     auto-optimise-store = true;
+
+    # Hydra never builds unfree, so steam/steam-run have no cache.nixos.org
+    # entry and build locally on every nixpkgs bump. nix-community's cache does
+    # carry them (verified 2026-11-03 against the 0bb2eed rev's exact paths).
+    extra-substituters = [ "https://nix-community.cachix.org" ];
+    extra-trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
   };
 
   # A crash loop must not be able to put gigabytes of cores on disk: the baloo
