@@ -56,6 +56,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Butter -- Rosemary's prefix and runner manager (GTK4 + libadwaita).
+    # Pinned to a release tag: unlike rosemary, upstream tags properly and main
+    # moves. Shares our nixpkgs; its rust-overlay still pins its own toolchain.
+    butter = {
+      url = "github:microlift/butter/v1.2.1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # CoruFrame -- Coru's own Warframe companion (relic HUD, inventory ledger,
     # market tools). Ships packages plus NixOS/home-manager modules. Its Rust and
     # Tauri builds are pinned by cargoHash/pnpmDeps, so it must follow our nixpkgs
@@ -82,6 +90,7 @@
       nixpkgs-equibop,
       windscribe,
       rosemary,
+      butter,
       coruframe,
       ...
     }:
@@ -95,13 +104,16 @@
       # by its own flake; pkgs/default.nix republishes it as pkgs.rosemary.
       rosemaryPkg = rosemary.packages.${system}.rosemary;
 
+      # Butter's flake exposes `butter` and `default` as the same derivation.
+      butterPkg = butter.packages.${system}.butter;
+
       # `pkgs` is passed explicitly to homeManagerConfiguration, so home-manager
       # ignores its own nixpkgs.config -- package config (unfree, overlays) MUST
       # live here.
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
-          (import ./pkgs { inherit equibopPkgs rosemaryPkg; })
+          (import ./pkgs { inherit equibopPkgs rosemaryPkg butterPkg; })
           windscribe.overlays.default
           chaotic.overlays.default
         ];
@@ -138,7 +150,7 @@
               # pkgs.usb-port-power-cycle, which a sudoers rule and a wrapper
               # both pin.
               nixpkgs.overlays = [
-                (import ./pkgs { inherit equibopPkgs rosemaryPkg; })
+                (import ./pkgs { inherit equibopPkgs rosemaryPkg butterPkg; })
                 windscribe.overlays.default
                 chaotic.overlays.default
               ];
@@ -166,6 +178,7 @@
           commonHm = [
             ./home.nix
             plasma-manager.homeModules.plasma-manager
+            rosemary.homeManagerModules.default
             coruframe.homeManagerModules.default
           ];
 
@@ -183,10 +196,7 @@
         {
           coru = mkNixos {
             extra = [ ./hosts/coru ];
-            hm = [
-              ./hosts/coru/hm.nix
-              rosemary.homeManagerModules.default
-            ];
+            hm = [ ./hosts/coru/hm.nix ];
           };
 
           # Attribute names must equal networking.hostName (hosts/*/default.nix):

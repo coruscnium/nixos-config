@@ -5,6 +5,7 @@
 {
   equibopPkgs,
   rosemaryPkg,
+  butterPkg,
 }:
 final: prev:
 let
@@ -111,4 +112,10 @@ in
     CFLAGS = "-march=native";
     CXXFLAGS = "-march=native";
   });
+
+  # ------------------------------------------------------------------- butter
+  # Rosemary's prefix and runner manager (flake.nix). Republished here for the
+  # same reason as rosemary: nixos/ and modules/ see one attribute, not the
+  # flake output, and both hosts install the identical store path.
+  butter = butterPkg;
 }

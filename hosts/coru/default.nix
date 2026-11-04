@@ -21,12 +21,6 @@
   networking.hostName = "coru";
   system.stateVersion = "25.11";
 
-  # macOS compatibility layer (Wine-shaped) -- runs macOS binaries. It is a
-  # system-level runtime, so it belongs in systemPackages rather than
-  # modules/gaming.nix, but it is only here: the laptop does not run the Roblox
-  # stack, and forcing this input costs a Cargo git fetch at eval time.
-  environment.systemPackages = [ pkgs.rosemary ];
-
   # Only this one helper is passwordless. pkgs.usb-port-power-cycle is defined in
   # the overlay so this rule and the watchdog wrapper pin the same path.
   security.sudo.extraRules = [

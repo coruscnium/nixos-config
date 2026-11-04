@@ -196,6 +196,11 @@
     inetutils
     screen
     tmux
+
+    # macOS compatibility layer -- a system-level runtime so anything that
+    # shells out to `rosemary` finds it on PATH: nutmeg and Butter both do.
+    # Built by the rosemary flake input (flake.nix -> pkgs/default.nix).
+    rosemary
   ];
 
   # sshd is deliberately off: a listening sshd is a decision, not a default.

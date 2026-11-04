@@ -2,12 +2,23 @@
 
 # The basic gaming userland every host gets: launchers, mod clients, and the
 # Proton/compat tooling that has to resolve the same Proton Steam does. Desk-only
-# pieces -- VR, the Roblox routes, the ultrawide fix -- live in hosts/coru/hm.nix.
+# pieces -- VR, the ultrawide fix -- live in hosts/coru/hm.nix.
 {
   home.packages = with pkgs; [
     heroic
     prismlauncher
     r2modman
+
+    # Roblox via the *macOS* client: nutmeg (pkgs/nutmeg.nix) boots it through
+    # rosemary, where vinegar/Sober run the Android one. Two independent clients
+    # -- installing nutmeg does not disturb Sober. Its roblox: URL handlers are
+    # registered per-user by `nutmeg install-desktop`, not declaratively.
+    nutmeg
+
+    # Butter is the GUI over rosemary: runners (Rosemary builds) and bottles
+    # (prefixes). Installed from the flake input; it downloads its runners, so
+    # it needs no build-time coupling to pkgs.rosemary.
+    butter
 
     protonup-qt
     protonplus
@@ -36,6 +47,16 @@
   # User-facing mangohud + its config. Steam gets its own copy inside the sandbox
   # (nixos/gaming.nix); this covers a plain terminal.
   programs.mangohud.enable = true;
+
+  # Rosemary as a Steam compatibility tool -- drops it into compatibilitytools.d
+  # so a macOS app runs under Steam's "Rosemary" entry. Rosemary itself is the
+  # system runtime (nixos/system.nix, pkgs.rosemary); pin `package` to that build
+  # so the tool reuses it instead of the flake's own default derivation.
+  # Upstream module: rosemary.homeManagerModules.default (flake.nix commonHm).
+  programs.rosemary = {
+    steam.enable = true;
+    package = pkgs.rosemary;
+  };
 
   # CoruFrame -- Coru's Warframe companion (relic reward HUD, inventory ledger,
   # market tools). Upstream flake's home-manager module; the one package carries

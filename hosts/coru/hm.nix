@@ -2,9 +2,9 @@
 
 # The desktop's own home config -- everything that is bound to this desk: the
 # peripherals, the 3D-printing tools, the desk's user units, and the gaming
-# userland that needs this hardware (the VR runtime pair, the Roblox routes, the
-# ultrawide fix, the mod managers for the games installed here). The shared set
-# is ../../modules, which the laptop imports wholesale.
+# userland that needs this hardware (the VR runtime pair, the ultrawide fix, the
+# mod managers for the games installed here). The shared set is ../../modules,
+# which the laptop imports wholesale.
 {
   imports = [
     ../../modules
@@ -22,13 +22,6 @@
     ddmm # Helldivers 2 mod manager, Tauri binary (pkgs/ddmm.nix)
     winboat
     vinegar
-
-    # Roblox, the other way round: nutmeg runs the *macOS* client through
-    # rosemary (pkgs/nutmeg.nix), where vinegar/Sober run the Android one. Two
-    # independent clients -- installing nutmeg does not disturb Sober. Its
-    # roblox: URL handlers are registered per-user by `nutmeg install-desktop`,
-    # not declaratively.
-    nutmeg
 
     reigntweak # Elden Ring: Nightreign ultrawide / 60fps
     wineWow64Packages.stable
@@ -59,15 +52,5 @@
     runtime = [ "${pkgs.xrizer}/lib/xrizer" ];
     config = [ "${config.xdg.dataHome}/Steam/config" ];
     log = [ "${config.xdg.dataHome}/Steam/logs" ];
-  };
-
-  # Rosemary as a Steam compatibility tool -- drops it into
-  # compatibilitytools.d so a macOS app runs under Steam's "Rosemary" entry.
-  # Rosemary itself is a system runtime (nixos/system.nix, pkgs.rosemary);
-  # pin `package` to that build so the tool reuses it instead of the flake's
-  # own default derivation. Upstream module: rosemary.homeManagerModules.default.
-  programs.rosemary = {
-    steam.enable = true;
-    package = pkgs.rosemary;
   };
 }
