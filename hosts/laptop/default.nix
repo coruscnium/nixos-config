@@ -65,6 +65,38 @@ let
     export VK_DRIVER_FILES="$VK_ICD_FILENAMES"
     exec "$@"
   '';
+
+  # AMD's Strix Point xHCI at 0000:c7:00.0 (1022:151f) intermittently fails to
+  # come back from s2idle: "xHC restore state timeout", then "HC died; cleaning
+  # up". The internal keyboard and Bluetooth are the only devices behind it, so
+  # a failed resume leaves the laptop with no input until reboot. Unbinding and
+  # rebinding the PCI driver resets the controller and re-enumerates everything
+  # behind it -- the workaround tracked in kernel bug 221073. The root fix (a
+  # mandatory 10ms D3cold->D0 delay in the PCI core) is not in 7.3.1 yet.
+  xhciResumeFix = pkgs.writeShellScript "xhci-resume-fix" ''
+    set -eu
+    controller=0000:c7:00.0
+    kmsg=/run/xhci-kmsg-lines
+
+    # The missing keyboard is the symptom; the kernel message is the proof.
+    # Check both: hub_event can still be processing the disconnect when this
+    # hook runs, so the device node may not be gone yet.
+    failed=0
+    [ -e /sys/bus/usb/devices/3-3 ] || failed=1
+    if [ "$failed" -eq 0 ] && [ -r "$kmsg" ]; then
+      marker=$(cat "$kmsg")
+      new=$(${pkgs.util-linux}/bin/dmesg | tail -n +"$((marker + 1))" || true)
+      if printf '%s\n' "$new" | grep -q "xhci_hcd $controller: HC died"; then
+        failed=1
+      fi
+    fi
+    [ "$failed" -eq 1 ] || exit 0
+
+    echo "xhci-resume-fix: $controller died on resume, rebinding" >&2
+    echo -n "$controller" > /sys/bus/pci/drivers/xhci_hcd/unbind || true
+    sleep 1
+    echo -n "$controller" > /sys/bus/pci/drivers/xhci_hcd/bind || true
+  '';
 in
 {
   imports = [
@@ -103,8 +135,17 @@ in
     '';
   };
 
-  # OOBE comes back on resume, same as on a cold boot.
+  # Where the kernel log ends before sleeping, so the resume hook can tell
+  # which messages belong to this suspend. Written on shutdown too; harmless.
+  powerManagement.powerDownCommands = ''
+    ${pkgs.util-linux}/bin/dmesg 2>/dev/null | wc -l > /run/xhci-kmsg-lines || true
+  '';
+
+  # OOBE comes back on resume, same as on a cold boot. The xHCI fix runs first:
+  # if the controller died, asus-kbd-oobe would otherwise spend 20 seconds
+  # waiting for a keyboard that is not there.
   powerManagement.resumeCommands = ''
+    ${xhciResumeFix}
     ${kbdOobeLevel}
     ${asusKbdOobe}/bin/asus-kbd-oobe "$level" || true
   '';
