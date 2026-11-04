@@ -12,11 +12,23 @@
   # NextDNS over DoH via the official client. The module only runs `nextdns run`
   # (listening on 127.0.0.1:53) and never touches resolv.conf, so the resolver
   # wiring is on us; NM owns resolv.conf here, hence `dns = "none"`.
+  #
+  # The client's own defaults are cache-size 0 (cache off) and 32 inflight
+  # upstream requests, and it fails extra requests instantly rather than queuing
+  # them. Warframe's launcher opens ~48 connections to one CDN host in the same
+  # millisecond; the over-32 ones got SERVFAIL, Wine surfaced
+  # ERROR_WINHTTP_NAME_NOT_RESOLVED, and the launcher blacklisted the host for 60s
+  # and declared the update failed. Measured 2026-11-03: 50 parallel lookups at
+  # defaults -> 18 SERVFAIL; with the two flags below -> 0, second wave cached.
   services.nextdns = {
     enable = true;
     arguments = [
       "-profile"
       "a8561e"
+      "-cache-size"
+      "10MB"
+      "-max-inflight-upstream-requests"
+      "128"
     ];
   };
   networking.networkmanager.dns = "none";
