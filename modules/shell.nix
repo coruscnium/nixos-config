@@ -111,11 +111,13 @@ in
       # See the writeShellApplication at the top of this file.
       nixbuild = "nh os build ~/Projects/NixClone/nixos-config";
       nixboot = "nh os boot ~/Projects/NixClone/nixos-config";
-      # Both halves of the source set: flake.lock inputs (nix flake update) plus
-      # the nvfetcher-pinned AppImages (cherry-studio, elegooslicer) that nix
-      # flake update cannot see. The subshell keeps your cwd put -- nvfetcher
-      # writes _sources/ relative to cwd, so it has to run inside the repo.
-      nixupd = "(cd ~/Projects/NixClone/nixos-config && nix flake update && nix run nixpkgs#nvfetcher)";
+      # Every source set, in the order they have to run: tag-pinned flake inputs
+      # (butter -- a tag never moves, so `nix flake update` cannot bump it),
+      # then flake.lock inputs, then the nvfetcher AppImages (cherry-studio,
+      # elegooslicer, astra) that neither of the other two can see. The
+      # subshell keeps your cwd put -- nvfetcher writes _sources/ relative to
+      # cwd, so it has to run inside the repo.
+      nixupd = "(cd ~/Projects/NixClone/nixos-config && ./scripts/bump-release-tags && nix flake update && nix run nixpkgs#nvfetcher)";
       # nh raises its own elevation (doas/sudo/run0/pkexec), so no `sudo` here.
       # Keeps 3 generations per profile (nh defaults to 1) for rollback headroom.
       nixgc = "nh clean all -k 3";

@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Advance flake inputs pinned to a GitHub release tag.
+#
+# A tag pin (`github:owner/repo/v1.2.3`) is stable by construction: `nix flake
+# update` re-resolves the tag to the same commit, so it can never move. That is
+# usually what you want, and it is why butter sat at v1.2.1 while three newer
+# things shipped. This walks the table below, asks GitHub for the latest
+# *release* (pre-releases and drafts excluded -- a release tag should mean
+# released), rewrites the tag in flake.nix and re-locks that one input.
+#
+# Main is deliberately not an option: microlift moves it between releases.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+# flake input name -> owner/repo whose latest release it should follow
+tag_inputs=(
+  "butter microlift/butter"
+)
+
+for entry in "${tag_inputs[@]}"; do
+  read -r name repo <<<"$entry"
+
+  current=$(sed -n "s|.*github:${repo}/\([^\"]*\)\".*|\1|p" flake.nix | tail -1)
+  if [[ -z "$current" ]]; then
+    echo "bump-release-tags: $name is not tag-pinned to $repo in flake.nix" >&2
+    exit 1
+  fi
+
+  if ! latest=$(curl -fsSL --max-time 20 "https://api.github.com/repos/${repo}/releases/latest" |
+    sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | tail -1); then
+    echo "bump-release-tags: cannot read $repo's latest release, leaving $name at $current" >&2
+    continue
+  fi
+  if [[ -z "$latest" ]]; then
+    echo "bump-release-tags: $repo returned no release tag (rate limit?), leaving $name at $current" >&2
+    continue
+  fi
+
+  if [[ "$latest" == "$current" ]]; then
+    echo "bump-release-tags: $name is current at $current"
+    continue
+  fi
+
+  echo "bump-release-tags: $name $current -> $latest"
+  sed -i "s|github:${repo}/${current}\"|github:${repo}/${latest}\"|" flake.nix
+  nix flake update "$name"
+done

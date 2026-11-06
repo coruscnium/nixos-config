@@ -57,10 +57,13 @@
     };
 
     # Butter -- Rosemary's prefix and runner manager (GTK4 + libadwaita).
-    # Pinned to a release tag: unlike rosemary, upstream tags properly and main
-    # moves. Shares our nixpkgs; its rust-overlay still pins its own toolchain.
+    # Tracks release tags, not main: unlike rosemary, upstream tags properly and
+    # main moves between releases. The tag below is kept current by
+    # scripts/bump-release-tags (nixupd calls it first) -- `nix flake update` on
+    # its own can never move a tag pin. Shares our nixpkgs; its rust-overlay
+    # still pins its own toolchain.
     butter = {
-      url = "github:microlift/butter/v1.2.1";
+      url = "github:microlift/butter/v1.3.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
