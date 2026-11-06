@@ -66,10 +66,23 @@ in
     setOptions = [ "INTERACTIVE_COMMENTS" ];
 
     # zsh-autocomplete runs compinit itself and owns the completion system, so
-    # home-manager's completion init must be off. It also owns Tab and the history
-    # keys, so autosuggestions / history-substring-search / fzf-tab are absent --
-    # each fights it for the same bindings.
+    # home-manager's completion init must be off. It also owns Tab and the arrow
+    # keys, so history-substring-search / fzf-tab are absent -- each rebinds what
+    # it already binds. Autosuggestions is the exception: it binds no key of its
+    # own, and upstream says the two coexist (discussion #456).
     enableCompletion = false;
+
+    # zsh-autocomplete is a completion *menu*, not a history hint: while you type
+    # it completes commands and paths from compsys, and it only reaches into
+    # history through the up-arrow widget. zsh-autosuggestions is what puts the
+    # grey ghost text from history under the cursor, accepted with Right/Ctrl-E.
+    # Home-manager sources it at order 700 -- after autocomplete (500) and before
+    # syntax highlighting (1200) -- which is the order it needs.
+    autosuggestion = {
+      enable = true;
+      # The plugin default fg=8 is near-invisible on p10k's dark palette.
+      highlight = "fg=244";
+    };
     syntaxHighlighting.enable = true;
 
     history = {
@@ -92,6 +105,53 @@ in
       # zsh-autocomplete must load before anything calls compdef.
       (lib.mkOrder 500 ''
         source ${pkgs.zsh-autocomplete}/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+      '')
+
+      # CUA motions. Konsole's shipped keytab (data/keyboard-layouts/default.keytab,
+      # the "-Shift+AnyMod" rows) sends \E[1;5X for Ctrl+arrow and \E[1;6X for
+      # Ctrl+Shift+arrow, and zsh leaves both unbound -- "undefined-key", so they
+      # did nothing at all. Ctrl+Up/Down jump the ends of the line because the
+      # plain arrows already walk history.
+      (lib.mkOrder 600 ''
+        bindkey '^[[1;5D' backward-word
+        bindkey '^[[1;5C' forward-word
+        bindkey '^[[1;5A' beginning-of-buffer
+        bindkey '^[[1;5B' end-of-buffer
+
+        # Ctrl+Shift+arrows extend a selection over the command line, the shell-side
+        # half of CUA. ZLE's region is what draws the reverse-video highlight, and
+        # the first press has to set the mark or the selection has no anchor. One
+        # function covers all four: WIDGET names the entry that fired, the array
+        # says which motion that entry runs. This selects inside the input line --
+        # selecting command *output* is Konsole's own mode, Ctrl+Shift+D.
+        typeset -A _cua_select_motion=(
+          _cua-select-left       backward-word
+          _cua-select-right      forward-word
+          _cua-select-up         beginning-of-buffer
+          _cua-select-down       end-of-buffer
+          _cua-select-char-left  backward-char
+          _cua-select-char-right forward-char
+        )
+        _cua-select() {
+          (( REGION_ACTIVE )) || zle set-mark-command
+          zle $_cua_select_motion[$WIDGET]
+        }
+        for widget in ''${(k)_cua_select_motion}; do
+          zle -N $widget _cua-select
+        done
+        bindkey '^[[1;6D' _cua-select-left
+        bindkey '^[[1;6C' _cua-select-right
+        bindkey '^[[1;6A' _cua-select-up
+        bindkey '^[[1;6B' _cua-select-down
+
+        # Shift+arrows, one character or one line at a time. Only reachable with
+        # the CUA keytab selected in the Konsole profile: stock Konsole sends
+        # nothing for shift+arrow, because its defaults spend shift+left/right
+        # on previous/next tab and shift+up/down on scrolling.
+        bindkey '^[[1;2D' _cua-select-char-left
+        bindkey '^[[1;2C' _cua-select-char-right
+        bindkey '^[[1;2A' _cua-select-up
+        bindkey '^[[1;2B' _cua-select-down
       '')
 
       # p10k last. Both lines needed: the theme only defines the prompt and runs
@@ -126,6 +186,13 @@ in
   };
 
   home.packages = [ nixup ];
+
+  # Konsole's stock table never lets shift+arrow reach the shell, so the bindkeys
+  # above are dead keys until this layout is picked in the profile's Keyboard
+  # list. The file is read-only on purpose -- Konsole copies it into
+  # ~/.local/share/konsole/ when the user edits a layout in the GUI, and that
+  # copy is what the profile then points at.
+  home.file.".local/share/konsole/CUA.keytab".source = ../konsole/CUA.keytab;
 
   # zsh-autocomplete installs the dist chpwd_recent_dirs hook, whose cache lives
   # under ${XDG_DATA_HOME:-~/.local/share}/zsh/ -- but nothing creates that dir, so
