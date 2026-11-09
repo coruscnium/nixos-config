@@ -9,7 +9,6 @@
     kdePackages.filelight
     kdePackages.kamoso
     kdePackages.kate
-    kdePackages.kdeconnect-kde
     kdePackages.konsole
     kdePackages.okular
     kdePackages.partitionmanager

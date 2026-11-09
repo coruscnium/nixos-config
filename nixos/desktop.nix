@@ -78,13 +78,29 @@
     };
   };
 
-  # ---- Printing and scanning ------------------------------------------------
-  services.printing.enable = true;
+  # ---- LAN discovery --------------------------------------------------------
   services.avahi = {
     enable = true;
     nssmdns4 = true;
     openFirewall = true;
   };
+
+  # The module owns the firewall side: it opens 1714-1764 TCP+UDP, which is what
+  # kdeconnectd actually listens on (1716) and what the phone dials back to. The
+  # package itself moved here from modules/desktop.nix -- installing it in both
+  # would duplicate it.
+  programs.kdeconnect.enable = true;
+
+  # Spotify Connect. The desktop client advertises itself on 57621 (TCP+UDP) and
+  # the phone connects to that port; without it the desktop never shows up as a
+  # device on the phone. mDNS (UDP 5353) is already covered by avahi above.
+  networking.firewall = {
+    allowedTCPPorts = [ 57621 ];
+    allowedUDPPorts = [ 57621 ];
+  };
+
+  # ---- Printing and scanning ------------------------------------------------
+  services.printing.enable = true;
 
   # Brother ADS scanner.
   hardware.sane = {
