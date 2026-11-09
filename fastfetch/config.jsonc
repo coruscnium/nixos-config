@@ -1,0 +1,219 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "type": "file",
+        "source": "@LOGO@",
+        "padding": {
+            "top": 7,
+            "left": 3
+        }
+    },
+    "display": {
+        "color": {
+            "keys": "#8d7dc8",
+            "output": "#e8e2ff"
+        },
+        "separator": "",
+        "constants": [
+            "─────────────────────────────────────────────────────",
+            "\u001b[54D",
+            "\u001b[52C",
+            "\u001b[52C",
+            "════════════════════════════════════════════════════"
+        ]
+    },
+    "modules": [
+        {
+            "type": "version",
+            "key": "{##7a69fe}╔══════════════╦══{$5}╗\u001b[45D",
+            "format": "\u001b[1m{##7a69fe} {1} · {2} "
+        },
+        {
+            "type": "os",
+            "key": "{##7a69fe}║{##7a69fe}│ ● System    │ {$3}│{##7a69fe}║{$2}"
+        },
+        {
+            "type": "datetime",
+            "key": "{##7a69fe}║{##7a69fe}│ ● Fetched   │ {$3}│{##7a69fe}║{$2}",
+            "format": "{year}-{month-pretty}-{day-pretty} {hour-pretty}:{minute-pretty}:{second-pretty}"
+        },
+        {
+            "type": "locale",
+            "key": "{##7a69fe}║{##7a69fe}│ ● Locale    │ {$3}│{##7a69fe}║{$2}"
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##6f8bff}┌─────────────┬{$1}┐{##7a69fe}║\u001b[40D",
+            "format": "{##6f8bff} Hardware "
+        },
+        {
+            "key": "{##7a69fe}║{##6f8bff}│ ▸ Chassis   │ {$3}│{##7a69fe}║{$2}",
+            "type": "chassis"
+        },
+        {
+            "key": "{##7a69fe}║{##6f8bff}│ ▸ RAM       │ {$3}│{##7a69fe}║{$2}",
+            "type": "memory"
+        },
+        {
+            "key": "{##7a69fe}║{##6f8bff}│ ▸ SWAP      │ {$3}│{##7a69fe}║{$2}",
+            "type": "swap"
+        },
+        {
+            "key": "{##7a69fe}║{##6f8bff}│ ▸ CPU       │ {$3}│{##7a69fe}║{$2}",
+            "type": "cpu",
+            "showPeCoreCount": true
+        },
+        {
+            "key": "{##7a69fe}║{##6f8bff}│ ▸ GPU       │ {$3}│{##7a69fe}║{$2}",
+            "type": "gpu"
+        },
+        {
+            "key": "{##7a69fe}║{##6f8bff}│ ▸ Disk      │ {$3}│{##7a69fe}║{$2}",
+            "type": "disk",
+            "format": "{mountpoint} {size-used} / {size-total} ({size-percentage})"
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##6f8bff}└─────────────┴{$1}┘{##7a69fe}║",
+            "format": ""
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##9c58ff}┌─────────────┬{$1}┐{##7a69fe}║\u001b[39D",
+            "format": "{##9c58ff} Desktop "
+        },
+        {
+            "key": "{##7a69fe}║{##9c58ff}│ ▸ Desktop   │ {$3}│{##7a69fe}║{$2}",
+            "type": "de"
+        },
+        {
+            "key": "{##7a69fe}║{##9c58ff}│ ▸ Session   │ {$3}│{##7a69fe}║{$2}",
+            "type": "wm"
+        },
+        {
+            "key": "{##7a69fe}║{##9c58ff}│ ▸ Display   │ {$3}│{##7a69fe}║{$2}",
+            "type": "display"
+        },
+        {
+            "key": "{##7a69fe}║{##9c58ff}│ ▸ G-Driver  │ {$3}│{##7a69fe}║{$2}",
+            "type": "gpu",
+            "format": "{driver}"
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##9c58ff}└─────────────┴{$1}┘{##7a69fe}║",
+            "format": ""
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##b14bf9}┌─────────────┬{$1}┐{##7a69fe}║\u001b[40D",
+            "format": "{##b14bf9} Terminal "
+        },
+        {
+            "key": "{##7a69fe}║{##b14bf9}│ ▸ Shell     │ {$3}│{##7a69fe}║{$2}",
+            "type": "shell"
+        },
+        {
+            "key": "{##7a69fe}║{##b14bf9}│ ▸ Terminal  │ {$3}│{##7a69fe}║{$2}",
+            "type": "terminal"
+        },
+        {
+            "key": "{##7a69fe}║{##b14bf9}│ ▸ Term Font │ {$3}│{##7a69fe}║{$2}",
+            "type": "terminalfont"
+        },
+        {
+            "key": "{##7a69fe}║{##b14bf9}│ ▸ Colors    │ {$3}│{##7a69fe}║{$2}",
+            "type": "terminaltheme"
+        },
+        {
+            "key": "{##7a69fe}║{##b14bf9}│ ▸ Packages  │ {$3}│{##7a69fe}║{$2}",
+            "type": "packages",
+            "combined": true
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##b14bf9}└─────────────┴{$1}┘{##7a69fe}║",
+            "format": ""
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##d94cf5}┌─────────────┬{$1}┐{##7a69fe}║\u001b[41D",
+            "format": "{##d94cf5} Development "
+        },
+        {
+            "key": "{##7a69fe}║{##d94cf5}│ ▸ Rust      │ {$3}│{##7a69fe}║{$2}",
+            "type": "command",
+            "text": "rustc --version",
+            "format": "rustc {~6,13}"
+        },
+        {
+            "key": "{##7a69fe}║{##d94cf5}│ ▸ Clang     │ {$3}│{##7a69fe}║{$2}",
+            "type": "command",
+            "text": "clang --version 2>/dev/null | sed -n 's/.*version \\([0-9][0-9.]*\\).*/\\1/p'",
+            "format": "clang {}"
+        },
+        {
+            "key": "{##7a69fe}║{##d94cf5}│ ▸ NodeJS    │ {$3}│{##7a69fe}║{$2}",
+            "type": "command",
+            "text": "node --version 2>/dev/null",
+            "format": "node {~1}"
+        },
+        {
+            "key": "{##7a69fe}║{##d94cf5}│ ▸ Go        │ {$3}│{##7a69fe}║{$2}",
+            "type": "command",
+            "text": "go version 2>/dev/null | cut -d' ' -f3",
+            "format": "go {~2}"
+        },
+        {
+            "key": "{##7a69fe}║{##d94cf5}│ ▸ Editor    │ {$3}│{##7a69fe}║{$2}",
+            "type": "editor"
+        },
+        {
+            "key": "{##7a69fe}║{##d94cf5}│ ▸ Git       │ {$3}│{##7a69fe}║{$2}",
+            "type": "command",
+            "text": "git version",
+            "format": "git {~12}"
+        },
+        {
+            "key": "{##7a69fe}║{##d94cf5}│ ▸ Interface │ {$3}│{##7a69fe}║{$2}",
+            "type": "font"
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##d94cf5}└─────────────┴{$1}┘{##7a69fe}║",
+            "format": ""
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##ff5ad8}┌─────────────┬{$1}┐{##7a69fe}║\u001b[39D",
+            "format": "{##ff5ad8} Uptime "
+        },
+        {
+            "key": "{##7a69fe}║{##ff5ad8}│ ▸ Uptime    │ {$3}│{##7a69fe}║{$2}",
+            "type": "uptime"
+        },
+        {
+            "key": "{##7a69fe}║{##ff5ad8}│ ▸ Login     │ {$3}│{##7a69fe}║{$2}",
+            "type": "users",
+            "format": "{name}@{host-name}"
+        },
+        {
+            "key": "{##7a69fe}║{##ff5ad8}│ ▸ Disk Age  │ {$3}│{##7a69fe}║{$2}",
+            "type": "disk",
+            "folders": "/",
+            "format": "{create-time:10} [{days} days]"
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}║{##ff5ad8}└─────────────┴{$1}┘{##7a69fe}║",
+            "format": ""
+        },
+        {
+            "type": "custom",
+            "key": "{##7a69fe}╚═════════════════{$5}╝",
+            "format": ""
+        },
+        "break",
+        "colors"
+    ]
+}

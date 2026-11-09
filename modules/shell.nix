@@ -202,7 +202,16 @@ in
     run mkdir -p "''${XDG_DATA_HOME:-$HOME/.local/share}/zsh"
   '';
 
+  # fastfetch: the boxed layout is generated JSONC -- it is mostly cursor escapes
+  # (\u001b[52C), so it stays a file and Nix only swaps in the logo's store path.
+  # Regenerate with gen_config.py in the vault (50-Flake/Fastfetch).
   programs.fastfetch.enable = true;
+
+  xdg.configFile."fastfetch/config.jsonc".source = pkgs.writeText "fastfetch-config.jsonc" (
+    builtins.replaceStrings [ "@LOGO@" ] [ "${../fastfetch/logo.ansi}" ] (
+      builtins.readFile ../fastfetch/config.jsonc
+    )
+  );
 
   # Frecency `cd`: `z <fragment>` jumps to the dir you actually visit. Binds only
   # z/zi, so it does not contend with zsh-autocomplete.
