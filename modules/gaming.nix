@@ -9,11 +9,12 @@
     prismlauncher
     r2modman
 
-    # Roblox via the *macOS* client: nutmeg (pkgs/nutmeg.nix) boots it through
-    # rosemary, where vinegar/Sober run the Android one. Two independent clients
-    # -- installing nutmeg does not disturb Sober. Its roblox: URL handlers are
-    # registered per-user by `nutmeg install-desktop`, not declaratively.
-    nutmeg
+    # Roblox via the *macOS* client: ginrose (flake input, pkgs/default.nix)
+    # boots it through its own patched Rosemary build, where vinegar/Sober run
+    # the Android one. Two independent clients -- installing ginrose does not
+    # disturb Sober. modules/mimeapps.nix points the roblox: URL handlers at it.
+    # Replaced nutmeg on 2026-11-07.
+    ginrose
 
     # Butter is the GUI over rosemary: runners (Rosemary builds) and bottles
     # (prefixes). Installed from the flake input; it downloads its runners, so

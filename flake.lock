@@ -97,6 +97,21 @@
         "type": "github"
       }
     },
+    "crane_3": {
+      "locked": {
+        "lastModified": 1792350552,
+        "narHash": "sha256-292lvpvxTGKryKxh3/3tcIVi85CwYGdl4oOi113Sob8=",
+        "owner": "ipetkov",
+        "repo": "crane",
+        "rev": "e675a36b7377bebe41d548388a2501cbb16d380d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ipetkov",
+        "repo": "crane",
+        "type": "github"
+      }
+    },
     "flake-schemas": {
       "locked": {
         "lastModified": 1780327564,
@@ -109,6 +124,27 @@
       "original": {
         "type": "tarball",
         "url": "https://flakehub.com/f/DeterminateSystems/flake-schemas/%3D0.5.0.tar.gz"
+      }
+    },
+    "ginrose": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rosemary": "rosemary"
+      },
+      "locked": {
+        "lastModified": 1793987984,
+        "narHash": "sha256-fwhDOvBKwZpETy6si2HnKkVbw5g8P47dt2Joz0Vtihw=",
+        "owner": "nunreasonable",
+        "repo": "ginrose",
+        "rev": "6bd7dadbbf56baf0553e2c78a1db56eb2261857d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nunreasonable",
+        "repo": "ginrose",
+        "type": "github"
       }
     },
     "home-manager": {
@@ -227,12 +263,13 @@
         "butter": "butter",
         "chaotic": "chaotic",
         "coruframe": "coruframe",
+        "ginrose": "ginrose",
         "home-manager": "home-manager_2",
         "nix-flatpak": "nix-flatpak",
         "nixpkgs": "nixpkgs",
         "nixpkgs-equibop": "nixpkgs-equibop",
         "plasma-manager": "plasma-manager",
-        "rosemary": "rosemary",
+        "rosemary": "rosemary_2",
         "windscribe": "windscribe"
       }
     },
@@ -240,9 +277,33 @@
       "inputs": {
         "crane": "crane_2",
         "nixpkgs": [
+          "ginrose",
           "nixpkgs"
         ],
         "rust-overlay": "rust-overlay_2"
+      },
+      "locked": {
+        "lastModified": 1793928076,
+        "narHash": "sha256-NDeJvwm9AQjIdu9kUcgexh31LsJGlGjRZoplZDjb+H8=",
+        "owner": "nunreasonable",
+        "repo": "rosemary",
+        "rev": "6b92069c558c4da79a1d4ecde930619f3d6e7ce6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nunreasonable",
+        "ref": "ginrose-0.3.3",
+        "repo": "rosemary",
+        "type": "github"
+      }
+    },
+    "rosemary_2": {
+      "inputs": {
+        "crane": "crane_3",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": "rust-overlay_3"
       },
       "locked": {
         "lastModified": 1793918794,
@@ -280,6 +341,28 @@
       }
     },
     "rust-overlay_2": {
+      "inputs": {
+        "nixpkgs": [
+          "ginrose",
+          "rosemary",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793348683,
+        "narHash": "sha256-qv+P8z2xS5Xdws5Kigvr/WKJiaJSa6Ke8iH7ozmO53w=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "96a0986b0486341fbc163fa2fabc6d3b44cdcbf1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "rust-overlay_3": {
       "inputs": {
         "nixpkgs": [
           "rosemary",

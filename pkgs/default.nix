@@ -6,6 +6,7 @@
   equibopPkgs,
   rosemaryPkg,
   butterPkg,
+  ginrosePkg,
 }:
 final: prev:
 let
@@ -34,7 +35,6 @@ in
   ddmm = prev.callPackage ./ddmm.nix { };
   beautysolar = prev.callPackage ./beautysolar.nix { };
   olsvr = prev.callPackage ./olsvr.nix { };
-  nutmeg = prev.callPackage ./nutmeg.nix { };
   # System-wide Carl suite for the Plasma Login Manager greeter, which cannot see
   # coru's home.
   carl-theme = prev.callPackage ./carl-theme.nix { themesDir = ../themes; };
@@ -118,4 +118,13 @@ in
   # same reason as rosemary: nixos/ and modules/ see one attribute, not the
   # flake output, and both hosts install the identical store path.
   butter = butterPkg;
+
+  # ---------------------------------------------------------------- ginrose
+  # Roblox launcher (flake.nix). Upstream's package already wraps its own
+  # Rosemary fork -- video decode, drag and drop, the present/cursor fixes --
+  # so nothing here needs pkgs.rosemary. That fork is a second rosemary build
+  # in the closure; swapping it for pkgs.rosemary is one line in flake.nix
+  # (pass `rosemary = pkgs.rosemary` to its package function) at the cost of
+  # those fixes. Mic input and Ctrl-as-Command are upstream and survive either.
+  ginrose = ginrosePkg;
 }

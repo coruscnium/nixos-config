@@ -25,16 +25,14 @@
     "x-scheme-handler/cherrystudio" = "CherryStudio.desktop";
     "x-scheme-handler/ror2mm" = "r2modman.desktop";
 
-    # Roblox player deep links. Was Sober; switched to nutmeg -- the *macOS*
-    # client through rosemary (pkgs/nutmeg.nix) -- on 2026-10-13, so the browser
-    # Play button goes through rosemary. Coru still runs Sober too while rosemary
-    # matures, and keeps it reachable in KDE's "Open with" without an entry here:
-    # Sober's own .desktop declares both schemes. The id below exists only because
-    # `nutmeg install-desktop` wrote it to ~/.local/share/applications, so running
-    # `nutmeg uninstall-desktop` dangles this association -- that is a nudge, not a
-    # boot failure. roblox-studio*/place/model stay on Vinegar.
-    "x-scheme-handler/roblox" = "io.github.frolleks.Nutmeg.desktop";
-    "x-scheme-handler/roblox-player" = "io.github.frolleks.Nutmeg.desktop";
+    # Roblox player deep links. Was Sober, then nutmeg; ginrose took it on
+    # 2026-11-07 -- the *macOS* client through its patched Rosemary. Coru still
+    # runs Sober too and keeps it reachable in KDE's "Open with" without an entry
+    # here: Sober's own .desktop declares both schemes. Unlike nutmeg's, this id
+    # ships inside the ginrose package, so it cannot dangle. roblox-studio*/
+    # place/model stay on Vinegar.
+    "x-scheme-handler/roblox" = "me.daeese.apps.ginrose.player.desktop";
+    "x-scheme-handler/roblox-player" = "me.daeese.apps.ginrose.player.desktop";
   };
 
   # Kept so "open with" ordering matches what KDE had written by hand.

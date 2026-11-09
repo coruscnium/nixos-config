@@ -67,6 +67,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Ginrose -- Roblox launcher built around Rosemary. We take its own flake
+    # output rather than packaging it in pkgs/: upstream's flake already builds
+    # the package AND passes its patched Rosemary fork (video decode, drag and
+    # drop, the present/cursor fixes), which hand-packaging would lose.
+    # Tracks main, so `nix flake update ginrose` moves it.
+    ginrose = {
+      url = "github:nunreasonable/ginrose";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # CoruFrame -- Coru's own Warframe companion (relic HUD, inventory ledger,
     # market tools). Ships packages plus NixOS/home-manager modules. Its Rust and
     # Tauri builds are pinned by cargoHash/pnpmDeps, so it must follow our nixpkgs
@@ -95,6 +105,7 @@
       rosemary,
       butter,
       coruframe,
+      ginrose,
       ...
     }:
     let
@@ -110,13 +121,25 @@
       # Butter's flake exposes `butter` and `default` as the same derivation.
       butterPkg = butter.packages.${system}.butter;
 
+      # Ginrose's flake builds the package with its own Rosemary fork already on
+      # the wrapper's PATH. `ginrose-studio` is the same derivation with
+      # flavor = "ginrose-studio" if Coru ever wants it.
+      ginrosePkg = ginrose.packages.${system}.ginrose;
+
       # `pkgs` is passed explicitly to homeManagerConfiguration, so home-manager
       # ignores its own nixpkgs.config -- package config (unfree, overlays) MUST
       # live here.
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
-          (import ./pkgs { inherit equibopPkgs rosemaryPkg butterPkg; })
+          (import ./pkgs {
+            inherit
+              equibopPkgs
+              rosemaryPkg
+              butterPkg
+              ginrosePkg
+              ;
+          })
           windscribe.overlays.default
           chaotic.overlays.default
         ];
@@ -153,7 +176,14 @@
               # pkgs.usb-port-power-cycle, which a sudoers rule and a wrapper
               # both pin.
               nixpkgs.overlays = [
-                (import ./pkgs { inherit equibopPkgs rosemaryPkg butterPkg; })
+                (import ./pkgs {
+                  inherit
+                    equibopPkgs
+                    rosemaryPkg
+                    butterPkg
+                    ginrosePkg
+                    ;
+                })
                 windscribe.overlays.default
                 chaotic.overlays.default
               ];

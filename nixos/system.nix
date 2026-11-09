@@ -206,8 +206,10 @@
     tmux
 
     # macOS compatibility layer -- a system-level runtime so anything that
-    # shells out to `rosemary` finds it on PATH: nutmeg and Butter both do.
-    # Built by the rosemary flake input (flake.nix -> pkgs/default.nix).
+    # shells out to `rosemary` finds it on PATH. Coru runs it by hand, and
+    # Butter looks for one the same way. Built by the rosemary flake input
+    # (flake.nix -> pkgs/default.nix). ginrose does NOT use this one -- its
+    # wrapper prepends the fork's build, which wins the PATH lookup.
     rosemary
   ];
 
