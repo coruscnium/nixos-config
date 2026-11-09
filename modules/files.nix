@@ -13,8 +13,14 @@
     xdg-ninja
     gparted
     btrfs-assistant
-    plocate
     warehouse # GTK GUI for browsing/installing Flatpaks (Flatseal is a flatpak, nixos/services.nix)
+
+    # Indexed name search over the whole home dir -- the way to find what a
+    # removed program left behind when you do not know where it put things.
+    # The CLI half, `locate`, comes from services.locate (nixos/system.nix):
+    # plocate was inert here because the db is root-owned and only that
+    # module's setgid wrapper can read it.
+    fsearch
 
     # Modern CLI replacements for find/cat/ls, plus a fuzzy finder, a directory
     # tree, and tldr's short man pages.

@@ -174,6 +174,15 @@
   # the one desktop-only piece, and it lives in hosts/coru/hardware.nix.
   services.lact.enable = true;
 
+  # `locate` needs the service, not the package. plocate in home.packages sat
+  # inert: the database is root-owned, and only the setgid wrapper this module
+  # installs at /run/wrappers/bin/locate can read it -- with the service off
+  # there is no database at all. Enabling it gives the setgid wrapper plus the
+  # nightly updatedb timer, and puts plocate on PATH for both hosts.
+  # Its default prunePaths already covers /nix/store and /nix/var/log/nix, so
+  # nothing needs setting beyond enable.
+  services.locate.enable = true;
+
   # Admin/system tooling only -- btop, ripgrep, duf, ... are per-user in modules/.
   environment.systemPackages = with pkgs; [
     btrfs-progs
