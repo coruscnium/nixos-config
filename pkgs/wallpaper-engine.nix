@@ -3,6 +3,13 @@
 # Has a git submodule (src/backend_scene), so fetchSubmodules is required -- a
 # plain tarball has an empty submodule and will not build. Deps come from
 # upstream CMakeLists.txt.
+#
+# Pinned at the merge of PR #40. The pin before it (c1f55bd) predates the
+# AnimatedImage fixes (75a7100, 46fd03f): Qt 6.12 restarts a finished QMovie
+# from inside its own finished signal, so a preview GIF whose first frame does
+# not decode -- or a tile decoded at width 0 before layout -- recurses until
+# the stack overflows. Opening the wallpaper page then kills plasmashell.
+# Everything upstream after f8934f8 is test/CI tooling, so no reason to follow.
 final: prev:
 let
   inherit (prev) lib;
@@ -10,13 +17,13 @@ in
 {
   wallpaper-engine-kde-plugin = prev.stdenv.mkDerivation {
     pname = "wallpaper-engine-kde-plugin";
-    version = "1.5.r97.gc1f55bd";
+    version = "1.5.r160.gf8934f8";
 
     src = prev.fetchgit {
       url = "https://github.com/CaptSilver/wallpaper-engine-kde-plugin";
-      rev = "c1f55bd69239f32acc3d4a59c4c96f3e0557e9fb";
+      rev = "f8934f83647ad33e060eb4b5c8e26a5c219b24d8";
       fetchSubmodules = true;
-      hash = "sha256-UuVjfIkoyJ5KTq5JcdgzWQIDbzbC2uDrIGhYU7aW9AY=";
+      hash = "sha256-BMKBI0HwfXq52tczvgvbZioQbQBBow7Vn/Q1B635uK4=";
     };
 
     nativeBuildInputs = with prev; [
