@@ -1,6 +1,6 @@
 { ... }:
 
-# The desktop's panel, and nothing else -- the loader, kernel and splash are
+# The desktop's panel, and nothing else -- the loader, kernel and boot console are
 # shared policy (nixos/boot.nix).
 {
   # Ultrawide boot menu. "stretched" needs the shapes to match, hence the pinned

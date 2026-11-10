@@ -76,8 +76,8 @@ because NUR's 2026-11-03 revision cannot be unpacked. Re-adding it means re-addi
    `allowUnfree`, overlays, and `permittedInsecurePackages` must be in `flake.nix`.
 4. **Keep the Limine settings on `lib.mkDefault`** in `nixos/boot.nix` — never `mkForce` them.
    Same caution for `efiSupport`, `efiInstallAsRemovable`, `maxGenerations`, `canTouchEfiVariables`.
-   The loader, kernel and splash are shared policy; only the wallpaper and interface resolution are
-   per-host (`hosts/<name>/boot.nix`).
+   The loader, kernel and boot console are shared policy; only the wallpaper and interface
+   resolution are per-host (`hosts/<name>/boot.nix`).
 5. **`rootflags=` is derived** from `fileSystems."/".options`; never hardcode it, and do not add
    `subvol=@` or `x-initrd.mount` to `/`.
 6. **plasma-manager: leave `lookAndFeel` unset** — it clashes with the explicit theme block.

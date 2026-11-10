@@ -5,7 +5,7 @@
   ...
 }:
 
-# Boot policy every host shares: the loader choice, the kernel, the splash, and
+# Boot policy every host shares: the loader choice, the kernel, the boot console, and
 # the derived kernel params. Anything that depends on the panel or the disk --
 # the Limine wallpaper and interface resolution -- stays in hosts/<name>/boot.nix.
 {
@@ -82,8 +82,8 @@
   # 2026-10-14. mkDefault so a host can pin something else.
   boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
 
-  boot.plymouth.enable = true;
-  # bgrt draws the logo as a native-pixel watermark, so the file size IS the
-  # on-screen size (160px, down from 1204).
-  boot.plymouth.logo = ../boot/plymouth-logo.png;
+  # bootvine draws the boot console on tty12, from the initrd through the root
+  # switch to the display manager. It is the whole boot screen now; Plymouth was
+  # removed 2026-11-09. No LUKS here, so its passphrase agent never runs.
+  services.bootvine.enable = true;
 }

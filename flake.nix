@@ -15,6 +15,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # bootvine -- live systemd boot tree on the console. It replaced Plymouth on
+    # 2026-11-09 and takes tty12 from sysinit to the display manager. Pinned in
+    # flake.lock; `nix flake update bootvine` moves it.
+    bootvine = {
+      url = "git+https://codeberg.org/wvhulle/bootvine";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     chaotic = {
       # CachyOS-on-NixOS bridge. The linux-cachyos kernel was dropped for the
       # stock one (nixos/boot.nix); proton-cachyos is still wanted.
@@ -106,6 +114,7 @@
       butter,
       coruframe,
       ginrose,
+      bootvine,
       ...
     }:
     let
@@ -165,6 +174,7 @@
             windscribe.nixosModules.default
             home-manager.nixosModules.home-manager
             nix-flatpak.nixosModules.nix-flatpak
+            bootvine.nixosModules.default
 
             # Without the nyx cache every nyx package (proton-cachyos) builds
             # from source.
