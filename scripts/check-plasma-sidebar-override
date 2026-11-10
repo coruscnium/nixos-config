@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Remind that a hand-patched Plasma shell package is still sitting in $HOME.
+#
+# Plasma 6.8 regressed the widget explorer sidebar. 9eff3057 dropped the x/y
+# bindings from the sidePanel dialog on the assumption that layershell places
+# dock windows; it doesn't, so the sidebar landed clipped against the left edge
+# of whichever output it opened on (BUG:528201). Upstream's fix is
+# plasma-desktop MR !4172, still unmerged and in no release, so 6.8.2's shell
+# package is patched in ~/.local/share/plasma/shells/org.kde.plasma.desktop.
+#
+# That override shadows plasma-desktop's real shell package. It has to come out
+# when upstream ships the fix, and it absolutely has to come out when
+# plasma-desktop moves off 6.8.2 -- an old shell package loaded by a newer
+# plasmashell is how you end up with no desktop at all. This runs at the end of
+# `nixupd` so the reminder arrives with the update that makes it matter.
+set -uo pipefail
+
+override="$HOME/.local/share/plasma/shells/org.kde.plasma.desktop"
+patched_against=6.8.2
+
+[ -d "$override" ] || exit 0
+
+flake="$(cd "$(dirname "$0")/.." && pwd)"
+current=$(env -u LD_LIBRARY_PATH nix eval --raw \
+  "$flake#nixosConfigurations.$(hostname).pkgs.kdePackages.plasma-desktop.version" 2>/dev/null)
+
+if [ "$current" = "$patched_against" ]; then
+  printf '\n>> Plasma sidebar override: still needed. plasma-desktop is %s and its\n' "$current"
+  printf '   widget explorer stays broken until MR !4172 ships (BUG:528201).\n\n'
+  exit 0
+fi
+
+if [ -z "$current" ]; then
+  printf '\n>> Plasma sidebar override is still installed, but the plasma-desktop\n'
+  printf '   version could not be read. Worth a look.\n\n'
+  exit 0
+fi
+
+cat <<EOF
+
+>> Plasma sidebar override needs attention.
+
+   $override
+   is still shadowing plasma-desktop's shell package, patched against
+   $patched_against. plasma-desktop is now $current.
+
+   Check whether the fix landed in it:
+     qml=\$(env -u LD_LIBRARY_PATH nix build --no-link --print-out-paths \\
+       $flake#nixosConfigurations.$(hostname).pkgs.kdePackages.plasma-desktop)\\
+/share/plasma/shells/org.kde.plasma.desktop/contents/views/Desktop.qml
+     grep -n 'let result = desktop.x' "\$qml"
+
+   A match means MR !4172 is in. Either way the override must go before the
+   switch -- a $patched_against shell package under a newer plasmashell can leave
+   you without a desktop:
+     rm -rf $override
+     systemctl --user restart plasma-plasmashell
+
+EOF

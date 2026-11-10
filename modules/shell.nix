@@ -177,7 +177,10 @@ in
       # elegooslicer, astra) that neither of the other two can see. The
       # subshell keeps your cwd put -- nvfetcher writes _sources/ relative to
       # cwd, so it has to run inside the repo.
-      nixupd = "(cd ~/Projects/NixClone/nixos-config && ./scripts/bump-release-tags && nix flake update && nix run nixpkgs#nvfetcher)";
+      # The last link is not an update at all: it reminds you that the patched
+      # Plasma shell package in ~/.local/share is still there and still needs to
+      # come out once plasma-desktop moves past the release it was cut against.
+      nixupd = "(cd ~/Projects/NixClone/nixos-config && ./scripts/bump-release-tags && nix flake update && nix run nixpkgs#nvfetcher && ./scripts/check-plasma-sidebar-override)";
       # nh raises its own elevation (doas/sudo/run0/pkexec), so no `sudo` here.
       # Keeps 3 generations per profile (nh defaults to 1) for rollback headroom.
       nixgc = "nh clean all -k 3";
