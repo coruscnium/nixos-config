@@ -89,6 +89,18 @@ in
     ];
   };
 
+  # Text-only, on purpose: the two sides are different compositors, and a
+  # 4 MB image is not what this is for.
+  script-wayvr-clipboard-sync = mkScript {
+    name = "wayvr-clipboard-sync";
+    src = ../scripts/wayvr-clipboard-sync;
+    inputs = [
+      prev.wl-clipboard
+      prev.coreutils
+      prev.bash
+    ];
+  };
+
   script-autoclicker = mkScript {
     name = "autoclicker";
     src = ../scripts/autoclicker;

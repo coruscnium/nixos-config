@@ -24,6 +24,25 @@
     };
   };
 
+  # WayVR-native apps -- a browser launched from WayVR's own launcher -- run
+  # inside WayVR's Smithay compositor on a second Wayland display. Copying there
+  # lands in that compositor's clipboard, which Plasma never sees, while VRChat
+  # reads Plasma's: paste comes up empty. Mirror text both ways so "copy a link
+  # in the in-VR browser, paste it into VRChat" works.
+  #
+  # The unit idles until WayVR's display exists (WayVR writes it to
+  # $XDG_RUNTIME_DIR/wayvr.disp only while native apps run), so it costs a
+  # 1 Hz poll the rest of the time.
+  systemd.user.services.wayvr-clipboard-sync = {
+    description = "Mirror text between WayVR's compositor clipboard and Plasma's";
+    wantedBy = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.script-wayvr-clipboard-sync}/bin/wayvr-clipboard-sync";
+      Restart = "on-failure";
+      RestartSec = 5;
+    };
+  };
+
   # The wivrn-server wrapper is created by activation. A switch that restarts
   # this user unit can race the /run/wrappers swap and fail it with ENOENT
   # (status 127), so let the service come back on its own.

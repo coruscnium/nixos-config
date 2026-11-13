@@ -37,6 +37,7 @@
     # olsvr is not here either: its user unit is shared policy, so the package
     # sits with it in modules/services.nix.
     xrizer # OpenVR -> OpenXR, so SteamVR titles (VRChat) run under WiVRn
+    script-wayvr-clipboard-sync # the bridge its user unit starts (vr.nix)
   ];
 
   # Point the OpenVR runtime at xrizer, which translates OpenVR -> OpenXR and
