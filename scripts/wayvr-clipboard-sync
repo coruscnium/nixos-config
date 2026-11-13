@@ -1,0 +1,102 @@
+#!/bin/bash
+set -uo pipefail
+
+INTERVAL=1
+
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
+
+# kwin names its socket per session, so the inherited name goes stale after a
+# compositor restart. Same rule as the Stream Deck watchdog: trust it only
+# while the socket exists, otherwise take the first live one.
+resolve_host() {
+    local dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}" sock
+    if [[ -n ${WAYLAND_DISPLAY:-} && -S $dir/$WAYLAND_DISPLAY ]]; then
+        return 0
+    fi
+    for sock in "$dir"/wayland-*; do
+        [[ -S $sock ]] || continue
+        export WAYLAND_DISPLAY=${sock##*/}
+        return 0
+    done
+    return 1
+}
+
+# WayVR's Smithay compositor writes its socket number here while native apps
+# are running. No file (or a dead socket) means nothing to bridge.
+resolve_nested() {
+    local dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}" file num=""
+    file=$dir/wayvr.disp
+    [[ -r $file ]] || return 1
+    IFS= read -r num <"$file" || true
+    num=${num//[[:space:]]/}
+    [[ -n $num && -S $dir/wayland-$num ]] || return 1
+    printf 'wayland-%s' "$num"
+}
+
+# An empty selection and a dead compositor both land here as failure, which is
+# what we want: a clipboard with nothing readable is nothing to sync.
+read_clip() {
+    WAYLAND_DISPLAY=$1 timeout 2 wl-paste --no-newline --type text 2>/dev/null
+}
+
+last_host=""
+last_nested=""
+linked=""
+
+while :; do
+    sleep "$INTERVAL"
+
+    if ! resolve_host || ! nested=$(resolve_nested); then
+        # A fresh compositor gets a fresh set of surfaces. Replaying old text
+        # into it would paste stale content behind the user's back.
+        linked=""
+        continue
+    fi
+
+    host_text=$(read_clip "$WAYLAND_DISPLAY") || host_text=""
+    nested_text=$(read_clip "$nested") || nested_text=""
+
+    if [[ -z $linked ]]; then
+        linked=1
+        last_host=$host_text
+        last_nested=$nested_text
+        # Seed an empty side: a link copied before WayVR came up should not be
+        # lost. Two different non-empty sides are left alone -- there is no way
+        # to tell which one the user meant.
+        if [[ -n $host_text && -z $nested_text ]]; then
+            printf '%s' "$host_text" | WAYLAND_DISPLAY=$nested wl-copy 2>/dev/null || true
+            last_nested=$host_text
+        elif [[ -n $nested_text && -z $host_text ]]; then
+            printf '%s' "$nested_text" | wl-copy 2>/dev/null || true
+            last_host=$nested_text
+        fi
+        log "linked $WAYLAND_DISPLAY <-> $nested"
+        continue
+    fi
+
+    host_changed=0
+    nested_changed=0
+    [[ $host_text != "$last_host" ]] && host_changed=1
+    [[ $nested_text != "$last_nested" ]] && nested_changed=1
+
+    # Direction is decided by which side changed. Copying into the side that
+    # already holds the same text would just start a bounce.
+    if (( host_changed && ! nested_changed )) && [[ -n $host_text && $host_text != "$nested_text" ]]; then
+        if printf '%s' "$host_text" | WAYLAND_DISPLAY=$nested wl-copy 2>/dev/null; then
+            last_host=$host_text
+            last_nested=$host_text
+        else
+            log "copy to $nested failed"
+        fi
+    elif (( nested_changed && ! host_changed )) && [[ -n $nested_text && $nested_text != "$host_text" ]]; then
+        if printf '%s' "$nested_text" | wl-copy 2>/dev/null; then
+            last_host=$nested_text
+            last_nested=$nested_text
+        else
+            log "copy to $WAYLAND_DISPLAY failed"
+        fi
+    else
+        [[ -n $host_text ]] && last_host=$host_text
+        [[ -n $nested_text ]] && last_nested=$nested_text
+    fi
+done

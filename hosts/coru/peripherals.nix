@@ -27,7 +27,22 @@
 
   # The G502 X LIGHTSPEED is a USB wakeup source, so any movement wakes suspend or
   # hibernate. Disable it on the device node (its parent hubs are already off).
+  # "change" as well as "add" so `udevadm trigger` (run by every rebuild) repairs a
+  # node whose value was reset without needing a replug.
   services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c098", ATTR{power/wakeup}="disabled"
+    ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c098", ATTR{power/wakeup}="disabled"
+  '';
+
+  # The rule is in the running generation, yet the device still reported
+  # wakeup=enabled on 2026-11-13 -- something re-arms it after the device node is
+  # set. The value only matters at the instant the kernel suspends, so re-apply it
+  # there rather than trusting the uevent. Id-based; the receiver's port can move.
+  powerManagement.powerDownCommands = ''
+    for dev in /sys/bus/usb/devices/*; do
+      if [ "$(cat "$dev/idVendor" 2>/dev/null)" = 046d ] &&
+         [ "$(cat "$dev/idProduct" 2>/dev/null)" = c098 ]; then
+        echo disabled > "$dev/power/wakeup"
+      fi
+    done
   '';
 }
