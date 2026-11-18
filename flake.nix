@@ -77,12 +77,22 @@
 
     # Ginrose -- Roblox launcher built around Rosemary. We take its own flake
     # output rather than packaging it in pkgs/: upstream's flake already builds
-    # the package AND passes its patched Rosemary fork (video decode, drag and
-    # drop, the present/cursor fixes), which hand-packaging would lose.
+    # the package AND passes a Rosemary build, which hand-packaging would lose.
     # Tracks main, so `nix flake update ginrose` moves it.
+    #
+    # WHICH Rosemary, though: ginrose's default input is its own fork
+    # (nunreasonable/rosemary), and the fork at ref ginrose-0.3.7 dies inside
+    # RADV on the 9070 XT -- radv_shader_part_cache_get calls a null ops table at
+    # the first vkCmdDraw, ~6 s into the client. Upstream main runs the same
+    # Roblox.app without faulting, and ginrose's own flake.nix says to point
+    # this input at github:microlift/rosemary for the upstream one. It is still
+    # a second Rosemary build in the closure -- ginrose takes upstream's
+    # `default` output, pkgs.rosemary is built with the fullnative profile.
+    # Drop this override once the fork's crashes are fixed upstream.
     ginrose = {
       url = "github:nunreasonable/ginrose";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rosemary.follows = "rosemary";
     };
 
     # CoruFrame -- Coru's own Warframe companion (relic HUD, inventory ledger,
