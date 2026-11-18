@@ -9,10 +9,10 @@
 {
   systemd.user.services = {
     # input-remapper's daemon only autoloads once a logged-in user has told it
-    # where the config lives, and at boot the mouse is already plugged in, so the
-    # udev autoload (off by default) would have fired too early. Re-apply the
-    # G502X preset at session start instead -- the preset itself is seeded by
-    # modules/hardware.nix from input-remapper/.
+    # where the config lives, and at boot the peripherals are already plugged in,
+    # so the udev autoload (off by default) would have fired too early. Re-apply
+    # the presets at session start instead -- the presets themselves are seeded
+    # by modules/hardware.nix from input-remapper/.
     #
     # WantedBy=graphical-session.target, NOT default.target + After=graphical-session.target.
     # A target orders after everything it wants, so that pair closed a loop
@@ -21,10 +21,17 @@
     # xembedsniproxy, kaccess. Being wanted by the session target starts the unit with the
     # session without ordering anything after it.
     input-remapper-autoload = {
-      Unit.Description = "Apply the input-remapper G502X preset";
+      Unit.Description = "Apply the input-remapper presets for the desk peripherals";
       Service = {
         Type = "oneshot";
-        ExecStart = "${pkgs.input-remapper}/bin/input-remapper-control --command start --device 'Logitech G502 X LIGHTSPEED' --preset G502X";
+        # MC7 first: its dongle is always plugged in, while the G502 is wireless
+        # and often off at login -- a missing device makes input-remapper-control
+        # exit 4, and systemd stops the ExecStart list there. The leading "-"
+        # keeps that failure from wedging the unit.
+        ExecStart = [
+          "${pkgs.input-remapper}/bin/input-remapper-control --command start --device 'Turtle Beach Command Series MC7' --preset 'Shift Key'"
+          "-${pkgs.input-remapper}/bin/input-remapper-control --command start --device 'Logitech G502 X LIGHTSPEED' --preset G502X"
+        ];
       };
       Install.WantedBy = [ "graphical-session.target" ];
     };

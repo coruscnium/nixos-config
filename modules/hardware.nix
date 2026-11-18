@@ -26,9 +26,11 @@
   # not store symlinks -- seed them only when missing so GUI edits survive.
   home.activation.seedInputRemapper = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     cfg="$HOME/.config/input-remapper-2"
-    preset="$cfg/presets/Logitech G502 X LIGHTSPEED/G502X.json"
-    run mkdir -p "$(dirname "$preset")"
-    [ -e "$preset" ] || run install -m644 ${../input-remapper/G502X.json} "$preset"
+    g502="$cfg/presets/Logitech G502 X LIGHTSPEED/G502X.json"
+    mc7="$cfg/presets/Turtle Beach Command Series MC7/Shift Key.json"
+    run mkdir -p "$(dirname "$g502")" "$(dirname "$mc7")"
+    [ -e "$g502" ] || run install -m644 ${../input-remapper/G502X.json} "$g502"
+    [ -e "$mc7" ] || run install -m644 "${../input-remapper}/Shift Key.json" "$mc7"
     [ -e "$cfg/config.json" ] || run install -m644 ${../input-remapper/config.json} "$cfg/config.json"
   '';
 }

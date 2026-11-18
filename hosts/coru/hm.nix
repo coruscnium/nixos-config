@@ -20,6 +20,7 @@
     # stripped section headers and cannot be wrapped.
     bs-manager
     ddmm # Helldivers 2 mod manager, Tauri binary (pkgs/ddmm.nix)
+    mc7-studio # Command Series MC7 configurator, wrapped AppImage (pkgs/mc7-studio.nix)
     winboat
     vinegar
 

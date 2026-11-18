@@ -23,7 +23,18 @@
   # the hidraw node so the seated user can open the 0xFF60 vendor channel (Keychron
   # Launcher / VIA over WebHID), and clear the joystick flag these NKRO boards get
   # mislabelled with. uaccess is per-seat, unlike a world-writable node.
-  services.udev.packages = [ pkgs.keychron-udev-rules ];
+  services.udev.packages = [
+    pkgs.keychron-udev-rules
+
+    # MC7 (Turtle Beach): wired mouse 502c, its 2.4 GHz receiver 502e. Must sort
+    # before 73-seat-late.rules, which consumes uaccess -- so a package, not
+    # extraRules (99-local, too late).
+    (pkgs.writeTextDir "etc/udev/rules.d/70-swarm2-mc7.rules" ''
+      SUBSYSTEM=="hidraw", ATTRS{idVendor}=="10f5", ATTRS{idProduct}=="502c", TAG+="uaccess"
+      SUBSYSTEM=="hidraw", ATTRS{idVendor}=="10f5", ATTRS{idProduct}=="502e", TAG+="uaccess"
+      SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="10f5", ATTR{idProduct}=="502c", TAG+="uaccess"
+    '')
+  ];
 
   # The G502 X LIGHTSPEED is a USB wakeup source, so any movement wakes suspend or
   # hibernate. Disable it on the device node (its parent hubs are already off).
@@ -31,6 +42,18 @@
   # node whose value was reset without needing a replug.
   services.udev.extraRules = ''
     ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c098", ATTR{power/wakeup}="disabled"
+
+    # MC7: on a polling-rate change or a receiver reconnect the consumer node
+    # (interface 01, the one without "Keyboard" in its name) dumps its state as
+    # Brightness Increment usages, and hid-input turns each into BRIGHTNESSUP/
+    # DOWN -- at 4 kHz that walks brightness. libinput can only ignore whole
+    # nodes, so drop this one; the mouse and keyboard nodes stay.
+    #
+    # Two rules, not one: udev only matches ATTRS{} keys that all live on the
+    # SAME parent device, and the name is on inputN while bInterfaceNumber is
+    # on the USB interface. Combined into one line it silently matches nothing.
+    ACTION=="add|change", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="Turtle Beach Command Series MC7", ENV{MC7_CONSUMER}="1"
+    ACTION=="add|change", SUBSYSTEM=="input", KERNEL=="event*", ENV{MC7_CONSUMER}=="1", ATTRS{bInterfaceNumber}=="01", ENV{LIBINPUT_IGNORE_DEVICE}="1"
   '';
 
   # The rule is in the running generation, yet the device still reported

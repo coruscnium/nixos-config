@@ -33,6 +33,7 @@ in
   elegooslicer = prev.callPackage ./elegooslicer.nix { };
   astra = prev.callPackage ./astra.nix { };
   ddmm = prev.callPackage ./ddmm.nix { };
+  mc7-studio = prev.callPackage ./mc7-studio.nix { };
   beautysolar = prev.callPackage ./beautysolar.nix { };
   olsvr = prev.callPackage ./olsvr.nix { };
   # System-wide Carl suite for the Plasma Login Manager greeter, which cannot see

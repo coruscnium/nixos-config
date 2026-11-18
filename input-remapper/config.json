@@ -1,5 +1,6 @@
 {
     "autoload": {
-        "Logitech G502 X LIGHTSPEED": "G502X"
+        "Logitech G502 X LIGHTSPEED": "G502X",
+        "Turtle Beach Command Series MC7": "Shift Key"
     }
 }
