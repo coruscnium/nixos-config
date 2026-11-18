@@ -67,11 +67,23 @@
   # Models live under /var/lib/ollama (not the old ~/.ollama).
   services.ollama.enable = true;
 
-  # rustland, the module default. It schedules from userspace and cancels itself
-  # when a runnable task goes 5s unscheduled -- that killed a full-core compile
-  # on 2026-10-27. bpfland (same algorithm, in BPF) was tried instead and
-  # stuttered system-wide, so this is deliberately back on rustland.
-  services.scx.enable = true;
+  # rustland. It schedules from userspace and cancels itself when a runnable
+  # task goes 5s unscheduled -- that killed a full-core compile on 2026-10-27.
+  # bpfland (same algorithm, in BPF) was tried instead and stuttered
+  # system-wide, so this is deliberately on rustland. scx_loader starts no
+  # scheduler without default_sched, so the choice has to be spelled out.
+  services.scx-loader = {
+    enable = true;
+    config.default_sched = "scx_rustland";
+  };
+
+  # scx_loader authorises its default scheduler through polkit, and the module
+  # declares no ordering: at 2026-11-17 boot it ran 100 s before polkitd and
+  # died with "Action org.scx.loader.manage-schedulers is not registered".
+  systemd.services.scx_loader = {
+    wants = [ "polkit.service" ];
+    after = [ "polkit.service" ];
+  };
   services.psd.enable = true;
 
   # Deliberately no gnome-keyring: KWallet (ksecretd) is the Secret Service on
