@@ -39,11 +39,6 @@
     # Declarative flatpak app list -- nixpkgs' flatpak module has no app option.
     nix-flatpak.url = "github:gmodena/nix-flatpak";
 
-    # equibop 3.3.0 rewrote Wayland screen-share capture onto venmic 7.x, which
-    # broke sharing. Held at the last venmic 6.1.0 build (equibop 3.2.2) by exact
-    # rev, so `nix flake update` cannot move it.
-    nixpkgs-equibop.url = "github:NixOS/nixpkgs/c59305bab2065cfecc4944690d9eedbb56f3a9fa";
-
     # Windscribe VPN client -- ParkerrDev's community flake (binary .deb repack
     # + NixOS module). Replaced our own windscribe-nix: his module handles the
     # helper's hardcoded PATH and the realpath("/opt/windscribe") check ours did
@@ -116,7 +111,6 @@
       chaotic,
       plasma-manager,
       nix-flatpak,
-      nixpkgs-equibop,
       windscribe,
       rosemary,
       butter,
@@ -127,9 +121,6 @@
     }:
     let
       system = "x86_64-linux";
-
-      # equibop's pinned rev (its build uses venmic 6.1.0 -- see the input above).
-      equibopPkgs = import nixpkgs-equibop { inherit system; };
 
       # Rosemary's CLI (`rosemary` and `default` are the same derivation). Built
       # by its own flake; pkgs/default.nix republishes it as pkgs.rosemary.
@@ -151,7 +142,6 @@
         overlays = [
           (import ./pkgs {
             inherit
-              equibopPkgs
               rosemaryPkg
               butterPkg
               ginrosePkg
@@ -196,7 +186,6 @@
               nixpkgs.overlays = [
                 (import ./pkgs {
                   inherit
-                    equibopPkgs
                     rosemaryPkg
                     butterPkg
                     ginrosePkg

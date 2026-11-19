@@ -3,7 +3,6 @@
 # Imported as an overlay in flake.nix. Scripts live in ./scripts.nix so that
 # modules/services.nix can reference the same store paths.
 {
-  equibopPkgs,
   rosemaryPkg,
   butterPkg,
   ginrosePkg,
@@ -90,10 +89,10 @@ in
   # nixpkgs moves forward again.
 
   # -------------------------------------------------------------------- equibop
-  # 3.3.0 rewrote screen-share capture onto venmic 7.x, which broke Wayland
-  # sharing. Held at the last venmic 6.1.0 build (3.2.2) by building it from the
-  # pinned nixpkgs-equibop input in flake.nix.
-  equibop = equibopPkgs.equibop;
+  # Repacked release tarball, not nixpkgs. nixpkgs stopped updating this at
+  # 3.2.2 (2026-10-07) and never carried 3.3.x; 3.3.3's screenshare rewrite is
+  # what made Wayland capture work again. See ./equibop.nix.
+  equibop = prev.callPackage ./equibop.nix { };
 
   # ---------------------------------------------------------------- rosemary
   # macOS compatibility layer -- runs macOS binaries on Linux (Wine-shaped).
