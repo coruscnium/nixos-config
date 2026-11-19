@@ -34,3 +34,12 @@ src.github = "Boof2015/astra"
 src.prefix = "v"
 fetch.url = "https://github.com/Boof2015/astra/releases/download/v$ver/Astra-$ver-Linux.AppImage"
 url.name = "Astra-$ver-Linux.AppImage"
+
+[equibop]
+# nixpkgs froze this at 3.2.2 on 2026-10-07 and has never carried 3.3.x, so
+# there is no newer build through it; upstream ships no flake either. Repacked
+# release tarball (ships its own Electron), not built from source.
+src.github = "Equicord/Equibop"
+src.prefix = "v"
+fetch.url = "https://github.com/Equicord/Equibop/releases/download/v$ver/equibop-$ver.tar.gz"
+url.name = "equibop-$ver.tar.gz"

@@ -10,9 +10,13 @@
 # Repack rather than build from source: upstream ships a self-contained tarball
 # with its own Electron runtime, which is far more predictable than maintaining a
 # bun + electron-builder build plus a node_modules FOD against a moving tree.
+#
+# Version and tarball come from nvfetcher (`equibop` in nvfetcher.toml), so
+# bumping is `nix run nixpkgs#nvfetcher` and nothing else.
 {
   lib,
   stdenv,
+  callPackage,
   fetchurl,
   autoPatchelfHook,
   copyDesktopItems,
@@ -47,20 +51,21 @@
   systemd,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
-  pname = "equibop";
-  version = "3.3.4";
-
-  src = fetchurl {
-    url = "https://github.com/Equicord/Equibop/releases/download/v${finalAttrs.version}/equibop-${finalAttrs.version}.tar.gz";
-    hash = "sha256-Zu1mdRhduacTDu3wCyJOkj8t/9EeqiBwiULAueA+2d0=";
-  };
+let
+  sources = callPackage ../_sources/generated.nix { };
+  inherit (sources.equibop) pname version src;
 
   # The release tarball ships no icon; upstream keeps it in the repo instead.
+  # Pinned to the v3.3.4 tag commit rather than `version`: it is a repo file, not
+  # a release asset, so riding the version would invalidate the hash on every
+  # bump for a logo that never changes.
   icon = fetchurl {
-    url = "https://raw.githubusercontent.com/Equicord/Equibop/v${finalAttrs.version}/build/icon.svg";
+    url = "https://raw.githubusercontent.com/Equicord/Equibop/8e2746f4a422e8c3da5741c603bb0a013b992e7a/build/icon.svg";
     hash = "sha256-SWW6UYNr3B1NDJ1nK06Yq1m5GJwG/20j5cJ+LFmtLwU=";
   };
+in
+stdenv.mkDerivation {
+  inherit pname version src;
 
   nativeBuildInputs = [
     autoPatchelfHook
@@ -133,7 +138,7 @@ stdenv.mkDerivation (finalAttrs: {
     # permits, instead of aborting on the empty helper.
     rm -f $out/opt/equibop/chrome-sandbox
 
-    install -Dm644 ${finalAttrs.icon} $out/share/icons/hicolor/scalable/apps/equibop.svg
+    install -Dm644 ${icon} $out/share/icons/hicolor/scalable/apps/equibop.svg
 
     # Flags match what the nixpkgs wrapper passed when NIXOS_OZONE_WL was set.
     # Unconditional: --ozone-platform-hint=auto resolves to X11 when Wayland is
@@ -172,10 +177,10 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Custom Discord app with Equicord preinstalled";
     homepage = "https://github.com/Equicord/Equibop";
-    changelog = "https://github.com/Equicord/Equibop/releases/tag/v${finalAttrs.version}";
+    changelog = "https://github.com/Equicord/Equibop/releases/tag/v${version}";
     license = lib.licenses.gpl3Only;
     sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
     platforms = [ "x86_64-linux" ];
     mainProgram = "equibop";
   };
-})
+}

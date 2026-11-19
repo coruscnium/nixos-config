@@ -33,4 +33,13 @@
       sha256 = "sha256-ezs/CODQ1Ru0cshYZdG+mwwoOFQj2rocsMOyJdAQGvw=";
     };
   };
+  equibop = {
+    pname = "equibop";
+    version = "3.3.4";
+    src = fetchurl {
+      url = "https://github.com/Equicord/Equibop/releases/download/v3.3.4/equibop-3.3.4.tar.gz";
+      name = "equibop-3.3.4.tar.gz";
+      sha256 = "sha256-Zu1mdRhduacTDu3wCyJOkj8t/9EeqiBwiULAueA+2d0=";
+    };
+  };
 }

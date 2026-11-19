@@ -43,5 +43,20 @@
             "url": "https://github.com/elegooofficial/ElegooSlicer/releases/download/v1.5.3.5/ElegooSlicer_Linux_V1.5.3.5.AppImage"
         },
         "version": "1.5.3.5"
+    },
+    "equibop": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "equibop",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": "equibop-3.3.4.tar.gz",
+            "sha256": "sha256-Zu1mdRhduacTDu3wCyJOkj8t/9EeqiBwiULAueA+2d0=",
+            "type": "url",
+            "url": "https://github.com/Equicord/Equibop/releases/download/v3.3.4/equibop-3.3.4.tar.gz"
+        },
+        "version": "3.3.4"
     }
 }
