@@ -37,9 +37,9 @@
   virtualisation.docker.enable = true;
 
   # Flatpak is machine policy; the per-host app list lives in flatpaks.nix. It
-  # has to be here, not there: the laptop declares no apps but still needs the
+  # has to be here, not there: a host can declare no apps and still need the
   # tooling. Without this, flatpak ships no org.freedesktop.Flatpak session
-  # helper, and Warehouse (a home package on both hosts) fails every action with
+  # helper, and Warehouse (a home package) fails every action with
   # "Portal call failed: The name is not activatable" -- it drives flatpak
   # entirely through `flatpak-spawn --host`, which needs that bus name.
   services.flatpak.enable = true;

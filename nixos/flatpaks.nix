@@ -4,7 +4,7 @@
 {
   services.flatpak = {
     # Sober (Roblox) comes up a black window without the Discord IPC socket and
-    # an input device. Declared here once; both hosts install the app.
+    # an input device. Declared here once; every host installs the app.
     overrides.settings."org.vinegarhq.Sober".Context = {
       filesystems = [
         "xdg-run/app/com.discordapp.Discord:create"

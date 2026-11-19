@@ -3,16 +3,18 @@
   ...
 }:
 
-# User units that exist for hardware on the desk: the G502 rebinding and the
+# User units that exist for hardware on the desk: the mouse presets and the
 # Stream Deck watchdog. Split out of services.nix so a machine without those
-# peripherals -- the laptop -- does not carry units that can never do anything.
+# peripherals does not carry units that can never do anything.
 {
   systemd.user.services = {
     # input-remapper's daemon only autoloads once a logged-in user has told it
     # where the config lives, and at boot the peripherals are already plugged in,
-    # so the udev autoload (off by default) would have fired too early. Re-apply
-    # the presets at session start instead -- the presets themselves are seeded
-    # by modules/hardware.nix from input-remapper/.
+    # so the udev autoload (off by default) would have fired too early. Run the
+    # autoload command at session start instead -- it reads the autoload map in
+    # ~/.config/input-remapper-2/config.json, so that file stays the only place
+    # a device/preset pair is named. A wireless mouse that is off at login is
+    # skipped silently and picked up on the next autoload.
     #
     # WantedBy=graphical-session.target, NOT default.target + After=graphical-session.target.
     # A target orders after everything it wants, so that pair closed a loop
@@ -24,14 +26,7 @@
       Unit.Description = "Apply the input-remapper presets for the desk peripherals";
       Service = {
         Type = "oneshot";
-        # MC7 first: its dongle is always plugged in, while the G502 is wireless
-        # and often off at login -- a missing device makes input-remapper-control
-        # exit 4, and systemd stops the ExecStart list there. The leading "-"
-        # keeps that failure from wedging the unit.
-        ExecStart = [
-          "${pkgs.input-remapper}/bin/input-remapper-control --command start --device 'Turtle Beach Command Series MC7' --preset 'Shift Key'"
-          "-${pkgs.input-remapper}/bin/input-remapper-control --command start --device 'Logitech G502 X LIGHTSPEED' --preset G502X"
-        ];
+        ExecStart = "${pkgs.input-remapper}/bin/input-remapper-control --command autoload";
       };
       Install.WantedBy = [ "graphical-session.target" ];
     };

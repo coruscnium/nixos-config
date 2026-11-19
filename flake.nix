@@ -6,9 +6,7 @@
     # compositing (KDE bug 527668), where Overview and fullscreen animations stutter
     # on 240 + 144 + 60 Hz while every counter reads idle. Unpinned for 6.8.2, which
     # is the first release that fixes kwin's multi-GPU EGL-copy synchronisation
-    # (KDE bug 527591) -- the suspected cause of the laptop freezing when a game
-    # runs fullscreen on the 4050 while kwin composites on the 890M. Re-pin only if
-    # 527668 turns out to have survived into 6.8.2.
+    # (KDE bug 527591). Re-pin only if 527668 turns out to have survived into 6.8.2.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -98,8 +96,8 @@
     # CoruFrame -- Coru's own Warframe companion (relic HUD, inventory ledger,
     # market tools). Ships packages plus NixOS/home-manager modules. Its Rust and
     # Tauri builds are pinned by cargoHash/pnpmDeps, so it must follow our nixpkgs
-    # or the pinned hashes break. Both hosts enable it (modules/gaming.nix), so
-    # both home-manager module lists carry coruframe.homeManagerModules.default.
+    # or the pinned hashes break. modules/gaming.nix enables it, and
+    # coruframe.homeManagerModules.default sits on the shared module list.
     #
     # Tracks the `nightly` branch: the lockfile holds a commit, so "latest" means
     # `nix flake update coruframe` before rebuilding -- a plain build keeps
@@ -191,7 +189,7 @@
             chaotic.nixosModules.nyx-cache
 
             {
-              # One overlay set for both hosts, so every machine resolves the
+              # One overlay set for every host, so each machine resolves the
               # same attribute to the same store path -- notably
               # pkgs.usb-port-power-cycle, which a sudoers rule and a wrapper
               # both pin.
@@ -247,18 +245,14 @@
             };
         in
         {
+          # The attribute name must equal networking.hostName
+          # (hosts/coru/default.nix): `nh os switch` and `nixos-rebuild --flake .`
+          # both infer the attribute from the machine's hostname, so a short label
+          # like `desk` makes every one of them fail with "does not provide
+          # attribute".
           coru = mkNixos {
             extra = [ ./hosts/coru ];
             hm = [ ./hosts/coru/hm.nix ];
-          };
-
-          # Attribute names must equal networking.hostName (hosts/*/default.nix):
-          # `nh os switch` and `nixos-rebuild --flake .` both infer the attribute
-          # from the machine's hostname, so a short label like `laptop` makes
-          # every one of them fail with "does not provide attribute".
-          coru-laptop = mkNixos {
-            extra = [ ./hosts/laptop ];
-            hm = [ ./hosts/laptop/hm.nix ];
           };
         };
     };

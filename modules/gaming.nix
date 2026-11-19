@@ -63,6 +63,6 @@
   # market tools). Upstream flake's home-manager module; the one package carries
   # both `coruframe-app` and the `coruframe` CLI, with Tesseract on their PATH.
   # The HUD needs KWin's wlr-layer-shell plus a one-time portal screencast grant.
-  # Both hosts run Plasma 6, so it is shared.
+  # Every host runs Plasma 6, so it is shared.
   programs.coruframe.enable = true;
 }

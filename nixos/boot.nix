@@ -57,9 +57,8 @@
   boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
   boot.loader.timeout = 5;
 
-  # CoruscOS branding and palette, identical on both panels. The wallpaper and
-  # the interface resolution are per-host: the desktop pins an ultrawide mode so
-  # its JPEG is a 1:1 blit, the laptop lets the firmware pick the mode.
+  # CoruscOS branding and palette. The wallpaper and the interface resolution are
+  # per-host: the desktop pins an ultrawide mode so its JPEG is a 1:1 blit.
   boot.loader.limine.style = {
     interface = {
       branding = "CoruscOS";

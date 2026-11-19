@@ -43,9 +43,9 @@
 
   # baloo's file extractor is a QGuiApplication in a headless process. When
   # kde-baloo.service starts before the compositor exports WAYLAND_DISPLAY, Qt
-  # aborts in init_platform -- once per queued file. On the laptop that was
-  # ~17.9k aborts in eight seconds (4.1 GiB of cores); the desktop logs the
-  # same signature. offscreen makes the indexer independent of the session.
+  # aborts in init_platform -- once per queued file. On a machine that hit it
+  # that was ~17.9k aborts in eight seconds (4.1 GiB of cores); the desktop logs
+  # the same signature. offscreen makes the indexer independent of the session.
   #
   # LimitCORE is the second half. Every abort left a core, and DrKonqi then
   # drained the backlog at ~7 spawns/s (1.1 GiB of them, still on disk from

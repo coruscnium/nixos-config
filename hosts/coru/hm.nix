@@ -3,8 +3,8 @@
 # The desktop's own home config -- everything that is bound to this desk: the
 # peripherals, the 3D-printing tools, the desk's user units, and the gaming
 # userland that needs this hardware (the VR runtime pair, the ultrawide fix, the
-# mod managers for the games installed here). The shared set is ../../modules,
-# which the laptop imports wholesale.
+# mod managers for the games installed here). ../../modules is the shared set,
+# imported here whole.
 {
   imports = [
     ../../modules
@@ -20,7 +20,6 @@
     # stripped section headers and cannot be wrapped.
     bs-manager
     ddmm # Helldivers 2 mod manager, Tauri binary (pkgs/ddmm.nix)
-    mc7-studio # Command Series MC7 configurator, wrapped AppImage (pkgs/mc7-studio.nix)
     winboat
     vinegar
 

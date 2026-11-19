@@ -16,7 +16,7 @@ let
   hm = config.home.homeDirectory;
 in
 {
-  # The unit below pins olsvr's store path, so it runs on both hosts regardless.
+  # The unit below pins olsvr's store path, so it runs on every host regardless.
   # Listing it here keeps the binary on PATH for `olsvr run --now` -- the unit and
   # its package are one declaration, not two files that can drift.
   home.packages = [ pkgs.olsvr ];

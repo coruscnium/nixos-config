@@ -168,17 +168,16 @@
 
   # LACT, and it has to be the service, not a package. LACT is a root daemon
   # plus a thin client: `lact` in home.packages gives a GUI with nothing to
-  # connect to. The daemon needs root to write power caps and clocks, on the
-  # desktop's 9070 XT and the laptop's 4050 alike. Both hosts get it here
-  # because the rule is identical on both. The amdgpu ppfeaturemask unlock is
-  # the one desktop-only piece, and it lives in hosts/coru/hardware.nix.
+  # connect to. The daemon needs root to write power caps and clocks, and that
+  # rule is identical on every host, so it lives here. The amdgpu ppfeaturemask
+  # unlock is the desktop-only piece, and it lives in hosts/coru/hardware.nix.
   services.lact.enable = true;
 
   # `locate` needs the service, not the package. plocate in home.packages sat
   # inert: the database is root-owned, and only the setgid wrapper this module
   # installs at /run/wrappers/bin/locate can read it -- with the service off
   # there is no database at all. Enabling it gives the setgid wrapper plus the
-  # nightly updatedb timer, and puts plocate on PATH for both hosts.
+  # nightly updatedb timer, and puts plocate on PATH everywhere.
   # Its default prunePaths already covers /nix/store and /nix/var/log/nix, so
   # nothing needs setting beyond enable.
   services.locate.enable = true;

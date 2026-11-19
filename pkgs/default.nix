@@ -33,7 +33,6 @@ in
   elegooslicer = prev.callPackage ./elegooslicer.nix { };
   astra = prev.callPackage ./astra.nix { };
   ddmm = prev.callPackage ./ddmm.nix { };
-  mc7-studio = prev.callPackage ./mc7-studio.nix { };
   beautysolar = prev.callPackage ./beautysolar.nix { };
   olsvr = prev.callPackage ./olsvr.nix { };
   # System-wide Carl suite for the Plasma Login Manager greeter, which cannot see
@@ -117,7 +116,7 @@ in
   # ------------------------------------------------------------------- butter
   # Rosemary's prefix and runner manager (flake.nix). Republished here for the
   # same reason as rosemary: nixos/ and modules/ see one attribute, not the
-  # flake output, and both hosts install the identical store path.
+  # flake output, and every host installs the identical store path.
   butter = butterPkg;
 
   # ---------------------------------------------------------------- ginrose

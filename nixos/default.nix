@@ -5,7 +5,7 @@
   ...
 }:
 
-# Shared machine policy: everything true of every host. Both hosts import this
+# Shared machine policy: everything true of every host. Every host imports this
 # whole set, so anything machine-specific must NOT land here -- put it in
 # ../hosts/<name>/ instead. Per-host facts (disk UUIDs, the ESP, the bootloader,
 # the hostname, that machine's flatpak list and printer) live there.

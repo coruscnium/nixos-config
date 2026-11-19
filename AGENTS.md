@@ -29,8 +29,8 @@ and a broken boot.
 
 | Dir | Level | What belongs |
 |---|---|---|
-| `modules/` | Home Manager — **shared by both hosts** | `home.packages`, `home.file`, `systemd.user.*`, `programs.*` — what the *user* wants on any machine |
-| `nixos/` | NixOS — **shared by both hosts** | policy true of every host: `services.*`, `users.users`, `environment.systemPackages`. Nothing machine-specific |
+| `modules/` | Home Manager — **shared by every host** | `home.packages`, `home.file`, `systemd.user.*`, `programs.*` — what the *user* wants on any machine |
+| `nixos/` | NixOS — **shared by every host** | policy true of every host: `services.*`, `users.users`, `environment.systemPackages`. Nothing machine-specific |
 | `hosts/<name>/` | per-host, NixOS **and** Home Manager | `hardware.nix` (UUIDs, GPUs), `boot.nix` (only the panel: Limine wallpaper + interface resolution), `networking.hostName`, `hm.nix` (that host's Home Manager aggregator), its `flatpaks.nix` app list, and any host-only service |
 | `pkgs/` | overlay | custom packages; `default.nix` is the overlay function |
 | `scripts/` | raw shell | wrapped into derivations by `pkgs/scripts.nix` |
@@ -41,21 +41,20 @@ and a broken boot.
 `hosts/<name>/` is what makes one box that box. `modules/default.nix`, `nixos/default.nix` and each
 `hosts/<name>/default.nix` are pure `imports = [ ... ]` aggregators.
 
-**Both hosts import `nixos/default.nix` and `modules/default.nix` whole — never a hand-picked list.**
-A machine that needs a subset is a sign the thing belongs in `hosts/<name>/`, not a reason to
-enumerate. This is load-bearing: the hand-maintained lists were how the laptop silently lost flatpak
-(and, later, Steam) while the desktop kept working. To give one machine an extra, put it in
-`hosts/<name>/`; to give both, put it in `nixos/` or `modules/`.
+**Every host imports `nixos/default.nix` and `modules/default.nix` whole — never a hand-picked
+list.** A machine that needs a subset is a sign the thing belongs in `hosts/<name>/`, not a reason
+to enumerate. This is load-bearing: hand-maintained lists were how one host silently lost flatpak
+(and, later, Steam) while another kept working. To give one machine an extra, put it in
+`hosts/<name>/`; to give every host, put it in `nixos/` or `modules/`.
 
-Each host has an `hm.nix`. `hosts/coru/hm.nix` imports the desk-only categories
-(`modules/hardware.nix`, `modules/maker.nix`, `modules/services-desktop.nix`); `hosts/laptop/hm.nix`
-is just `imports = [ ../../modules ]`.
+Each host has an `hm.nix`. `hosts/coru/hm.nix` imports the shared set plus the desk-only
+categories (`modules/hardware.nix`, `modules/maker.nix`, `modules/services-desktop.nix`).
 
 ## Where a new thing goes, in preference order
 
 1. **In nixpkgs** → `home.packages` in the matching `modules/<category>.nix`. Admin/system tooling →
-   `environment.systemPackages` in `nixos/system.nix`. If it only makes sense on the desktop, or only
-   on the laptop, it goes in `hosts/<name>/` instead — the shared dirs are for what both want.
+   `environment.systemPackages` in `nixos/system.nix`. If it only makes sense on the desktop, it
+   goes in `hosts/<name>/` instead — the shared dirs are for what every machine wants.
 2. **In chaotic-nyx** → top-level `pkgs`.
 3. **Custom package** → new `pkgs/<name>.nix`, called from `pkgs/default.nix`.
 4. **nvfetcher-pinned upstream** → root-level table in `nvfetcher.toml`, then `nix run nixpkgs#nvfetcher`.
@@ -91,7 +90,7 @@ because NUR's 2026-11-03 revision cannot be unpacked. Re-adding it means re-addi
     forgotten, nothing installed twice.
 12. **The nyx cache module is required.** `chaotic.nixosModules.nyx-cache` must stay enabled, or every
     nyx package (proton-cachyos) is built from source instead of downloaded.
-13. **Nothing machine-specific in `nixos/` or `modules/`.** Both are imported whole by both hosts. A
+13. **Nothing machine-specific in `nixos/` or `modules/`.** Both are imported whole by every host. A
     flatpak list, a printer, a peripheral, a VR runtime — anything only one box wants — belongs in
     `hosts/<name>/`. If you find yourself hand-picking modules for a host, that is the bug.
 

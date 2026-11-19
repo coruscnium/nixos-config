@@ -70,7 +70,7 @@
   ];
   # LACT reaches the 9070 XT through sysfs, and clocks/voltage offsets stay
   # locked behind ppfeaturemask without overdrive. RDNA4 on a desktop chassis,
-  # so unlike the laptop the fan curve LACT writes here is a real one.
+  # so the fan curve LACT writes here is a real one.
   # 0xfffd7fff is the module default, kept on purpose -- 0xffffffff flickers.
   hardware.amdgpu.overdrive.enable = true;
 

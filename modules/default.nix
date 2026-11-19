@@ -1,7 +1,7 @@
-# Category modules for coru's home-manager configuration. Both hosts import this
-# whole set -- it is what the *user* wants on any machine. Desk-bound categories
-# (peripherals, 3D printing, the desk's user units) are NOT listed here: they are
-# imported by ../hosts/coru/hm.nix, so the laptop never carries them.
+# Category modules for coru's home-manager configuration. hosts/coru/hm.nix
+# imports this whole set -- it is what the *user* wants on any machine. Desk-bound
+# categories (peripherals, 3D printing, the desk's user units) are NOT listed
+# here: that hm.nix imports them instead.
 #
 # Add a new shared category to this list; add a desk-only one to hosts/coru/hm.nix.
 {
