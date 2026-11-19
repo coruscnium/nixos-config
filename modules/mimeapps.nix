@@ -1,13 +1,74 @@
-{ ... }:
+{ lib, ... }:
 
 # Declarative MIME/URL-scheme defaults. home-manager owns ~/.config/mimeapps.list
 # here, so KDE's System Settings can no longer persist a change to it -- edits go
 # through this file. Desktop ids resolve via the profile's share/applications, so a
 # rename upstream leaves a dangling association rather than a boot failure.
+let
+  # Every video container mpv's own .desktop claims, plus the playlist and
+  # streaming types that arrive as media links. umpv, not mpv: same player,
+  # single-instance socket, so a second file queues into the window already
+  # open instead of spawning another. Audio is deliberately absent -- those
+  # stay on whatever KDE picks.
+  videoMimeTypes = [
+    "video/mpeg"
+    "video/x-mpeg2"
+    "video/x-mpeg3"
+    "video/mp4"
+    "video/mp4v-es"
+    "video/x-m4v"
+    "application/x-extension-mp4"
+    "video/divx"
+    "video/vnd.divx"
+    "video/msvideo"
+    "video/x-msvideo"
+    "video/avi"
+    "video/x-avi"
+    "video/vnd.avi"
+    "video/quicktime"
+    "video/ogg"
+    "video/x-theora"
+    "video/x-theora+ogg"
+    "video/x-matroska"
+    "video/mkv"
+    "application/x-matroska"
+    "video/webm"
+    "video/x-flv"
+    "video/flv"
+    "video/x-flic"
+    "video/fli"
+    "video/x-flc"
+    "video/x-ms-wmv"
+    "video/x-ms-wmx"
+    "video/x-ms-wvxvideo"
+    "video/x-ms-asf"
+    "video/x-ms-afs"
+    "video/vnd.rn-realvideo"
+    "video/x-ogm"
+    "video/x-ogm+ogg"
+    "application/x-ogm-video"
+    "video/mp2t"
+    "video/3gp"
+    "video/3gpp"
+    "video/3gpp2"
+    "video/dv"
+    "application/mxf"
+    "application/sdp"
+    "application/smil"
+    "application/x-smil"
+    "application/streamingmedia"
+    "application/x-streamingmedia"
+    "application/vnd.rn-realmedia"
+    "application/vnd.rn-realmedia-vbr"
+    "application/x-mpegurl"
+    "application/vnd.apple.mpegurl"
+    "video/vnd.mpegurl"
+  ];
+in
 {
   xdg.mimeApps.enable = true;
 
-  xdg.mimeApps.defaultApplications = {
+  xdg.mimeApps.defaultApplications = lib.genAttrs videoMimeTypes (_: "umpv.desktop") // {
     "x-scheme-handler/mailto" = "tutanota-desktop.desktop";
     "x-scheme-handler/tuta" = "tutanota-desktop.desktop";
 
