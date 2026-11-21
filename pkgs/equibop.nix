@@ -144,7 +144,7 @@ stdenv.mkDerivation {
     # Unconditional: --ozone-platform-hint=auto resolves to X11 when Wayland is
     # absent, so this is correct under either session.
     mkdir -p $out/bin
-    cat > $out/bin/equibop <<WRAPPER
+    cat > $out/bin/equibop <<'WRAPPER'
     #!${stdenv.shell}
     # Native modules live INSIDE app.asar. Electron extracts them to a temp dir
     # before dlopen()ing, so they carry no RUNPATH and autoPatchelfHook cannot see
@@ -153,9 +153,14 @@ stdenv.mkDerivation {
     # picker), game-detection-x64.node -> libstdc++, libvesktop-x64.node ->
     # libglib/libgio/libgobject + libstdc++. Missing any one of these is silent:
     # the feature's list just comes up empty.
+    #
+    # libGL is libglvnd. Chromium's ANGLE dlopen()s libEGL.so.1, which is the
+    # libglvnd dispatcher, not the Mesa driver in /run/opengl-driver. The binary
+    # links it but does not carry it in RUNPATH, so it must be on the path.
     LD_LIBRARY_PATH=${
       lib.makeLibraryPath [
         glib
+        libGL
         libpulseaudio
         pipewire
         stdenv.cc.cc.lib
@@ -173,7 +178,7 @@ stdenv.mkDerivation {
       --ozone-platform-hint=auto \
       --enable-features=WaylandWindowDecorations \
       --enable-wayland-ime=true \
-      "\$@"
+      "$@"
     WRAPPER
     chmod +x $out/bin/equibop
 
