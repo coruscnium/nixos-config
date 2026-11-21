@@ -74,6 +74,13 @@
   # 0xfffd7fff is the module default, kept on purpose -- 0xffffffff flickers.
   hardware.amdgpu.overdrive.enable = true;
 
+  # The three monitors are brightness-controlled over DDC/CI, which is just I2C
+  # on the GPU's DDC lines. i2c-dev is not loaded by default, so /dev/i2c-*
+  # never appears and PowerDevil reads every external display as 0%. This loads
+  # the module, creates the i2c group, and tags the nodes uaccess so the seat
+  # user can write to them.
+  hardware.i2c.enable = true;
+
   # Radeon RX 9070 XT (RDNA4). ROCm for Blender Cycles / Resolve / LM Studio; the
   # desktop itself uses the mesa/vulkan path. `enable` is the platform baseline
   # (nixos/platform.nix).

@@ -12,6 +12,7 @@
     streamcontroller # autostarts itself; watchdog in services.nix
     openrgb
     brightnessctl
+    ddcutil # external monitors over DDC/CI; also the CLI to verify the i2c path
     uhubctl
 
     btop
