@@ -163,7 +163,13 @@ stdenv.mkDerivation {
     }''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
     export LD_LIBRARY_PATH
 
+    # Chromium takes Xft.dpi/96 as a base device scale and THEN multiplies by the
+    # Wayland output's fractional scale. KWin exports Xft.dpi 129 (the 135% output),
+    # so the app lands on 1.6125 against a 1.2 screen and 1.68 against the 1.25
+    # portrait -- UI a third too big, window wider than the monitor. Pinning the base
+    # to 1 leaves the factor equal to the output's own scale (measured 1.2 and 1.25).
     exec ${placeholder "out"}/opt/equibop/equibop \
+      --force-device-scale-factor=1 \
       --ozone-platform-hint=auto \
       --enable-features=WaylandWindowDecorations \
       --enable-wayland-ime=true \
